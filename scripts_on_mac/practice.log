@@ -1,0 +1,10 @@
+2022-07-28 21:29:40 - all_log - practice.py - <module> - 14 - INFO - 你好wolrd
+2022-07-28 21:29:40 - all_log - practice.py - <module> - 15 - WARNING - 监控报警，这是警号
+2022-07-28 21:30:06 - all_log - practice.py - <module> - 14 - INFO - 你好wolrd
+2022-07-28 21:30:06 - all_log - practice.py - <module> - 15 - WARNING - 监控报警，这是警号
+2022-07-28 21:31:02 - all_log - practice.py - <module> - 14 - INFO - 你好wolrd
+2022-07-28 21:31:02 - all_log - practice.py - <module> - 15 - WARNING - 监控报警，这是警号
+2022-07-28 21:31:24 - all_log - practice.py - <module> - 14 - INFO - 你好wolrd
+2022-07-28 21:31:25 - all_log - practice.py - <module> - 15 - WARNING - 监控报警，这是警号
+2022-07-28 21:33:47 - all_log - practice.py - <module> - 14 - INFO - 你好wolrd
+2022-07-28 21:33:47 - all_log - practice.py - <module> - 15 - WARNING - 监控报警: 这是警号第2次
