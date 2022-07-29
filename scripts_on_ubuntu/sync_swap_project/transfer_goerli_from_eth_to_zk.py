@@ -9,7 +9,7 @@ import sys
 sys.path.append('../')
 
 
-from basic.functions import *
+from functions import *
 
 #准备工作：登陆小狐狸，获取小狐狸账户个数。这是第0个标签
 url_dashboard = 'http://clash.razord.top/#/proxies'

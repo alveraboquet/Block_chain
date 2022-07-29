@@ -1,7 +1,11 @@
 
+# import os,inspect
+# current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+# print("目录是：",current_dir)
+# os.chdir(current_dir)
 import sys
+# sys.path.append('../')
 sys.path.append('/home/parallels/ubuntu_op/Block_chain')
-
 
 from functions import *
 # excel_path = "/home/parallels/Documents/block_chain/sync_swap_50.xlsx"
