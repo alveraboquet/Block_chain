@@ -3090,7 +3090,7 @@ def wait_OP_transfer_ok(wait):
 def orb_whether_connect_wallet(wait):
     print("我已进入orb_whether_connect_wallet，判断 orb 是否要连接钱包")
     try:
-        orb_connect_wallet =  wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='unLoginBtn']")))
+        orb_connect_wallet =  wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[2]/div/span/span')))
         print("orb 找到的按钮是", orb_connect_wallet.text)
         return orb_connect_wallet.text
     except:
@@ -3102,13 +3102,13 @@ def orb_connect_wallet(browser, wait):
     print("我已进入orb_connect_wallet()，orb 确实要连接钱包")
     try:
         # 点击连接钱包
-        orb_connect_wallet =  wait.until(EC.element_to_be_clickable((By.XPATH, "//span[@class='w700 s16']")))
-        time_sleep(3, "已经找到按钮")
+        orb_connect_wallet =  wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[2]/div/span/span')))
+        time_sleep(2, "已经找到按钮")
         browser.execute_script("arguments[0].click();", orb_connect_wallet)
 
         # 选择小狐狸
-        metamask_wallet = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='Connect']")))
-        time_sleep(3, "已经找到小狐狸")
+        metamask_wallet = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[2]/div/div[2]/span')))
+        time_sleep(2, "已经找到小狐狸")
         browser.execute_script("arguments[0].click();", metamask_wallet)
         print("orb_connect_wallet，连接钱包，点击小狐狸结束")
     except:
@@ -3116,54 +3116,24 @@ def orb_connect_wallet(browser, wait):
         return None
 
 # orb 选择from 和 to
-def L2_orb_L2_prepare_transfer_coin(browser, wait, L2_ETH_value, from_source, to_destination):
+def L2_orb_L2_prepare_transfer_coin(browser, wait, from_source_value, to_source_value):
     print("我已经进入L2_orb_L2_prepare_transfer_coin，输入交易金额，准备交易")
-    try:
-        #下拉按钮
-        from_list_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='content']/div[1]//div[@class='bottomItem']/div[@class='left']")))  # Ethereum   #Polygon  #Arbitrum One
-        time_sleep(2)
-        browser.execute_script("arguments[0].click();", from_list_button)
-
-        #选择from chain
-        From_chain_button = wait.until(EC.element_to_be_clickable(
-            (By.XPATH,
-             f"//div[@class='o-box-content senderbody']/div[6]//div[@class='selectChainContent']//span[text()='{from_source}']")))  # "zkSync" "Arbitrum" "Optimism"
-        time_sleep(2)
-        browser.execute_script("arguments[0].click();", From_chain_button)
-    except:
-        print("L2_orb_L2_prepare_transfer_coin(), 没有找到 from 链")
-
-    # To——链
-    try:
-        # 下拉按钮
-        to_list_button = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                                  "//div[@class='content']/div[2]//div[@class='bottomItem']/div[@class='left']")))  # Ethereum   #Polygon  #Arbitrum One
-        time_sleep(2)
-        browser.execute_script("arguments[0].click();", to_list_button)
-
-        # 选择from chain
-        to_chain_button = wait.until(EC.element_to_be_clickable(
-            (By.XPATH,
-             f"//div[@class='o-box-content senderbody']/div[7]//div[@class='selectChainContent']//span[text()='{to_destination}']")))  # "zkSync" "Arbitrum" "Optimism"
-        time_sleep(2)
-        browser.execute_script("arguments[0].click();", to_chain_button)
-    except:
-        print("L2_orb_L2_prepare_transfer_coin(), 没有找到 to 链")
+    
 
     # 三、选择要换多少钱
     BTH_input_button = wait.until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@class='right']")))
+        EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[2]/div/div[2]/div[2]/div[2]/input')))
 
     #========================法一：随机金额
-    point = random.randint(3, 4)  # 小数点最起码要有3位，不然会被向上取整，导致 orb 无法交易
-    input_value = round(random.uniform((L2_ETH_value) * (0.45), (L2_ETH_value) * (0.5)), point)
-    while input_value > float(L2_ETH_value):
-        point = random.randint(2, 4)  # 小数点最起码要有2位，因为L1的ETH金额一般是两位小数以上
-        input_value = round(random.uniform((L2_ETH_value) * (0.85), (L2_ETH_value) * (0.9)), point)
-    print("本次随机转账的ETH金额是：", input_value)
+    # point = random.randint(3, 4)  # 小数点最起码要有3位，不然会被向上取整，导致 orb 无法交易
+    # input_value = round(random.uniform((from_source_value) * (0.45), (from_source_value) * (0.5)), point)
+    # while input_value > float(from_source_value):
+    #     point = random.randint(2, 4)  # 小数点最起码要有2位，因为L1的ETH金额一般是两位小数以上
+    #     input_value = round(random.uniform((from_source_value) * (0.85), (from_source_value) * (0.9)), point)
+    # print("本次随机转账的ETH金额是：", input_value)
     
-    BTH_input_button.send_keys(str(input_value))  # 随机金额
-    time_sleep(5,"已经输入随机金额")
+    # BTH_input_button.send_keys(str(input_value))  # 随机金额
+    # time_sleep(5,"已经输入随机金额")
     #============================================
 
     #
@@ -3175,6 +3145,17 @@ def L2_orb_L2_prepare_transfer_coin(browser, wait, L2_ETH_value, from_source, to
     # input_value = "全部"
     # time_sleep(5,"已经输入max金额")
     ## ============================================
+
+    #========================法三：对半转账
+    point = random.randint(3, 4)  # 小数点最起码要有3位，不然会被向上取整，导致 orb 无法交易
+    average_value = (from_source_value + to_source_value)/2 
+    input_differ_value = from_source_value - average_value # 从源转出去多少钱
+    input_value = round(random.uniform((input_differ_value) * (0.8), (input_differ_value) * (0.9)), point)
+    
+    print("本次随机转账的ETH金额是：", input_value)
+    
+    BTH_input_button.send_keys(str(input_value))  # 随机金额
+    time_sleep(5,"已经输入随机金额")
     
     #点击Send
     send_button = wait.until(
@@ -3183,7 +3164,7 @@ def L2_orb_L2_prepare_transfer_coin(browser, wait, L2_ETH_value, from_source, to
     browser.execute_script("arguments[0].click();", send_button)
     time_sleep(8, "已经点击 send ，等待 orb 响应")
     # 获取orb gas fee
-    orb_gas_fee = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="aliveRouter"]/div/div/div[3]/div/span[2]')))
+    orb_gas_fee = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[4]/div/div[2]/div[2]/span')))
 
     # 点击confirm and send
     confirm_and_send = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='CONFIRM AND SEND']")))
@@ -3191,35 +3172,55 @@ def L2_orb_L2_prepare_transfer_coin(browser, wait, L2_ETH_value, from_source, to
     browser.execute_script("arguments[0].click();", confirm_and_send)
     time_sleep(10, "已经点击confirm and send，等待 orb 响应")
 
-    #
     return f" 本次交易额是：{input_value}, orb 显示 withholding fee 手续费是：{orb_gas_fee.text}"
 
 
 
 # 从 orb 上获取生态的实时余额，返回的是浮点数
 # Optimism、Arbitrum、zkSync
-def get_L2_balance_from_orb(browser, wait, from_source):
+def get_L2_balance_from_orb(browser, wait, from_source, to_source):
     print("我已经进入get_L2_balance_from_orb，准备获取 L2 生态的实时金额")
     try:
         # 下拉按钮
         from_list_button = wait.until(EC.element_to_be_clickable((By.XPATH,
-                                                                  "//div[@class='content']/div[1]//div[@class='bottomItem']/div[@class='left']")))  # Ethereum   #Polygon  #Arbitrum One
-        time_sleep(2)
+                                                                  '//*[@id="app"]/div[1]/div[2]/div/div[2]/div/div[2]/div[2]/div[1]')))  # Ethereum   #Polygon  #Arbitrum One
+        time_sleep(2,"开始找from_source的余额")
         browser.execute_script("arguments[0].click();", from_list_button)
 
         # 选择from chain
         From_chain_button = wait.until(EC.element_to_be_clickable(
             (By.XPATH,
-             f"//div[@class='o-box-content senderbody']/div[6]//div[@class='selectChainContent']//span[text()='{from_source}']")))  # "zkSync" "Arbitrum" "Optimism"
+             f"//*[@id='app']/div[1]/div[2]/div/div[2]/div/div[5]/div[2]/div/div/div[2]/div//span[text()='{from_source}']")))  # "zkSync" "Arbitrum" "Optimism"
         time_sleep(2)
         browser.execute_script("arguments[0].click();", From_chain_button)
     except:
         print("L2_orb_L2_prepare_transfer_coin(), 没有找到 from 链")
 
-    time_sleep(5, "等待orb显示出网络")
-    balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='content']/div[1]//div[@class='right']/span")))
-    time.sleep(2)
-    return float(balance_button.text)
+    
+    time_sleep(2, "开始找to_source的余额")
+
+    try:
+        # 下拉按钮
+        to_list_button = wait.until(EC.element_to_be_clickable((By.XPATH,
+                                                                  "//*[@id='app']/div[1]/div[2]/div/div[2]/div/div[3]/div[2]/div[1]")))  # Ethereum   #Polygon  #Arbitrum One
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", to_list_button)
+
+        # 选择from chain
+        to_chain_button = wait.until(EC.element_to_be_clickable(
+            (By.XPATH,
+             f"//*[@id='app']/div[1]/div[2]/div/div[2]/div/div[6]/div[2]/div/div/div[2]/div//span[text()='{to_source}']")))  # "zkSync" "Arbitrum" "Optimism"
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", to_chain_button)
+    except:
+        print("L2_orb_L2_prepare_transfer_coin(), 没有找到 to 链")
+
+    time_sleep(5, "等待orb显示出余额")
+    from_balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[2]/div/div[2]/div[1]/div[2]/span')))
+    to_balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[2]/div/div[3]/div[1]/div[2]/span')))
+    
+
+    return float(from_balance_button.text),float(to_balance_button.text)
 
 
 ##↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ orb 的一些函数↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #

@@ -1,13 +1,8 @@
-# 功能：把zk的钱，转移到op
+# 功能：把zk的钱，转移到op, 各分一半
 # ARB 的钱转到其他生态
-#user data 1：excel表格2~50，chrome2~50，Chrome1
-#user data 2：excel表格51~100，相差49，chrome2~51，Chrome2
-#user data 3：excel表格101~150，相差99，chrome2~51，Chrome3
-#user data 4：excel表格151~200，相差149，chrome2~51，Chrome4
-#user data 5：#excel表格2~200，相差0，chrome 2~201，Chrome5
 import time
 import sys
-sys.path.append('/home/parallels/ubuntu_op/Block_chain')
+sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
 from functions import *
 
 # L2——》lifi——》L2，可以实现：
@@ -122,40 +117,42 @@ def L2_orb_L2(browser, wait, from_source, to_destination):
 
         # 获取 L2 实时金额，比如zk的余额从 orb 上找
         # Optimism、Arbitrum、zkSync，返回的是浮点数
-        L2_ETH_value = get_L2_balance_from_orb(browser, wait, "zkSync")
-        print(f"这个号在 orb 上的实时 Optimism 金额是：{L2_ETH_value}")
-
+        from_source_value, to_source_value = get_L2_balance_from_orb(browser, wait, from_source, to_destination)
+        print(f"{from_source}的实时金额是: {from_source_value}, {to_destination}的实时金额是: {to_source_value}")
+        
         ########## lifi准备换币。返回本次的交易值
-        transfer_detail = L2_orb_L2_prepare_transfer_coin(browser, wait, L2_ETH_value, from_source,
-                                                          to_destination)
+        transfer_detail = L2_orb_L2_prepare_transfer_coin(browser, wait, from_source_value, to_source_value)
         # print(transfer_detail)
         # 切换到第小狐狸，刷新，签名。
         switch_tab_by_handle(browser, 1, 1)
         for i in range(1,3):#必须要签名2次
             fox_info = fox_confirm_sign(browser, wait)
-            time_sleep(15, f"第{i}次签名结束")
+            time_sleep(25, f"第{i}次签名结束")
 
         ######## 确认交易
         # fox_info = fox_confirm_L2_swap(browser, wait)  #这个网络不用签名3次
         switch_tab_by_handle(browser, 2, 0)
         orb_fail = ""
-        try:  # 如果orb 上这个按钮还在，说明转账失败
-            confirm_and_send = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='CONFIRM AND SEND']")))
-            if confirm_and_send:
-                orb_fail = f"小狐狸点击确认后，orb失败，还是没有转过去"
+        try:  # 如果Completed，说明转账success
+            confirm_and_send = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[4]/div/div[1]')))
+            if confirm_and_send.text == "Completed":
+                print("小狐狸点击确认后，orb转过去了")
+                orb_fail = "orb 成功"
                 return orb_fail
         except:
-            print("小狐狸点击确认后，orb转过去了")
+            orb_fail = "orb失败"
+            print("orb失败")
+            return orb_fail
 
-        if "成功" in fox_info:
-            if "orb失败" not in orb_fail:
-                all_info = f"【成功】通过orb，资金从{from_source}转到{to_destination} " + transfer_detail + f" {fox_info}"
-                return all_info
-            print("小狐狸点击确认后，orb失败，还是没有转过去")
-            return "小狐狸点击确认后，orb失败，还是没有转过去"
-        else:
-            print(fox_info)
-            return fox_info  # 失败了，orb
+        # if "成功" in fox_info:
+        #     if "失败" not in orb_fail:
+        #         all_info = f"【成功】通过orb，资金从{from_source}转到{to_destination} " + transfer_detail + f" {fox_info}"
+        #         return all_info
+        #     print("小狐狸点击确认后，orb失败，还是没有转过去")
+        #     return "小狐狸点击确认后，orb失败，还是没有转过去"
+        # else:
+        #     print(fox_info)
+        #     return fox_info  # 失败了，orb
     else:
         print("L2_orb_L2(), 源输入错误")
 
@@ -185,7 +182,7 @@ def zk_orb_ARB(write_success_to_excel_column):
         Do_Excel(excel_path).write(i, "W", info)
 
 
-excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_操作后.xlsx'
+excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_操作后.xlsx'
 write_success_to_excel_column = "L"  #把成功或失败记录到excel的列
 read_from_excel_column = "L" #从excel中的哪一列读取状态? 判断是不是要做任务?
 excel_start_row = 2
@@ -213,8 +210,7 @@ while True:
                 delete_cookie(browser)
                 login_metamask(browser, wait, metamask_pw, metamask_home)
                 fox_change_account(browser, wait, i)
-                
-                time_sleep(3600, "waiting......")
+        
 
                 #==== 开始任务
                 a = random.randint(2, 2)
