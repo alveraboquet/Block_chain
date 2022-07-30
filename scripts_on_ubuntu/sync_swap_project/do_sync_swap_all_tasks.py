@@ -5,13 +5,10 @@
 #4)解除流动性
 
 #为了跨文件夹导入包
-import os,inspect
-current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-os.chdir(current_dir)
 import sys
-sys.path.append('../')
+sys.path.append('/home/parallels/ubuntu_op/Block_chain')
+from functions import *
 
-from basic.functions import *
 
 #准备工作：登陆小狐狸，获取小狐狸账户个数。这是第0个标签
 url_dashboard = 'http://clash.razord.top/#/proxies'
