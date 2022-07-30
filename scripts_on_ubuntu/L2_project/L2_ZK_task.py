@@ -91,38 +91,6 @@ def ZK_zigzag_in_out(browser, wait):
         return fox_info
 
 
-# #做 ZK 上的 tevaera
-# def ZK_tevaera(browser, wait,L1_ETH_value):
-#     print("通过ZK官方桥，转到ZK。第一步是：小狐狸切换到主网")
-#     fox_change_network(browser, wait, "Ethereum")
-#     new_tab(browser, ZK_url)
-#     time.sleep(10)
-#     switch_tab_by_handle(browser, 2, 0)  # 切换到第
-#
-#     #判断是否连接小狐狸
-#     zk_connect_wallet(browser, wait)
-#     time.sleep(5)
-#     #返回转账值
-#     input_balance = zk_prepare_transfer(browser, wait, L1_ETH_value, L1_ETH_save_min)
-#     time.sleep(15)
-#
-#     # 小狐狸确认交易
-#     switch_tab_by_handle(browser, 1, 1)  # 切换到第1个标签页：
-#     success_or_fail = fox_confirm_swap(browser, wait)  # 小狐狸确认交易
-#
-#     if "成功" in success_or_fail:
-#         # 回到 zk，关闭它
-#         switch_tab_by_handle(browser, 2, 0)  # 切换
-#         wait_zk_complete(wait)  # 等待关闭
-#         time.sleep(3)
-#         detail = f"【成功】通过ZK官方桥，转到ZK：{input_balance}ETH，{success_or_fail}"
-#         switch_tab_by_handle(browser, 1, 0)  # 再切回小狐狸
-#         return detail
-#     else:
-#         detail = f"【失败】通过ZK官方桥，转到ZK：{input_balance}ETH，{success_or_fail}"
-#         switch_tab_by_handle(browser, 1, 0)  # 再切回小狐狸
-#         return detail
-
 excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_操作后.xlsx'
 #excel中, 标志列(用于记录任务成功或失败)
 # B列 = goerli转到zk上,
@@ -137,7 +105,7 @@ excel_start_row = 2
 browser_wait_times = 30
 
 while 1:
-    for i in range(22, 201):
+    for i in range(10, 201):
         success_or_fail = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         current_major_token = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         print(f"现在的运行状态是：{success_or_fail}, 主要代币是：{current_major_token}")
@@ -161,31 +129,32 @@ while 1:
                     login_metamask(browser, wait, metamask_pw, metamask_home, "Ethereum")
                     switch_tab_by_handle(browser, 1, 0)  # 切换到小狐狸
                     # 小狐狸换号
-                    print(f"=========================================开始换号{i} ==============")
+                    print(f"==============开始换号{i} ==============")
                     fox_change_account(browser, wait, i)  #换号，选列表里的
 
                     ##=========== 开始做任务
+                    #正向操作，记录保存信息到excel
                     save_record = ZK_zigzag_in_out(browser, wait)
-                    #保存信息到excel
                     if "ZK zigzag" in save_record:
-                        Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').write(i, "V", save_record)  #写到账号所在的行，zk_accounts[i] 不用改，就是用 excel 里的行
-                        Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').write(i, "P", "√")
+                        Do_Excel(excel_path).write(i, "V", save_record)  #
                         time_sleep(30, f"{save_record}，日志写入excel成功，30 秒后反向操作")
                     else:
-                        Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').write(i, "V", save_record)  # 写到账号所在的行，zk_accounts[i] 不用改，就是用 excel 里的行
+                        Do_Excel(excel_path).write(i, "V", save_record)  # 
                         time_sleep(30, f"{save_record}，日志写入excel成功，30 秒后反向操作")
-                    #===========反向操作
+
+                    #===========反向操作, 保存信息到excel
                     save_record = ZK_zigzag_in_out(browser, wait)
-                    ##保存信息到excel
                     if "ZK zigzag" in save_record:
-                        Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').write(i, "V", save_record)
-                        Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').write(i, "P", "√")
+                        Do_Excel(excel_path).write(i, "V", save_record)
+                        Do_Excel(excel_path).write(i, "P", "√")
                         time_sleep(2, f"{save_record}，日志写入excel成功")
                     else:
-                        Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').write(i, "V", save_record)  # 写到账号所在的行，zk_accounts[i] 不用改，就是用 excel 里的行
+                        Do_Excel(excel_path).write(i, "V", save_record)  
                         time_sleep(2, f"{save_record}，日志写入excel成功")
+                    
+                    # 
+                    Do_Excel(excel_path).plain_write(i, write_success_to_excel_column, "成功")
                     ##=========== 这里要设置随机等待时间
-                    Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').plain_write(i, "N", "成功")
                     a = random.randint(10, 15)
                     time_sleep(a, f"++++++++++随机等待时间{a}")
                     browser.quit()
@@ -195,7 +164,7 @@ while 1:
                 except:
                     ##=========== 使用指定工作表，保存信息到excel
                     print(f"----第{i}出错了，是excel没关闭吗？")
-                    Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').plain_write(i, "N", "×")
+                    Do_Excel(excel_path).plain_write(i, write_success_to_excel_column, "×")
                     time_sleep(6, "出错了")
                     browser.quit()
                     continue
