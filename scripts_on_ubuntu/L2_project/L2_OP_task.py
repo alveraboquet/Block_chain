@@ -2,6 +2,7 @@
 # 主要是swap，自动判断从金额高的token转到低token
 import sys
 sys.path.append('/home/parallels/ubuntu_op/Block_chain')
+sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
 from functions import *
 
 #####################一些url

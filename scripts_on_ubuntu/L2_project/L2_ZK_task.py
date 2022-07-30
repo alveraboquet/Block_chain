@@ -1,5 +1,6 @@
 import sys
 sys.path.append('/home/parallels/ubuntu_op/Block_chain')
+sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
 from functions import *
 
 #============ZK上的项目
@@ -91,7 +92,7 @@ def ZK_zigzag_in_out(browser, wait):
         return fox_info
 
 
-excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_操作后.xlsx'
+excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_操作后.xlsx'
 #excel中, 标志列(用于记录任务成功或失败)
 # B列 = goerli转到zk上,
 # C列 = ETH转USDC, D列 = USDC转ETH
@@ -114,13 +115,14 @@ while 1:
                 print(f"第{i} 个号需要做 zk ")
                 try:
                         ##=========== 准备浏览器
-                    which_chrome = 5
-                    wait, browser = my_chrome(which_chrome)
+                    wait, browser = my_linux_chrome()
 
                     ##=========== 预备步骤：切换IP。先打开
                     open_clash_dashboard(browser, wait, url_dashboard)
                     # switch_tab_by_handle(browser, 0, 0)  # 再切回 clash
-                    ip_switcher(browser, wait, url_google)  # 这里会新建一个标签页
+                    # ip_switcher(browser, wait, url_google)  # 这里会新建一个标签页
+                    random_select_clash_ip(browser, wait)
+
 
                     ##=========== 清理缓存（从上面新建的标签页里，打开下面的链接）
                     delete_cookie(browser)
@@ -131,7 +133,8 @@ while 1:
                     # 小狐狸换号
                     print(f"==============开始换号{i} ==============")
                     fox_change_account(browser, wait, i)  #换号，选列表里的
-
+                    
+                    time_sleep(3600, "waiting")
                     ##=========== 开始做任务
                     #正向操作，记录保存信息到excel
                     save_record = ZK_zigzag_in_out(browser, wait)
