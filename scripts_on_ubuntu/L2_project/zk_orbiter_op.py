@@ -127,7 +127,7 @@ def L2_orb_L2(browser, wait, from_source, to_destination):
         switch_tab_by_handle(browser, 1, 1)
         for i in range(1,3):#必须要签名2次
             fox_info = fox_confirm_sign(browser, wait)
-            time_sleep(25, f"第{i}次签名结束")
+            time_sleep(15, f"第{i}次签名结束")
 
         ######## 确认交易
         # fox_info = fox_confirm_L2_swap(browser, wait)  #这个网络不用签名3次
