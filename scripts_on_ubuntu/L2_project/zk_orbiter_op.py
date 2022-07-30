@@ -188,8 +188,8 @@ read_from_excel_column = "L" #从excel中的哪一列读取状态? 判断是不�
 excel_start_row = 2
 browser_wait_times = 30
 
-while True:
-    for i in range(2, 201):
+
+for i in range(4, 201):
         #============ 首先确定要转的源是哪个，比如 from 源是 ZK
         success_or_fail = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         print(f"现在的运行状态是：{success_or_fail}")
