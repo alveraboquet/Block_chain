@@ -3154,25 +3154,28 @@ def L2_orb_L2_prepare_transfer_coin(browser, wait, L2_ETH_value, from_source, to
     BTH_input_button = wait.until(
         EC.element_to_be_clickable((By.XPATH, "//input[@class='right']")))
 
-    # 法一：随机金额
-    # point = random.randint(3, 4)  # 小数点最起码要有3位，不然会被向上取整，导致 orb 无法交易
-    # input_value = round(random.uniform((L2_ETH_value) * (0.85), (L2_ETH_value) * (0.9)), point)
-    # while input_value > float(L2_ETH_value):
-    #     point = random.randint(2, 4)  # 小数点最起码要有2位，因为L1的ETH金额一般是两位小数以上
-    #     input_value = round(random.uniform((L2_ETH_value) * (0.85), (L2_ETH_value) * (0.9)), point)
-    # print("本次随机转账的ETH金额是：", input_value)
-    #
-    # BTH_input_button.send_keys(str(input_value))  # 随机金额
-    # time_sleep(5,"已经输入随机金额")
-    #
-    #法二：最大化
-    max_button = wait.until(
-        EC.element_to_be_clickable((By.XPATH, '//*[@id="aliveRouter"]/div/div[2]/div[1]/div[2]/div[2]/button/span')))
-    time_sleep(2)
-    browser.execute_script("arguments[0].click();", max_button)
-    time_sleep(5,"已经输入max金额")
-    input_value = "全部"
+    #========================法一：随机金额
+    point = random.randint(3, 4)  # 小数点最起码要有3位，不然会被向上取整，导致 orb 无法交易
+    input_value = round(random.uniform((L2_ETH_value) * (0.45), (L2_ETH_value) * (0.5)), point)
+    while input_value > float(L2_ETH_value):
+        point = random.randint(2, 4)  # 小数点最起码要有2位，因为L1的ETH金额一般是两位小数以上
+        input_value = round(random.uniform((L2_ETH_value) * (0.85), (L2_ETH_value) * (0.9)), point)
+    print("本次随机转账的ETH金额是：", input_value)
+    
+    BTH_input_button.send_keys(str(input_value))  # 随机金额
+    time_sleep(5,"已经输入随机金额")
+    #============================================
 
+    #
+    # #=========================法二：最大化
+    # max_button = wait.until(
+    #     EC.element_to_be_clickable((By.XPATH, '//*[@id="aliveRouter"]/div/div[2]/div[1]/div[2]/div[2]/button/span')))
+    # time_sleep(2)
+    # browser.execute_script("arguments[0].click();", max_button)
+    # input_value = "全部"
+    # time_sleep(5,"已经输入max金额")
+    ## ============================================
+    
     #点击Send
     send_button = wait.until(
         EC.element_to_be_clickable((By.XPATH, "//span[text()=' SEND ']")))
