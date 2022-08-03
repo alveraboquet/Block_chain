@@ -1379,14 +1379,15 @@ def zipswap_prepare_transfer(browser, wait, L2_ETH_value, from_token, to_token):
         EC.element_to_be_clickable((By.XPATH, "//div[@id='swap-currency-input']//input")))
     time_sleep(3,"找金额输入框")
     #=======随机金额
-    point = random.randint(2, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+    point = random.randint(3, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
     input_value = round(random.uniform(L2_ETH_value * 0.7, L2_ETH_value * 0.8), point)
     try_times = 1
-    while float(L2_ETH_value) - input_value < 0.007: #如果会使余额小于 0.007
-        point = random.randint(2, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
-        input_value = round(random.uniform(L2_ETH_value * 0.5, L2_ETH_value * 0.8), point)
+    while float(L2_ETH_value) - input_value < 0.005: #如果会使余额小于 0.005
+        point = random.randint(3, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+        input_value = round(random.uniform(L2_ETH_value * 0.3, L2_ETH_value * 0.7), point)
         try_times = try_times + 1
-        if try_times == 20:
+        if try_times == 100:
+            print("余额不足，直接报错")
             return 0  #说明余额不做，直接报错即可
 
     print(f"本次zipswap从 {from_token} 随机转到 {to_token} 的金额是：{input_value}，将来预估余额是：{float(L2_ETH_value) - input_value}")
@@ -1622,17 +1623,19 @@ def clipper_prepare_transfer(browser, wait, L2_ETH_value, from_token, to_token):
     time_sleep(2)
 
     # 随机金额
-    point = random.randint(2, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+    point = random.randint(3, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
     input_value = round(random.uniform(L2_ETH_value * 0.7, L2_ETH_value * 0.8), point)
     try_times = 0
-    while float(L2_ETH_value) - input_value < 0.007:
-        point = random.randint(2, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
-        input_value = round(random.uniform(L2_ETH_value * 0.5, L2_ETH_value * 0.8), point)
+    while float(L2_ETH_value) - input_value < 0.005:
+        point = random.randint(3, 4)  # 最起码保留3位小数
+        input_value = round(random.uniform(L2_ETH_value * 0.3, L2_ETH_value * 0.7), point)
         try_times = try_times + 1
-        if try_times == 20:
+        if try_times == 100:
+            print("余额不足，直接报错")
             return 0 #说明余额不足，直接报错即可
     print(f"本次从 {from_token} 转到 {to_token} 的随机金额是{input_value}，将来预估余额是：{float(L2_ETH_value) - input_value}")
     input_amount.send_keys(str(input_value))
+    time_sleep(10,"已经输入金额")
 
     # 如果from token 是 USDC，则允许网站访问 USDC
     if from_token != "ETH":
@@ -1662,7 +1665,7 @@ def clipper_prepare_transfer(browser, wait, L2_ETH_value, from_token, to_token):
         accept_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='rfq-container']/div/div[4]/button/span[1]")))
         time_sleep(2)
         browser.execute_script("arguments[0].click();", accept_button)
-        print("已经点击提交订单")
+        time_sleep(8,"已经点击提交订单")
         return f"OP clipper 提交订单成功，本次从 {from_token} 转到 {to_token} 的随机金额是{input_value}；"
     except:
         print(f"提交订单失败")
@@ -2890,17 +2893,17 @@ def matcha_input_coin_amount(browser, wait, L2_balance, from_token, to_token):
     except:
         print(f"可能是之前选择了{to_token}")
 
-    if to_token != "Ethereum":
-        # =============== 有可能出现 I understand
-        try:
-            I_understand_button = wait.until(EC.element_to_be_clickable(
-                (By.XPATH,
-                 "//button[text()='I understand']")))
-            time_sleep(2)
-            browser.execute_script("arguments[0].click();", I_understand_button)
-            print("get_OP_ETH_by_matcha_and_prepare_from_to_token, 已经点击 I understand")
-        except:
-            print("to 时，尝试点击 I understand 点击失败，可能没出现")
+    # if to_token != "Ethereum":
+    #     # =============== 有可能出现 I understand
+    try:
+        I_understand_button = wait.until(EC.element_to_be_clickable(
+            (By.XPATH,
+                "//button[text()='I understand']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", I_understand_button)
+        print("get_OP_ETH_by_matcha_and_prepare_from_to_token, 已经点击 I understand")
+    except:
+        print("to 时，尝试点击 I understand 点击失败，可能没出现")
 
     # ============= 二、再选择 from，源
     # 点击下拉框
@@ -2927,23 +2930,27 @@ def matcha_input_coin_amount(browser, wait, L2_balance, from_token, to_token):
              "//button[text()='I understand']")))
         time_sleep(2)
         browser.execute_script("arguments[0].click();", I_understand_button)
-        print("matcha_input_coin_amount, 已经点击 I understand")
+        print("==matcha_input_coin_amount, 已经点击 I understand")
     except:
         print("from时，尝试点击 I understand 点击失败，可能没出现")
-
     #================ 三、选择 from 要换多少
-    pay_input_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="trading-page-container"]/div[2]/div/div/aside/div[1]/div/div/div[4]/div[2]/div/input')))
+    try:
+        pay_input_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="trading-page-container"]/div[2]/div/div/aside/div[1]/div/div/div[4]/div[2]/div/input')))
+        print("I find input")   
+    except:
+        print("Find intput botton wrong!!")
 
-    point = random.randint(2, 4)  # ETH时，小数点最起码要有2位，因为L1的金额一般是两位小数以上
+    point = random.randint(3, 4)  # ETH时，小数点最起码要有2位，因为L1的金额一般是两位小数以上
     input_value = round(random.uniform(L2_balance * 0.7, L2_balance * 0.8), point)  #随机金额
     try_times = 0
-    while float(L2_balance) - input_value < 0.007: #如果会使余额小于 0.007
-        point = random.randint(2, 4)  # ETH时，小数点最起码要有2位，因为L1的金额一般是两位小数以上
-        input_value = round(random.uniform(L2_balance * 0.6, L2_balance * 0.8), point)  # 随机金额
+    while float(L2_balance) - input_value < 0.005: #如果会使余额小于 0.005
+        point = random.randint(3, 4)  # ETH时，小数点最起码要有2位，因为L1的金额一般是两位小数以上
+        input_value = round(random.uniform(L2_balance * 0.3, L2_balance * 0.7), point)  # 随机金额
         try_times = try_times + 1
-        if try_times == 15:
+        if try_times == 100:
+            print("余额不足，直接报错")
             return 0  # 说明余额不做，直接报错即可
-
+    
     print(f"随机转账的{from_token}金额是：{input_value}，将来预估余额是：{float(L2_balance) - input_value}")
     pay_input_button.send_keys(str(input_value))
     time_sleep(2, f"matcha_input_coin_amount(), 已经输入要换的{from_token}")
