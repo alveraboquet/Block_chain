@@ -73,6 +73,7 @@ def OP_matcha():
     time_sleep(2, f"正式换钱，从 {from_token} 换到 {to_token}")
     detail = matcha_input_coin_amount(browser, wait, L2_balance, from_token, to_token)  #准备换钱
 
+    print("ready to switch to fox")
     switch_tab_by_handle(browser, 1, 1)  # 切换到小狐狸，
     fox_info = fox_confirm_OP(browser, wait)  # 小狐狸确认交易
     time_sleep(8)
@@ -209,7 +210,7 @@ write_success_to_excel_column = "H"  #把成功或失败记录到excel的列
 write_major_token_to_excel_column = "J"  #记录主要代币是什么
 
 read_from_excel_column = "H" #从excel中的哪一列读取状态? 判断是不是要做任务?
-excel_start_row = 2
+excel_start_row = 102
 browser_wait_times = 30
 
 
@@ -286,15 +287,15 @@ while 1:
 
 
                     ##=========== 这里要设置随机等待时间
-                    a = random.randint(2, 10)
+                    a = random.randint(10, 15)
                     time_sleep(a, f"++++++++++随机等待时间{a}")
                     browser.quit()
-                    a = random.randint(2, 10)
+                    a = random.randint(5, 10)
                     time_sleep(a, f"++++++++++随机等待时间{a}")
                 except:
                     print(f"----第{i}出错了")
                     Do_Excel(excel_path).plain_write(i, write_success_to_excel_column, "×")
-                    time_sleep(5, "出错了")
+                    time_sleep(10, "出错了")
                     browser.quit()
                     continue
 
