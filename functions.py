@@ -4383,8 +4383,6 @@ url_dashboard = 'https://clash.razord.top/#/proxies'
 sync_swap_trade = "https://syncswap.xyz/swap" #用于做swap任务
 sync_swap_pool = "https://syncswap.xyz/pool/add"#用于流动性任务
 sync_swap_remove = "https://syncswap.xyz/pool/remove"#用于流动性任务
-excel_path = "/home/parallels/Documents/block_chain/sync_swap_50.xlsx"
-
 
 
 def open_zk_bridge_page(browser, wait):

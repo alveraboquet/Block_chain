@@ -14,7 +14,7 @@ from functions import *
 url_dashboard = 'http://clash.razord.top/#/proxies'
 sync_swap_trade = "https://syncswap.xyz/swap" #用于做swap任务
 sync_swap_pool = "https://syncswap.xyz/pool/add"#用于流动性任务
-excel_path = "/home/parallels/Documents/block_chain/sync_swap_50.xlsx"
+excel_path = "scripts_on_ubuntu/sync_swap_project/sync_swap_50.xlsx"
 
 
 #excel中, 标志列(用于记录任务成功或失败)
