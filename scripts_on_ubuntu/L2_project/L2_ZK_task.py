@@ -134,7 +134,6 @@ while 1:
                     print(f"==============开始换号{i} ==============")
                     fox_change_account(browser, wait, i)  #换号，选列表里的
                     
-                    time_sleep(3600, "waiting")
                     ##=========== 开始做任务
                     #正向操作，记录保存信息到excel
                     save_record = ZK_zigzag_in_out(browser, wait)

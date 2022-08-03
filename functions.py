@@ -1971,7 +1971,7 @@ def new_tab(browser, url):
 def open_clash_dashboard(browser, wait, url_dashboard):
     print("我已经进入open_clash_dashboard")
     browser.get(url_dashboard)
-    for i in range(1,20): #最多刷新九次
+    for i in range(1,5): #最多刷新九次
         print(f"刷新第{i}次")
         try:
             global_expand = browser.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/div/div[1]/div/ul/li[1]/div/div[2]/div/span')
@@ -4372,7 +4372,7 @@ def fox_confirm_yield_signature(browser, wait):
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  syncswap的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
 #准备工作：登陆小狐狸，获取小狐狸账户个数。这是第0个标签
-url_dashboard = 'http://clash.razord.top/#/proxies'
+url_dashboard = 'https://clash.razord.top/#/proxies'
 sync_swap_trade = "https://syncswap.xyz/swap" #用于做swap任务
 sync_swap_pool = "https://syncswap.xyz/pool/add"#用于流动性任务
 sync_swap_remove = "https://syncswap.xyz/pool/remove"#用于流动性任务
