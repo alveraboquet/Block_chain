@@ -4524,7 +4524,7 @@ def ETH_swap_USDC(browser, wait, excel_row, write_excel_column): #后面两个�
     switch_tab_by_handle(browser, 2, 0)
 
     #连接小狐狸钱包
-    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/header/div/div[2]/button[2]')))
+    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/button')))
     time_sleep(1, "准备点击连接钱包")
     browser.execute_script("arguments[0].click();", wallet_button)
     time_sleep(5, "等等小狐狸出现")
@@ -4588,7 +4588,7 @@ def USDC_swap_ETH(browser, wait, excel_row, write_excel_column, mode): #后面�
     switch_tab_by_handle(browser, 2, 0)
 
     #连接小狐狸钱包
-    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/header/div/div[2]/button[2]')))
+    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/button')))
     time_sleep(1, "准备点击连接钱包")
     browser.execute_script("arguments[0].click();", wallet_button)
     time_sleep(5, "等等小狐狸出现")
