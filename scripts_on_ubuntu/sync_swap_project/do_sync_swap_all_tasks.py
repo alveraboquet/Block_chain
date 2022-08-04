@@ -22,8 +22,8 @@ excel_path = "scripts_on_ubuntu/sync_swap_project/sync_swap_50.xlsx"
 # C列 = ETH转USDC, D列 = USDC转ETH
 # E列 = 提供流动性, F列 = 解除流动性
 
-write_to_excel_column = "D"  #把成功或失败记录到excel的列
-read_from_excel_column = "D" #从excel中的哪一列读取状态? 判断是不是要做任务?
+write_to_excel_column = "F"  #把成功或失败记录到excel的列
+read_from_excel_column = "F" #从excel中的哪一列读取状态? 判断是不是要做任务?
 excel_start_row = 2
 browser_wait_times = 30
 
