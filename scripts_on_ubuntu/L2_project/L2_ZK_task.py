@@ -64,12 +64,14 @@ def ZK_zigzag_in_out(browser, wait):
     print("获得的余额是：", balance_and_token)
     matches = re.search('[\d.]+', balance_and_token)  # 正则提取类似 “0.001 ETH”
     zigzag_balance = matches.group()
-
+    print(f"获得的余额是：{zigzag_balance}")
     ##  自动判断 Sell或 Buy，
-    if select_token in balance_and_token:
-        buy_or_sell = "Buy"
-    elif "ETH" in balance_and_token:
+    # if select_token in balance_and_token:
+    #     buy_or_sell = "Buy"
+    if "ETH" in balance_and_token:
         buy_or_sell = "Sell"
+    else:
+        buy_or_sell = "Buy"
 
     detail = zk_zigzag_prepare_swap(browser, wait, zigzag_balance, buy_or_sell)
 
@@ -103,7 +105,7 @@ write_major_token_to_excel_column = "F"  #记录主要代币是什么
 
 read_from_excel_column = "D" #从excel中的哪一列读取状态? 判断是不是要做任务?
 excel_start_row = 2
-browser_wait_times = 30
+browser_wait_times = 15
 
 while 1:
     for i in range(2, 201):
@@ -134,7 +136,6 @@ while 1:
                     print(f"==============开始换号{i} ==============")
                     fox_change_account(browser, wait, i)  #换号，选列表里的
                     
-                    time_sleep(3600, "waiting")
                     ##=========== 开始做任务
                     #正向操作，记录保存信息到excel
                     save_record = ZK_zigzag_in_out(browser, wait)

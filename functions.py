@@ -344,7 +344,7 @@ def login_metamask(browser, wait, metamask_pw, metamask_home, net_error="Ethereu
     send_password.send_keys(metamask_pw)
     time.sleep(1)
     send_password.send_keys(Keys.ENTER)
-    time_sleep(5,"正在打开小狐狸")
+    time_sleep(25,"正在打开小狐狸")
     for i in range(1,20):
         try:
             just_wait = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='identicon__address-wrapper']")))
@@ -353,29 +353,35 @@ def login_metamask(browser, wait, metamask_pw, metamask_home, net_error="Ethereu
             # browser.refresh()
             time_sleep(5, "已经输入小狐狸登陆，还未进入主页，继续等待")
 
-    time_sleep(5, "小狐狸登陆成功")
+    time_sleep(5, "小狐狸小狐狸change net")
+    fox_change_network(browser, wait, net_error)
+    time_sleep(5, "小狐狸change net")
+    fox_change_network(browser, wait, net_error)
+    time_sleep(5, "小狐狸change net")
+    fox_change_network(browser, wait, net_error)
 
     #如果出现切换网络失败，则关闭提示
-    # try:
-    #     #这是切换网络提示的按钮
-    #     time_sleep(3, "准备查看是否网络失败")
-    #     change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
-    #     # time_sleep(2)
-    #     # browser.execute_script("arguments[0].click();", change_net_error)
-    #     while change_net_error: #如果真的存在切换网络提示的按钮，则切换
-    #         print("找到了切换网络提示的按钮，下面尝试切换网络")
-    #         fox_change_network(browser, wait, net_error)
-    #         time_sleep(10,"再查看是有有网络切换提示按钮")
-    #         change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
-    #
-    #     #=====下面是关闭错误提示的代码
-    #     # close_change_network = browser.find_element(By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')
-    #     # # close_change_network = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')))
-    #     # time_sleep(2)
-    #     # ActionChains(browser).click(close_change_network).perform()  # 模拟鼠标点
-    #     # print("关闭切换网络失败的提醒")
-    # except:
-    #     print("小狐狸可能没有遇到切换网络失败的问题")
+    try:
+        #这是切换网络提示的按钮
+        time_sleep(3, "准备查看是否网络失败")
+        change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
+        # time_sleep(2)
+        # browser.execute_script("arguments[0].click();", change_net_error)
+        while change_net_error: #如果真的存在切换网络提示的按钮，则切换
+            print("找到了切换网络提示的按钮，下面尝试切换网络")
+            fox_change_network(browser, wait, net_error)
+            time_sleep(10,"再查看是有有网络切换提示按钮")
+            change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
+    
+        #=====下面是关闭错误提示的代码
+        # close_change_network = browser.find_element(By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')
+        # # close_change_network = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')))
+        # time_sleep(2)
+        # ActionChains(browser).click(close_change_network).perform()  # 模拟鼠标点
+        # print("关闭切换网络失败的提醒")
+    except:
+        print("小狐狸可能没有遇到切换网络失败的问题")
+
 #先不考虑
 def fox_commom_confirm(browser, wait):
     print("我已经进入fox_commom_confirm，这是小狐狸【万能】确认函数")
@@ -876,6 +882,32 @@ def fox_confirm_ARB(browser, wait):
     except:
         print("fox_confirm_ARB()小狐狸点击【签名】失败了，是否影响？")
         return "fox_confirm_ARB()小狐狸点击【签名】失败了，是否影响？"
+
+#小狐狸【确认】galaxy
+def fox_confirm_galaxy(browser, wait):
+    print('fox_confirm_galaxy，【从小狐狸端】确认galaxy, NFT')
+    browser.refresh()
+    time_sleep(8)
+    try:
+        # 签名
+        confirm_button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div/div[5]/div[3]/footer/button[2]')))
+        time_sleep(3)
+        browser.execute_script("arguments[0].click();", confirm_button)
+        print("小狐狸签名成功")
+        return "小狐狸签名成功"
+    except:
+        try:#拒绝
+            cancle_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div/div[5]/div[3]/footer/button[1]')))
+    
+            time_sleep(1)
+            browser.execute_script("arguments[0].click();", cancle_button)
+            print("fox失败, 已经点击拒绝交易")
+            return "fox失败, 已经点击拒绝交易"
+        except:
+            print("小狐狸拒绝前面失败")
+            return "fox失败"
+
 
 
 #绑定网络，从小狐狸端：批准——>切换网络
@@ -2167,7 +2199,7 @@ def zk_zigzag_start_tradding(browser, wait):
     print("进入zk_zigzag_start_tradding()，点击start tradding")
     try:
         #点击Start_Tradding
-        Start_Tradding = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@class='btn text-white bg-gradient-to-l from-teal-400 to-blue-500 hover:from-blue-500 hover:to-teal-500 hover:translate-y-1 my-5 mr-5' and text()='Start Trading']")))
+        Start_Tradding = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div/header/div/div/nav/ul[2]/li[5]/a")))
         time_sleep(3)
         browser.execute_script("arguments[0].click();", Start_Tradding)
 
@@ -2207,70 +2239,82 @@ def zk_whether_connect_wallet(wait):
 
 def ZK_zigzag_choose_token(browser, wait, token):
     print("进入ZK_zigzag_choose_token()，选择何种代币")
+
+    #先点击 xiala
+    down_button = wait.until(
+        EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/header/div/div[1]/div[1]/div/div[1]/button')))
+    time_sleep(3,"先点击下拉")
+    browser.execute_script("arguments[0].click();", down_button)
+    time_sleep(5)
     #先点击 ALL
     all_button = wait.until(
-        EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/article/header/div/div/div[1]/div/div/button')))
-    time_sleep(8)
+        EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/header/div/div[1]/div[1]/div/div[2]/div[3]/div[1]/div[1]/div')))
+    time_sleep(3,"点击ALL")
     browser.execute_script("arguments[0].click();", all_button)
-
+    time_sleep(5,"准备选择token")
     if token == "DAI":
         token_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[text()='ETH/DAI']")))
         time_sleep(3)
         browser.execute_script("arguments[0].click();", token_button)
         #收起列表
-        all_button = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//*[@id="root"]/div[2]/div/article/header/div/div/div[1]/div/div/button')))
-        time_sleep(8)
-        browser.execute_script("arguments[0].click();", all_button)
+        # all_button = wait.until(
+        #     EC.element_to_be_clickable(
+        #         (By.XPATH, '//*[@id="root"]/div[2]/div/article/header/div/div/div[1]/div/div/button')))
+        # time_sleep(8,"选择了DAI")
+        # browser.execute_script("arguments[0].click();", all_button)
+        down_button = wait.until(
+        EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/header/div/div[1]/div[1]/div/div[1]/button')))
+        time_sleep(3,"收起列表")
+        
+        browser.execute_script("arguments[0].click();", down_button)
     elif token == "USDC":
         token_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[text()='ETH/USDC']")))
         time_sleep(3)
         browser.execute_script("arguments[0].click();", token_button)
 
         # 收起列表
-        all_button = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//*[@id="root"]/div[2]/div/article/header/div/div/div[1]/div/div/button')))
-        time_sleep(8)
-        browser.execute_script("arguments[0].click();", all_button)
+        down_button = wait.until(
+        EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/header/div/div[1]/div[1]/div/div[1]/button')))
+        time_sleep(3,"收起列表")
     elif token == "USDT":
         token_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[text()='ETH/USDT']")))
         time_sleep(3)
         browser.execute_script("arguments[0].click();", token_button)
 
         # 收起列表
-        all_button = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//*[@id="root"]/div[2]/div/article/header/div/div/div[1]/div/div/button')))
-        time_sleep(8)
-        browser.execute_script("arguments[0].click();", all_button)
+        down_button = wait.until(
+        EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/header/div/div[1]/div[1]/div/div[1]/button')))
+        time_sleep(3,"收起列表")
     else:
         print("ZK_zigzag_choose_token 代币输入错误，请重新输入")
-    time_sleep(8)
+    time_sleep(8, "ZK_zigzag_choose_token 运行结束")
 
 #zk任务：获取zigzag上的ETH余额
 def get_ZK_zigzag_balance(browser, wait):
     print("进入get_ZK_zigzag_balance()，获取zigzag上的ETH余额")
+    # browser.refresh()
+    # time_sleep(8)
     #点击图标"
-    icon_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[9]/button')))
+    icon_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[1]/button')))
     time_sleep(3)
     browser.execute_script("arguments[0].click();", icon_button)
-
+    
     #点击L2
-    L2_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[9]/div/div[1]/ul/li[2]/div')))
+    L2_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[1]/div/div[1]/ul/li[2]/div')))
     time_sleep(3)
     browser.execute_script("arguments[0].click();", L2_button)
 
     #获取有多少种货币 "//ul[@class='sc-jKTccl coOmWL']/li"
 
     #获取有多少个代币
-    tokens = wait.until(EC.visibility_of_all_elements_located((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[9]/div/div[3]/ul/li')))
-    print("总共代币数量",len(list(tokens)))
+    # tokens = wait.until(EC.visibility_of_all_elements_located((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[9]/div/div[3]/ul/li')))
+    # print("总共代币数量",len(list(tokens)))
 
     #总是获取第一个代币余额
     try:
-        Amount = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[9]/div/div[3]/ul/li[1]/div/div[1]')))
+        Amount = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[1]/div/div[3]/ul/li[1]/div/div[1]')))
+        time_sleep(3)
+        browser.execute_script("arguments[0].click();", icon_button)#收回列表
         return Amount.text
     except:
         print("可能只有一个代币")
@@ -2293,18 +2337,22 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
         print("本次 zigzag swap的随机金额是：", input_value)
 
         ##  ============ 点击 sell模块
-        sell_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/article/aside/div/div[1]/ul/li[2]/div')))
-        time_sleep(2)
-        browser.execute_script("arguments[0].click();", sell_button)
+        try:
+            sell_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[text()='SELL']")))
+            time_sleep(2)
+            browser.execute_script("arguments[0].click();", sell_button)
+            print("已经点击sell")
+        except:
+            print("dinf sell button failed")
 
         ## ============ 输入交易金额
-        input_swap_amount = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/article/aside/div/div[3]/form/div[2]/div/div/input')))
+        input_swap_amount = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="react-grid-layout-wrap"]/div/div/div[1]/div/aside/div/div[3]/form/div[2]/div/div/input')))
         time_sleep(2)
         input_swap_amount.send_keys(str(input_value))
         time_sleep(5)
 
         ## ============ 确认交易
-        confirm_sell_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/article/aside/div/div[3]/form/div[7]/button')))
+        confirm_sell_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[text()="SELL ETH"]')))
         time_sleep(2)
         browser.execute_script("arguments[0].click();", confirm_sell_button)
 
@@ -2315,8 +2363,8 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
     elif buy_or_sell == "Buy": #进行买操作
         ## ============ 转账随机值
         print("准备进行“Buy”")
-        min = float(L2_ETH_value) * 0.8
-        max = float(L2_ETH_value) * 0.95
+        min = float(L2_ETH_value) * 0.7
+        max = float(L2_ETH_value) * 0.9
         point = random.randint(2, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
         input_value = round(random.uniform(min, max), point)
         while input_value > float(L2_ETH_value):
@@ -2327,13 +2375,14 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
         ## ========== 点击 Buy模块
         print("准备进行“Buy”")
         buy_button = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, '//*[@id="root"]/div[2]/div/article/aside/div/div[1]/ul/li[1]/div')))
+            (By.XPATH, "//div[text()='BUY']")))
         time_sleep(2)
         browser.execute_script("arguments[0].click();", buy_button)
+        print("已经点击buy")
 
         ## ============ 输入交易金额
         input_swap_amount = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, '//*[@id="root"]/div[2]/div/article/aside/div/div[3]/form/div[4]/div/div/input')))
+            (By.XPATH, '//*[@id="react-grid-layout-wrap"]/div/div/div[1]/div/aside/div/div[3]/form/div[2]/div/div/input')))
         time_sleep(1)
         input_swap_amount.send_keys(str(input_value))
         time_sleep(5)
@@ -2355,7 +2404,7 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
 
         ##======== 确认交易
         confirm_buy_button = wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[2]/div/article/aside/div/div[3]/form/div[7]/button')))
+            EC.element_to_be_clickable((By.XPATH, '//button[text()="BUY ETH"]')))
         time_sleep(2)
         browser.execute_script("arguments[0].click();", confirm_buy_button)
 
@@ -4379,12 +4428,10 @@ def fox_confirm_yield_signature(browser, wait):
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  syncswap的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
 #准备工作：登陆小狐狸，获取小狐狸账户个数。这是第0个标签
-url_dashboard = 'http://clash.razord.top/#/proxies'
+url_dashboard = 'https://clash.razord.top/#/proxies'
 sync_swap_trade = "https://syncswap.xyz/swap" #用于做swap任务
 sync_swap_pool = "https://syncswap.xyz/pool/add"#用于流动性任务
 sync_swap_remove = "https://syncswap.xyz/pool/remove"#用于流动性任务
-excel_path = "/home/parallels/Documents/block_chain/sync_swap_50.xlsx"
-
 
 
 def open_zk_bridge_page(browser, wait):
@@ -4526,7 +4573,7 @@ def ETH_swap_USDC(browser, wait, excel_row, write_excel_column): #后面两个�
     switch_tab_by_handle(browser, 2, 0)
 
     #连接小狐狸钱包
-    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/header/div/div[2]/button[2]')))
+    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/button')))
     time_sleep(1, "准备点击连接钱包")
     browser.execute_script("arguments[0].click();", wallet_button)
     time_sleep(5, "等等小狐狸出现")
@@ -4590,7 +4637,7 @@ def USDC_swap_ETH(browser, wait, excel_row, write_excel_column, mode): #后面�
     switch_tab_by_handle(browser, 2, 0)
 
     #连接小狐狸钱包
-    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/header/div/div[2]/button[2]')))
+    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/button')))
     time_sleep(1, "准备点击连接钱包")
     browser.execute_script("arguments[0].click();", wallet_button)
     time_sleep(5, "等等小狐狸出现")
@@ -4686,7 +4733,7 @@ def syncswap_provide_LP(browser, wait, excel_row, write_excel_column): #后面�
     new_tab(browser, sync_swap_pool)
     time_sleep(5,"等待网络加载")
     switch_tab_by_handle(browser, 2, 0)
-    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/header/div/div[2]/button[2]')))
+    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/button')))
     print("找到的文字是:",wallet_button.text)
     
     if "Connect" in wallet_button.text:#如果没有链接钱包,则链接钱包
@@ -4784,7 +4831,7 @@ def syncswap_remove_LP(browser, wait, excel_row, write_excel_column, mode): #后
     new_tab(browser, sync_swap_remove)
     time_sleep(5,"等待网络加载")
     switch_tab_by_handle(browser, 2, 0)
-    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/header/div/div[2]/button[2]')))
+    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/button')))
     print("找到的文字是:",wallet_button.text)
     
     if "Connect" in wallet_button.text:#如果没有链接钱包,则链接钱包
