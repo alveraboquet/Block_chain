@@ -14,7 +14,8 @@ from functions import *
 url_dashboard = 'http://clash.razord.top/#/proxies'
 sync_swap_trade = "https://syncswap.xyz/swap" #用于做swap任务
 sync_swap_pool = "https://syncswap.xyz/pool/add"#用于流动性任务
-excel_path = "scripts_on_ubuntu/sync_swap_project/sync_swap_50.xlsx"
+excel_path = "/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/sync_swap_project/sync_swap_50.xlsx"
+
 
 
 #excel中, 标志列(用于记录任务成功或失败)
@@ -22,16 +23,16 @@ excel_path = "scripts_on_ubuntu/sync_swap_project/sync_swap_50.xlsx"
 # C列 = ETH转USDC, D列 = USDC转ETH
 # E列 = 提供流动性, F列 = 解除流动性
 
-write_to_excel_column = "F"  #把成功或失败记录到excel的列
-read_from_excel_column = "F" #从excel中的哪一列读取状态? 判断是不是要做任务?
+write_to_excel_column = "D"  #把成功或失败记录到excel的列
+read_from_excel_column = "D" #从excel中的哪一列读取状态? 判断是不是要做任务?
 excel_start_row = 2
-browser_wait_times = 30
+browser_wait_times = 15
 
 while True:
     for i in range(excel_start_row, 52):
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, read_from_excel_column)
         if success_or_fail != "成功":
-            try:
+            # try: 
                 print(f"第{i}个号需要做任务")
                 wait, browser = my_linux_chrome(time_out = browser_wait_times)
                 #===========做一些准备工作
@@ -47,17 +48,17 @@ while True:
 
                 #=============开始任务, i 用于记录第几个号, excel_which_column用于记录成功或失败
                 #任务1:ETH转USDC. 任务成功会记录到excel中
-                # ETH_swap_USDC(browser, wait, i, write_to_excel_column)
+                # ETH_swap_USDC(browser, wait,excel_path, i, write_to_excel_column)
                 
                 # #任务2:USDC转ETH.模式0:随机转金额;模式1:全部转
-                USDC_swap_ETH(browser, wait, i, write_to_excel_column, 0)
+                USDC_swap_ETH(browser, wait,excel_path, i, write_to_excel_column, 0)
                 
 
                 # #任务3:提供流动性
-                # syncswap_provide_LP(browser, wait, i, write_to_excel_column)
+                # syncswap_provide_LP(browser, wait,excel_path, i, write_to_excel_column)
 
                 # #任务4:解除流动性.模式0:移除随机比例的流动性;模式1:移除所有流动性
-                # syncswap_remove_LP(browser, wait, i, write_to_excel_column, 0)
+                # syncswap_remove_LP(browser, wait,excel_path, i, write_to_excel_column, 0)
 
                 ##=========== 这里要设置随机等待时间
                 aa = random.randint(45, 80)
@@ -73,23 +74,23 @@ while True:
                 aa = random.randint(2, 10)
                 time_sleep(aa, f"++++++++++随机等待时间{aa}")
 
-            except:
-                Do_Excel(excel_path,sheetname='Sheet1').plain_write(i, write_to_excel_column, "×")
-                time_sleep(5, f"----啊啊!第{i}个号出错了, 已经记录")
-                try:
-                    #循环安全关闭网页,最后关闭浏览器
-                    for k in range(2, -1, -1):
-                        print(f"循环关闭网页{k}")
-                        switch_tab_by_handle(browser, k, 0)
-                        browser.close()
-                        time.sleep(2)
-                except:
-                    print("可能网页数量没那么多")
-                # browser.quit()
-                #随机休息
-                aa = random.randint(10, 30)
-                time_sleep(aa, f"++++++++++随机等待时间{aa}")
-                continue
+            # except:
+            #     Do_Excel(excel_path,sheetname='Sheet1').plain_write(i, write_to_excel_column, "×")
+            #     time_sleep(5, f"----啊啊!第{i}个号出错了, 已经记录")
+            #     try:
+            #         #循环安全关闭网页,最后关闭浏览器
+            #         for k in range(2, -1, -1):
+            #             print(f"循环关闭网页{k}")
+            #             switch_tab_by_handle(browser, k, 0)
+            #             browser.close()
+            #             time.sleep(2)
+            #     except:
+            #         print("可能网页数量没那么多")
+            #     # browser.quit()
+            #     #随机休息
+            #     aa = random.randint(10, 30)
+            #     time_sleep(aa, f"++++++++++随机等待时间{aa}")
+            #     continue
                 
 
 
