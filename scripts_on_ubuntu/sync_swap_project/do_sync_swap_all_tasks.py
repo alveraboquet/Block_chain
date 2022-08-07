@@ -14,7 +14,8 @@ from functions import *
 url_dashboard = 'http://clash.razord.top/#/proxies'
 sync_swap_trade = "https://syncswap.xyz/swap" #用于做swap任务
 sync_swap_pool = "https://syncswap.xyz/pool/add"#用于流动性任务
-excel_path = "scripts_on_ubuntu/sync_swap_project/sync_swap_50.xlsx"
+excel_path = "/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/sync_swap_project/sync_swap_50.xlsx"
+
 
 
 #excel中, 标志列(用于记录任务成功或失败)
@@ -47,17 +48,17 @@ while True:
 
                 #=============开始任务, i 用于记录第几个号, excel_which_column用于记录成功或失败
                 #任务1:ETH转USDC. 任务成功会记录到excel中
-                # ETH_swap_USDC(browser, wait, i, write_to_excel_column)
+                # ETH_swap_USDC(browser, wait,excel_path, i, write_to_excel_column)
                 
                 # #任务2:USDC转ETH.模式0:随机转金额;模式1:全部转
-                USDC_swap_ETH(browser, wait, i, write_to_excel_column, 0)
+                USDC_swap_ETH(browser, wait,excel_path, i, write_to_excel_column, 0)
                 
 
                 # #任务3:提供流动性
-                # syncswap_provide_LP(browser, wait, i, write_to_excel_column)
+                # syncswap_provide_LP(browser, wait,excel_path, i, write_to_excel_column)
 
                 # #任务4:解除流动性.模式0:移除随机比例的流动性;模式1:移除所有流动性
-                # syncswap_remove_LP(browser, wait, i, write_to_excel_column, 0)
+                # syncswap_remove_LP(browser, wait,excel_path, i, write_to_excel_column, 0)
 
                 ##=========== 这里要设置随机等待时间
                 aa = random.randint(45, 80)

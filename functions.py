@@ -4567,7 +4567,7 @@ def fox_allow_syncswap_use_LP(browser, wait):
 
 
 #任务1:ETH转USDC.
-def ETH_swap_USDC(browser, wait, excel_row, write_excel_column): #后面两个参数用于记录信息到excel
+def ETH_swap_USDC(browser, wait, excel_path,excel_row, write_excel_column): #后面两个参数用于记录信息到excel
     #新建标签页,准备转goerli
     new_tab(browser, sync_swap_trade)
     time_sleep(5,"等待网络加载")
@@ -4631,7 +4631,7 @@ def ETH_swap_USDC(browser, wait, excel_row, write_excel_column): #后面两个�
         print("成功!! 已经记录到excel")
 
 #任务2:USDC转ETH.
-def USDC_swap_ETH(browser, wait, excel_row, write_excel_column, mode): #后面两个参数用于记录信息到excel
+def USDC_swap_ETH(browser, wait, excel_path,excel_row, write_excel_column, mode): #后面两个参数用于记录信息到excel
     #新建标签页,准备转goerli
     new_tab(browser, sync_swap_trade)
     time_sleep(5,"等待网络加载")
@@ -4645,7 +4645,7 @@ def USDC_swap_ETH(browser, wait, excel_row, write_excel_column, mode): #后面�
     fox_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[2]/div/div/div[2]/div[2]/div[1]')))
     time_sleep(5, "小狐狸出现了,准备点击")
     browser.execute_script("arguments[0].click();", fox_button)
-    time_sleep(8, "已经点击小狐狸")
+    time_sleep(13, "已经点击小狐狸")
     
     #调换一下USDC和ETH的位置
     position_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/div[2]/div[2]')))
@@ -4729,7 +4729,7 @@ def USDC_swap_ETH(browser, wait, excel_row, write_excel_column, mode): #后面�
 
 
 #任务3:提供流动性
-def syncswap_provide_LP(browser, wait, excel_row, write_excel_column): #后面两个参数用于记录信息到excel
+def syncswap_provide_LP(browser, wait,excel_path, excel_row, write_excel_column): #后面两个参数用于记录信息到excel
     #新建标签页,准备转goerli
     new_tab(browser, sync_swap_pool)
     time_sleep(5,"等待网络加载")
@@ -4827,7 +4827,7 @@ def syncswap_provide_LP(browser, wait, excel_row, write_excel_column): #后面�
         print("成功!! 已经记录到excel")
 
 #任务4:解除流动性
-def syncswap_remove_LP(browser, wait, excel_row, write_excel_column, mode): #后面两个参数用于记录信息到excel
+def syncswap_remove_LP(browser, wait, excel_path,excel_row, write_excel_column, mode): #后面两个参数用于记录信息到excel
     #新建标签页,准备转goerli
     new_tab(browser, sync_swap_remove)
     time_sleep(5,"等待网络加载")
