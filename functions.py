@@ -2312,9 +2312,10 @@ def get_ZK_zigzag_balance(browser, wait):
 
     #总是获取第一个代币余额
     try:
-        Amount = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[1]/div/div[3]/ul/li[1]/div/div[1]')))
-        time_sleep(3)
-        browser.execute_script("arguments[0].click();", icon_button)#收回列表
+        print("获取第一个代币余额")
+        Amount = wait.until(EC.element_to_be_clickable((By.XPATH, "//ul/li[1]//div[@class='Text-sc-d4qk04-0 jXcvep']")))                                                             
+        # time_sleep(3,"waiting 收回列表")
+        # browser.execute_script("arguments[0].click();", icon_button)#收回列表
         return Amount.text
     except:
         print("可能只有一个代币")
@@ -2349,7 +2350,7 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
         input_swap_amount = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="react-grid-layout-wrap"]/div/div/div[1]/div/aside/div/div[3]/form/div[2]/div/div/input')))
         time_sleep(2)
         input_swap_amount.send_keys(str(input_value))
-        time_sleep(5)
+        time_sleep(8)
 
         ## ============ 确认交易
         confirm_sell_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[text()="SELL ETH"]')))
@@ -2371,7 +2372,7 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
             point = random.randint(2, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
             input_value = round(random.uniform(min, max), point)
         print("本次 zigzag swap的随机金额是：", input_value)
-
+        time_sleep(8)
         ## ========== 点击 Buy模块
         print("准备进行“Buy”")
         buy_button = wait.until(EC.element_to_be_clickable(
