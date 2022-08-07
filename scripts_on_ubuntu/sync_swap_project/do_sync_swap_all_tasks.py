@@ -31,7 +31,7 @@ while True:
     for i in range(excel_start_row, 52):
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, read_from_excel_column)
         if success_or_fail != "成功":
-            try:
+            # try: 
                 print(f"第{i}个号需要做任务")
                 wait, browser = my_linux_chrome(time_out = browser_wait_times)
                 #===========做一些准备工作
@@ -73,23 +73,23 @@ while True:
                 aa = random.randint(2, 10)
                 time_sleep(aa, f"++++++++++随机等待时间{aa}")
 
-            except:
-                Do_Excel(excel_path,sheetname='Sheet1').plain_write(i, write_to_excel_column, "×")
-                time_sleep(5, f"----啊啊!第{i}个号出错了, 已经记录")
-                try:
-                    #循环安全关闭网页,最后关闭浏览器
-                    for k in range(2, -1, -1):
-                        print(f"循环关闭网页{k}")
-                        switch_tab_by_handle(browser, k, 0)
-                        browser.close()
-                        time.sleep(2)
-                except:
-                    print("可能网页数量没那么多")
-                # browser.quit()
-                #随机休息
-                aa = random.randint(10, 30)
-                time_sleep(aa, f"++++++++++随机等待时间{aa}")
-                continue
+            # except:
+            #     Do_Excel(excel_path,sheetname='Sheet1').plain_write(i, write_to_excel_column, "×")
+            #     time_sleep(5, f"----啊啊!第{i}个号出错了, 已经记录")
+            #     try:
+            #         #循环安全关闭网页,最后关闭浏览器
+            #         for k in range(2, -1, -1):
+            #             print(f"循环关闭网页{k}")
+            #             switch_tab_by_handle(browser, k, 0)
+            #             browser.close()
+            #             time.sleep(2)
+            #     except:
+            #         print("可能网页数量没那么多")
+            #     # browser.quit()
+            #     #随机休息
+            #     aa = random.randint(10, 30)
+            #     time_sleep(aa, f"++++++++++随机等待时间{aa}")
+            #     continue
                 
 
 

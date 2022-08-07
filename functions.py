@@ -335,7 +335,7 @@ def delete_cookie(browser):
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 小狐狸的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓#
 
 #登陆小狐狸，直到登陆成功.
-def login_metamask(browser, wait, metamask_pw, metamask_home, net_error="Ethereum"):
+def login_metamask(browser, wait, metamask_pw, metamask_home, net_error=None):
     print("我已进入login_metamask，开始登陆小狐狸")
     # new_tab(browser, metamask_home)
     browser.get(metamask_home)
@@ -352,13 +352,13 @@ def login_metamask(browser, wait, metamask_pw, metamask_home, net_error="Ethereu
         except:
             # browser.refresh()
             time_sleep(5, "已经输入小狐狸登陆，还未进入主页，继续等待")
-
-    time_sleep(5, "小狐狸小狐狸change net")
-    fox_change_network(browser, wait, net_error)
-    time_sleep(5, "小狐狸change net")
-    fox_change_network(browser, wait, net_error)
-    time_sleep(5, "小狐狸change net")
-    fox_change_network(browser, wait, net_error)
+    if net_error:
+        time_sleep(5, "小狐狸小狐狸change net")
+        fox_change_network(browser, wait, net_error)
+        time_sleep(5, "小狐狸change net")
+        fox_change_network(browser, wait, net_error)
+        time_sleep(5, "小狐狸change net")
+        fox_change_network(browser, wait, net_error)
 
     #如果出现切换网络失败，则关闭提示
     try:
