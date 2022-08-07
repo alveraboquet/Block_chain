@@ -2363,8 +2363,8 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
     elif buy_or_sell == "Buy": #进行买操作
         ## ============ 转账随机值
         print("准备进行“Buy”")
-        min = float(L2_ETH_value) * 0.8
-        max = float(L2_ETH_value) * 0.95
+        min = float(L2_ETH_value) * 0.7
+        max = float(L2_ETH_value) * 0.9
         point = random.randint(2, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
         input_value = round(random.uniform(min, max), point)
         while input_value > float(L2_ETH_value):
