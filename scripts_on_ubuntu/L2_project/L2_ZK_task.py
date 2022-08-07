@@ -61,15 +61,18 @@ def ZK_zigzag_in_out(browser, wait):
 
     ## ============== 获取Zigzag上有多少ETH，返回余额（字符串），之后传参给 zk_zigzag_prepare_swap()
     balance_and_token = get_ZK_zigzag_balance(browser, wait)
-    print("获得的余额是：", balance_and_token)
-    matches = re.search('[\d.]+', balance_and_token)  # 正则提取类似 “0.001 ETH”
-    zigzag_balance = matches.group()
-
+    print("获得的余额和token是：", balance_and_token)
+    zigzag_balance = balance_and_token.split()[0]
+    # matches = re.search('[\d.]+', balance_and_token)  # 正则提取类似 “0.001 ETH”
+    # zigzag_balance = matches.group()
+    print(f"分割后获得的余额是：{zigzag_balance}")
     ##  自动判断 Sell或 Buy，
-    if select_token in balance_and_token:
-        buy_or_sell = "Buy"
-    elif "ETH" in balance_and_token:
+    # if select_token in balance_and_token:
+    #     buy_or_sell = "Buy"
+    if "ETH" in balance_and_token:
         buy_or_sell = "Sell"
+    else:
+        buy_or_sell = "Buy"
 
     detail = zk_zigzag_prepare_swap(browser, wait, zigzag_balance, buy_or_sell)
 
@@ -103,10 +106,10 @@ write_major_token_to_excel_column = "F"  #记录主要代币是什么
 
 read_from_excel_column = "D" #从excel中的哪一列读取状态? 判断是不是要做任务?
 excel_start_row = 2
-browser_wait_times = 30
+browser_wait_times = 15
 
 while 1:
-    for i in range(2, 201):
+    for i in range(4, 201):
         success_or_fail = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         current_major_token = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         print(f"现在的运行状态是：{success_or_fail}, 主要代币是：{current_major_token}")
