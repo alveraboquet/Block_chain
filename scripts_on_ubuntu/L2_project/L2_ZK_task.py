@@ -109,7 +109,7 @@ excel_start_row = 2
 browser_wait_times = 15
 
 while 1:
-    for i in range(4, 201):
+    for i in range(6, 201):
         success_or_fail = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         current_major_token = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         print(f"现在的运行状态是：{success_or_fail}, 主要代币是：{current_major_token}")
@@ -131,7 +131,7 @@ while 1:
                     delete_cookie(browser)
 
                     ##=========== 登陆小狐狸，
-                    login_metamask(browser, wait, metamask_pw, metamask_home, "Ethereum")
+                    login_metamask(browser, wait, metamask_pw, metamask_home)
                     switch_tab_by_handle(browser, 1, 0)  # 切换到小狐狸
                     # 小狐狸换号
                     print(f"==============开始换号{i} ==============")
