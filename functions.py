@@ -4589,11 +4589,11 @@ def USDC_swap_ETH(browser, wait, excel_row, write_excel_column, mode): #后面�
 
     #连接小狐狸钱包
     wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/button')))
-    time_sleep(1, "准备点击连接钱包")
+    time_sleep(5, "准备点击连接钱包")
     browser.execute_script("arguments[0].click();", wallet_button)
     time_sleep(5, "等等小狐狸出现")
     fox_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[2]/div/div/div[2]/div[2]/div[1]')))
-    time_sleep(1, "小狐狸出现了,准备点击")
+    time_sleep(5, "小狐狸出现了,准备点击")
     browser.execute_script("arguments[0].click();", fox_button)
     time_sleep(8, "已经点击小狐狸")
     
@@ -4606,14 +4606,14 @@ def USDC_swap_ETH(browser, wait, excel_row, write_excel_column, mode): #后面�
         print("模式0, 随机转USDC (25~75%)")
         percent = random.randint(1, 3)  # ETH时，小数点最起码要有2位，因为L1的金额一般是两位小数以上
         percent_button = wait.until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="container"]/div/div/div[5]/div/div/div/div[2]/div[1]/div[3]/button[{percent}]')))
-        time_sleep(2, "准备点击USDC比例")
+        time_sleep(8, "准备点击USDC比例")
         browser.execute_script("arguments[0].click();", percent_button)
         print("已经点击转出比例")
 
     elif mode == 1:
         print("模式1, 转走全部USDC (100%)")
         percent_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/div[2]/div[1]/div[3]/button[4]')))
-        time_sleep(1, "USDC比例100%")
+        time_sleep(8, "USDC比例100%")
         browser.execute_script("arguments[0].click();", percent_button)
         print("已经点击全部转出")
     
@@ -4645,9 +4645,9 @@ def USDC_swap_ETH(browser, wait, excel_row, write_excel_column, mode): #后面�
     
     #准备交易
     switch_tab_by_handle(browser, 2, 0) #切换回网页
-    time_sleep(6, "准备寻找swap") #必须加延时,否则找不到元素
+    time_sleep(8, "准备寻找swap") #必须加延时,否则找不到元素
     swap_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/button')))
-    time_sleep(2, "准备点击swap")
+    time_sleep(8, "准备点击swap")
     browser.execute_script("arguments[0].click();", swap_button)
     time_sleep(10, "已经点击swap")
 
