@@ -2293,14 +2293,14 @@ def ZK_zigzag_choose_token(browser, wait, token):
 def get_ZK_zigzag_balance(browser, wait):
     print("进入get_ZK_zigzag_balance()，获取zigzag上的ETH余额")
     # browser.refresh()
-    # time_sleep(8)
+    # time_sleep(5)
     #点击图标"
-    icon_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[1]/button')))
+    icon_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='StyledButton-sc-19l6nhk-0 cHQUGM IconButton-sc-1wt1b69-0 AccountButton__IconButton-sc-1vtrp04-0 lagfdI JHywm']")))
     time_sleep(3)
     browser.execute_script("arguments[0].click();", icon_button)
     
     #点击L2
-    L2_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[1]/div/div[1]/ul/li[2]/div')))
+    L2_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[text()='l2']")))
     time_sleep(3)
     browser.execute_script("arguments[0].click();", L2_button)
 
