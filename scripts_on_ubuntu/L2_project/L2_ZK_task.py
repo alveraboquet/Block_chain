@@ -96,6 +96,8 @@ def ZK_zigzag_in_out(browser, wait):
 
 
 excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_操作后.xlsx'
+excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_操作后.xlsx'
+
 #excel中, 标志列(用于记录任务成功或失败)
 # B列 = goerli转到zk上,
 # C列 = ETH转USDC, D列 = USDC转ETH
@@ -109,7 +111,7 @@ excel_start_row = 2
 browser_wait_times = 15
 
 while 1:
-    for i in range(100, 201):
+    for i in range(101, 201):
         success_or_fail = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         current_major_token = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         print(f"现在的运行状态是：{success_or_fail}, 主要代币是：{current_major_token}")
