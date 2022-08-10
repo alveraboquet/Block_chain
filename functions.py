@@ -336,7 +336,7 @@ def delete_cookie(browser):
 
 #登陆小狐狸，直到登陆成功.
 def login_metamask(browser, wait, metamask_pw, metamask_home, net_error=None):
-    print("我已进入login_metamask，开始登陆小狐狸")
+    print("我已进入login_metamask，开始登陆小狐狸0000")
     # new_tab(browser, metamask_home)
     browser.get(metamask_home)
     time_sleep(3)
