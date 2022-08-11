@@ -144,12 +144,12 @@ def my_chrome(chrome_user_num):
     return wait, browser
 
 #构建浏览器
-def my_mac_chrome():
+def my_mac_chrome(time_out=30):
     # 获取驱动的路径
     driver_path = "/usr/local/bin/chromedriver" # chromedriver完整路径，path是重点。如果不行，试试chromedriver.exe
     # print(driver_path)
 
-    TIME_OUT = 30  # 设置显示等待的超时时间，尽量设置的长一点，考虑到网络可能缓慢
+    TIME_OUT = time_out  # 设置显示等待的超时时间，尽量设置的长一点，考虑到网络可能缓慢
     option = ChromeOptions()
     # option.add_argument('--headless')#是否开启无头模式
     # option.add_argument('--disable-gpu')#屏蔽浏览器引擎
@@ -335,8 +335,8 @@ def delete_cookie(browser):
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 小狐狸的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓#
 
 #登陆小狐狸，直到登陆成功.
-def login_metamask(browser, wait, metamask_pw, metamask_home, net_error=None):
-    print("我已进入login_metamask，开始登陆小狐狸0000")
+def login_metamask(browser, wait, metamask_pw, metamask_home, netname=None):
+    print("我已进入login_metamask，开始登陆小狐狸")
     # new_tab(browser, metamask_home)
     browser.get(metamask_home)
     time_sleep(3)
@@ -345,42 +345,39 @@ def login_metamask(browser, wait, metamask_pw, metamask_home, net_error=None):
     time.sleep(1)
     send_password.send_keys(Keys.ENTER)
     time_sleep(25,"正在打开小狐狸")
-    for i in range(1,20):
+    for i in range(1,10):
         try:
             just_wait = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='identicon__address-wrapper']")))
             break
         except:
             # browser.refresh()
             time_sleep(5, "已经输入小狐狸登陆，还未进入主页，继续等待")
-    if net_error:
-        time_sleep(5, "小狐狸小狐狸change net")
-        fox_change_network(browser, wait, net_error)
-        time_sleep(5, "小狐狸change net")
-        fox_change_network(browser, wait, net_error)
-        time_sleep(5, "小狐狸change net")
-        fox_change_network(browser, wait, net_error)
+    if netname: #如果有参数，说明要切换网络
+        for i in range(1,6): #尝试切换5次
+            time_sleep(5, f"小狐狸准备切换网络，第{i}次")
+            fox_change_network(browser, wait, netname)
+            try:  #如果出现"切换网络"失败，则关闭提示
+                time_sleep(20, "准备查看是否网络失败")
+                # change_net_error 即出现"切换网络"失败的提醒
+                change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
+                time_sleep(2, "确实找到了失败按钮，需要再次切换，先关闭提醒")
 
-    #如果出现切换网络失败，则关闭提示
-    try:
-        #这是切换网络提示的按钮
-        time_sleep(3, "准备查看是否网络失败")
-        change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
-        # time_sleep(2)
-        # browser.execute_script("arguments[0].click();", change_net_error)
-        while change_net_error: #如果真的存在切换网络提示的按钮，则切换
-            print("找到了切换网络提示的按钮，下面尝试切换网络")
-            fox_change_network(browser, wait, net_error)
-            time_sleep(10,"再查看是有有网络切换提示按钮")
-            change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
-    
-        #=====下面是关闭错误提示的代码
-        # close_change_network = browser.find_element(By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')
-        # # close_change_network = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')))
-        # time_sleep(2)
-        # ActionChains(browser).click(close_change_network).perform()  # 模拟鼠标点
-        # print("关闭切换网络失败的提醒")
-    except:
-        print("小狐狸可能没有遇到切换网络失败的问题")
+                # =====下面是关闭错误提示的代码。需要用鼠标模拟点击，因为有after
+                # close_change_network = browser.find_element(By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')
+                close_change_network = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')))
+                time_sleep(2)
+                ActionChains(browser).click(close_change_network).perform()  # 模拟鼠标点
+                time_sleep(2,"已经关闭了错误提醒")
+                if i == 5:
+                    print(f"已经尝试切换了{i}次，还是失败，关闭浏览器")
+                    browser.close()
+                else:
+                    print("已经关闭切换网络失败的提醒，准备再次切换")
+                    continue
+
+            except:
+                print("√ √ √ 小狐狸可能没有遇到切换网络失败的问题")
+                break
 
 #先不考虑
 def fox_commom_confirm(browser, wait):
@@ -2063,7 +2060,7 @@ def random_select_clash_ip(browser, wait):
         EC.visibility_of_all_elements_located((By.XPATH, '//*[@id="root"]/div/div[2]/div/div[1]/div/ul/li[1]/div/div[2]/div/ul/li[@class="cursor-pointer"]')))
     ip_num = random.randint(3, len(list(IPs)) - 26)  # 随机取一个 ip 序列
     browser.execute_script("arguments[0].click();", IPs[ip_num])
-    time_sleep(5)
+    time_sleep(5, "已经切换了随机节点")
     
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ zksync的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓#
@@ -4922,6 +4919,67 @@ def syncswap_remove_LP(browser, wait, excel_path,excel_row, write_excel_column, 
         print("成功!! 已经记录到excel")
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  syncswap的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  Galaxy领取NFT上的项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+Odyssey_url = "https://galaxy.eco/arbitrum/campaign/GCCNzUtQiW/"  # 2022,8,5,领取odesseyNFT
+
+# 领取ORB的奥德赛 NFT
+def claim_orb_NFT(browser, wait):
+    time_sleep(2, "准备打开 orb ")
+    new_tab(browser, Odyssey_url)
+    time_sleep(10, "正在打开 orb ")
+    switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
+    time_sleep(6, "waiting")
+    browser.refresh()
+    time_sleep(6, "waiting")
+    browser.refresh()
+    time_sleep(6, "waiting")
+    browser.refresh()
+    time_sleep(6, "waiting")  # 多刷新几次，防止说不能cliam
+
+    # 连接小狐狸
+    # try:
+    #     connect_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="topNavbar"]/div/div[2]/div[2]/div[1]/div[2]/button/span')))
+    #     if "Connect Wallet" in connect_button.text:
+    #         time_sleep(2)
+    #         browser.execute_script("arguments[0].click();", connect_button)
+
+    #         fox_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[3]/div/div/div/div[2]/div[2]/div')))
+    #         time_sleep(2)
+    #         browser.execute_script("arguments[0].click();", fox_button)
+    # except:
+    #     print("可能已经连接了小狐狸")
+    try:
+        claim_button = wait.until(EC.element_to_be_clickable((By.XPATH,
+                                                              '//*[@id="app"]/div/main/div/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div/button/span')))
+        time_sleep(7, "button found")
+        browser.execute_script("arguments[0].click();", claim_button)
+        time_sleep(15)
+        switch_tab_by_handle(browser, 1, 1)  # 切换到被撸网站
+        fox_info = fox_confirm_galaxy(browser, wait)
+        time_sleep(20)
+        switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
+
+        if "成功" in fox_info:
+            try:
+                submitted_button = wait.until(
+                    EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[3]/div/div/div/div[1]')))
+                if "submitted" in submitted_button.text:
+                    print("领取成功!")
+                    return "领取成功"
+            except:  # 小狐狸虽然确认成功了，但实际没有cliam成功
+                return "失败,小狐狸虽然确认成功了，但实际没有cliam成功"
+        else:
+            print("这个号领不了NFT")
+            return "失败"
+    except:
+        print("这个号领不了NFT")
+        return "失败"
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
 
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #

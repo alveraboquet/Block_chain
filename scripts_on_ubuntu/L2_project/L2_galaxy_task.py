@@ -3,60 +3,6 @@ sys.path.append('/home/parallels/ubuntu_op/Block_chain')
 sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
 from functions import *
 
-#============galaxy上的项目
-Odyssey_url = "https://galaxy.eco/arbitrum/campaign/GCCNzUtQiW/"  # 2022,8,5,领取NFT
-
-
-# 领取ORB NFT
-def claim_orb_NFT(browser, wait):
-    time_sleep(2, "准备打开 orb ")
-    new_tab(browser, Odyssey_url)
-    time_sleep(10, "正在打开 orb ")
-    switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
-    time_sleep( 6, "waiting")
-    browser.refresh()
-    time_sleep( 6, "waiting")
-    browser.refresh()
-    time_sleep( 6, "waiting")
-    browser.refresh()
-    time_sleep( 6, "waiting")   #多刷新几次，防止说不能cliam
-
-    #连接小狐狸
-    # try:
-    #     connect_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="topNavbar"]/div/div[2]/div[2]/div[1]/div[2]/button/span')))
-    #     if "Connect Wallet" in connect_button.text:
-    #         time_sleep(2)
-    #         browser.execute_script("arguments[0].click();", connect_button)
-
-    #         fox_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[3]/div/div/div/div[2]/div[2]/div')))
-    #         time_sleep(2)
-    #         browser.execute_script("arguments[0].click();", fox_button)
-    # except:
-    #     print("可能已经连接了小狐狸")  
-    try:
-        claim_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div/main/div/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div/button/span')))
-        time_sleep(7,"button found")
-        browser.execute_script("arguments[0].click();", claim_button)
-        time_sleep(15)
-        switch_tab_by_handle(browser, 1, 1)  # 切换到被撸网站
-        fox_info = fox_confirm_galaxy(browser, wait)
-        time_sleep(20)
-        switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
-        
-        if "成功" in fox_info:
-            try:
-                submitted_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[3]/div/div/div/div[1]')))
-                if "submitted" in submitted_button.text:
-                    print("领取成功!")
-                    return "领取成功"
-            except: #小狐狸虽然确认成功了，但实际没有cliam成功
-                return "失败,小狐狸虽然确认成功了，但实际没有cliam成功"
-        else:
-            print("这个号领不了NFT")
-            return "失败"
-    except:
-        print("这个号领不了NFT")
-        return "失败"
 
 excel_path= '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/L2_project/ARB_NFT.xlsx'
 #excel中, 标志列(用于记录任务成功或失败)
@@ -77,8 +23,8 @@ while 1:
         if success_or_fail != "成功":
             print(f"第{i} 个号需要做 galaxy ")
             try:
-                    ##=========== 准备浏览器
-                wait, browser = my_linux_chrome()
+                ##=========== 准备浏览器
+                wait, browser = my_linux_chrome(time_out=browser_wait_times)
 
                 ##=========== 预备步骤：切换IP。先打开
                 open_clash_dashboard(browser, wait, url_dashboard)
