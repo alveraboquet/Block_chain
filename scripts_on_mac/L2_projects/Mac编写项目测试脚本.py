@@ -1,13 +1,10 @@
 #pycharm通过git同步代码：窗口右上角粉色小箭头➡️
 from functions import *
 
-import linecache
-
-
 excel_path = '/Users/spencer/PycharmProjects/Block_chain/eth1000_操作后.xlsx'
 write_success_to_excel_column = "D"  #把成功或失败记录到excel的列
 read_from_excel_column = "D" #从excel中的哪一列读取状态? 判断是不是要做任务?
-excel_start_row = 30
+excel_start_row = 1
 browser_wait_times = 10
 
 for i in range(excel_start_row, 201):
@@ -30,7 +27,7 @@ for i in range(excel_start_row, 201):
 
 
     ##=========== 开始做任务
-    CID_text = linecache.getline(r"json_CID.txt", 2)
+    CID_text = DO_TXT(r"json_CID.txt", i).read_x_line()
     print("这次用的CID_text是",CID_text)
     save_record = zksync_mint_NFT(browser, wait, CID_text)
 
