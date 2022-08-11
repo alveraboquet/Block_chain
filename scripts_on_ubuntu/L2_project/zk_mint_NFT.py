@@ -25,7 +25,7 @@ while 1:  #到时要把对应的txt行数删掉
                 ##=========== 清理缓存（从上面新建的标签页里，打开下面的链接）
                 delete_cookie(browser)
 
-                ##=========== 登陆小狐狸，
+                ##============ 登陆小狐狸，
                 login_metamask(browser, wait, metamask_pw, metamask_home)
                 switch_tab_by_handle(browser, 1, 0)  # 切换到小狐狸
 

@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Block_chain.iml" filepath="$PROJECT_DIR$/.idea/Block_chain.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Learn_python/.idea/Learn_python.iml" filepath="$PROJECT_DIR$/../Learn_python/.idea/Learn_python.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../auto_video_project/.idea/auto_video_project.iml" filepath="$PROJECT_DIR$/../auto_video_project/.idea/auto_video_project.iml" />
     </modules>
   </component>
 </project>
