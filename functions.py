@@ -19,6 +19,7 @@ import string
 from itertools import chain
 from random import choice, sample
 from openpyxl import Workbook,load_workbook
+import linecache #用于读取txt文档
 
 ##===========切换IP相关
 url_dashboard = "http://127.0.0.1:9090/ui/#/proxies"
@@ -65,6 +66,22 @@ hop_url = "https://app.hop.exchange/#/send?token=ETH"
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 通用函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓#
 
+#txt索引从第一行开始
+class DO_TXT:
+    def __init__(self, input_path, input_x_line):
+        self.path = input_path
+        self.line = input_x_line
+    def read_x_line(self):
+        result = linecache.getline(self.path, self.line)
+        return result
+    def delet_x_line(self):
+        file = open(self.path)
+        lines = file.readlines()
+        del lines[self.line-1:self.line]
+        file.close()
+        file_new = open(self.path, "w")
+        file_new.writelines(lines)
+        file_new.close()
 
 
 # 保存剪切板数据
