@@ -9,6 +9,7 @@ read_from_excel_column = "D" #从excel中的哪一列读取状态? 判断是不�
 excel_start_row = 2
 browser_wait_times = 15
 
+
 while 1:  #到时要把对应的txt行数删掉
     for i in range(2, 101):
         success_or_fail = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
