@@ -4984,8 +4984,8 @@ def galaxy_claim_op_hop_NFT(browser, wait):
     time_sleep(2, "准备打开 orb ")
     new_tab(browser, galaxy_op_hop_NFT)
     time_sleep(30, "正在打开 orb ")
-    switch_tab_by_handle(browser, 1, 0)  # Mac下调试，切换到被撸网站
-    # switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
+    # switch_tab_by_handle(browser, 1, 0)  # Mac下调试，切换到被撸网站
+    switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
     # time_sleep(6, "waiting")
     # browser.refresh()
     # time_sleep(6, "waiting")
