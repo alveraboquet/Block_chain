@@ -57,8 +57,6 @@ def claim_orb_NFT(browser, wait):
     except:
         print("这个号领不了NFT")
         return "失败"
-    
-
 
 excel_path= '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/L2_project/ARB_NFT.xlsx'
 #excel中, 标志列(用于记录任务成功或失败)
@@ -87,7 +85,6 @@ while 1:
                 # switch_tab_by_handle(browser, 0, 0)  # 再切回 clash
                 # ip_switcher(browser, wait, url_google)  # 这里会新建一个标签页
                 random_select_clash_ip(browser, wait)
-
 
                 ##=========== 清理缓存（从上面新建的标签页里，打开下面的链接）
                 delete_cookie(browser)
