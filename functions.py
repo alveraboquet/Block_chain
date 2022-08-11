@@ -5006,40 +5006,43 @@ def galaxy_claim_op_hop_NFT(browser, wait):
     #         browser.execute_script("arguments[0].click();", fox_button)
     # except:
     #     print("可能已经连接了小狐狸")
-
-    #==================  查看有多少个数量可以领
-    available_num_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[@class='text-base ml-1 text-bold']")))
-    claimed_num_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[@class='text-base ml-1 mr-3 text-bold']")))
-    if claimed_num_button.text == "1": #说明这个号已经领取成功
-        print("这个号领取成功!")
-        return "领取成功"
-    else:
-        if available_num_button.text == "1": #说明这个号确实可以领，但还没有领
-            print("找到的available数量是：",available_num_button.text)
-            for i in range(1,5):
-                print(f"开始第{i}次领取")
-                claim_button = wait.until(EC.element_to_be_clickable((By.XPATH,'//*[@id="app"]/div/main/div/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div/button/span')))
-                time_sleep(7, "claim button found")
-                browser.execute_script("arguments[0].click();", claim_button)
-
-                time_sleep(60,"60秒后查看是否到账")
-                claimed_num_button = wait.until(
-                    EC.element_to_be_clickable((By.XPATH, "//span[@class='text-base ml-1 mr-3 text-bold']")))
-                if claimed_num_button.text == "1":  # 说明这个号已经领取成功
-                    print("领取成功!")
-                    return "领取成功"
-                else:
-                    time_sleep(2, "已经点击领取，但60秒后还未到账")
-                    browser.refresh()
-                    time_sleep(20, "刷新浏览器后继续")
-                    if i == 4:
-                        print("尝试领取4次，依旧失败")
-                        return "失败"
-                    continue
+    try:
+        #==================  查看有多少个数量可以领
+        available_num_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[@class='text-base ml-1 text-bold']")))
+        claimed_num_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[@class='text-base ml-1 mr-3 text-bold']")))
+        if claimed_num_button.text != "0": #说明这个号已经领取成功
+            print("这个号领取成功!")
+            return "领取成功"
         else:
-            print("这个号领不了NFT")
-            return "失败"
+            if available_num_button.text != "0": #说明这个号确实可以领，但还没有领
+                print("找到的available数量是：",available_num_button.text)
+                for i in range(1,5):
+                    print(f"开始第{i}次领取")
+                    claim_button = wait.until(EC.element_to_be_clickable((By.XPATH,'//*[@id="app"]/div/main/div/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div/button/span')))
+                    time_sleep(7, "claim button found")
+                    browser.execute_script("arguments[0].click();", claim_button)
 
+                    time_sleep(60,"60秒后查看是否到账")
+                    claimed_num_button = wait.until(
+                        EC.element_to_be_clickable((By.XPATH, "//span[@class='text-base ml-1 mr-3 text-bold']")))
+                    if claimed_num_button.text == "1":  # 说明这个号已经领取成功
+                        print("领取成功!")
+                        return "领取成功"
+                    else:
+                        time_sleep(2, "已经点击领取，但60秒后还未到账")
+                        browser.refresh()
+                        time_sleep(20, "刷新浏览器后继续")
+                        if i == 4:
+                            print("尝试领取4次，依旧失败")
+                            return "失败"
+                        continue
+            else:
+                print("这个号领不了NFT")
+                return "失败"
+    except:
+        print("这个号领不了NFT")
+        browser.quit()
+        return "失败"
 
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
