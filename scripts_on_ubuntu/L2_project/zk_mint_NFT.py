@@ -4,8 +4,8 @@ sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
 from functions import *
 excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_操作后.xlsx'
 
-write_success_to_excel_column = "D"  #把成功或失败记录到excel的列
-read_from_excel_column = "D" #从excel中的哪一列读取状态? 判断是不是要做任务?
+write_success_to_excel_column = "E"  #把成功或失败记录到excel的列
+read_from_excel_column = "E" #从excel中的哪一列读取状态? 判断是不是要做任务?
 excel_start_row = 2
 browser_wait_times = 15
 
@@ -13,7 +13,7 @@ while 1:  #到时要把对应的txt行数删掉
     for i in range(2, 101):
         success_or_fail = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         if success_or_fail != "成功":
-            print(f"第{i} 个号需要做 zk ")
+            print(f"第{i} 个号需要mint NFT ")
             try:
                 ##=========== 准备浏览器
                 wait, browser = my_linux_chrome(time_out = browser_wait_times)

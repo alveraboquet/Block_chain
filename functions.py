@@ -2464,7 +2464,11 @@ def zksync_mint_NFT(browser, wait, CID_text):
     time_sleep(5, "准备打开 zksync NFT ")
     new_tab(browser, zksybc_nft_url)
     time_sleep(20, "正在打开 zksync NFT ")
-    switch_tab_by_handle(browser, 1, 0)  # mac下调试，切换到被撸网站
+    browser.refresh()
+    time_sleep(30, "refresh ")
+    browser.refresh()
+    time_sleep(30, "refresh ")
+    switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
 
     ##=======开始链接钱包
     zk_connect_wallet(browser, wait)
@@ -2491,11 +2495,11 @@ def zksync_mint_NFT(browser, wait, CID_text):
     time_sleep(5, "等待小狐狸确认授权")
 
     #5)小狐狸确认授权
-    switch_tab_by_handle(browser, 0, 1)  # mac下调试，切换到小狐狸
+    switch_tab_by_handle(browser, 1, 1)  # mac下调试，切换到小狐狸
     fox_confirm_sign(browser, wait)
 
     #6）正式Mint NFT
-    switch_tab_by_handle(browser, 1, 0)  # mac下调试，切换到被撸网站
+    switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
     fromal_mint_NFT_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button//div[text()='Mint NFT']")))
     time_sleep(2)
     browser.execute_script("arguments[0].click();", fromal_mint_NFT_button)
@@ -2510,12 +2514,12 @@ def zksync_mint_NFT(browser, wait, CID_text):
         print("可能是不需要等待 proceed")
 
     # 7)小狐狸确认授权
-    switch_tab_by_handle(browser, 0, 1)  # mac下调试，切换到小狐狸
+    switch_tab_by_handle(browser, 1, 1)  # mac下调试，切换到小狐狸
     fox_confirm_sign(browser, wait)
 
     # 8)查看是否mint成功
     time_sleep(10, "等待查看是否成功 mint")
-    switch_tab_by_handle(browser, 1, 0)  # mac下调试，切换到被撸网站
+    switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
     try:
         OK_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()[contains(.,'Ok')]]")))
         print("找到ok，确实 mint 成功！")
