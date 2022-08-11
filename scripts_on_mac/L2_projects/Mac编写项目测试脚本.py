@@ -3,7 +3,7 @@ from functions import *
 
 excel_path = '/Users/spencer/PycharmProjects/Block_chain/eth1000_操作后.xlsx'
 browser_wait_times = 10
-for i in range(2, 201):
+for i in range(7, 201):
     # one_sign =str(Do_Excel(excel_path).read(i, "N"))
     # if "1" in one_sign:
     fail_sign = Do_Excel(excel_path).read(i, "K")
@@ -27,8 +27,8 @@ for i in range(2, 201):
 
 
         ##=========== 开始做任务
-        time_sleep(3600,"waiting。。。。。")
-
+        save_record = galaxy_claim_op_hop_NFT(browser, wait)
+        print("记录是：",save_record)
         a = random.randint(10, 15)
         time_sleep(a, f"++++++++++随机等待时间{a}")
         browser.quit()

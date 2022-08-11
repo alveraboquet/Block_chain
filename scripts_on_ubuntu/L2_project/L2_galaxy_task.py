@@ -44,7 +44,7 @@ while 1:
                 
                 ##=========== 开始做任务
                 #记录保存信息到excel
-                save_record = claim_orb_NFT(browser, wait)
+                save_record = galaxy_claim_orb_odyssey_NFT(browser, wait)
 
                 if "成功" in save_record:
                     Do_Excel(excel_path,sheetname='Sheet1').plain_write(i, write_success_to_excel_column, "成功")

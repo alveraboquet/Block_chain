@@ -357,7 +357,7 @@ def login_metamask(browser, wait, metamask_pw, metamask_home, netname=None):
             time_sleep(5, f"小狐狸准备切换网络，第{i}次")
             fox_change_network(browser, wait, netname)
             try:  #如果出现"切换网络"失败，则关闭提示
-                time_sleep(20, "准备查看是否网络失败")
+                time_sleep(30, "准备查看是否网络失败")
                 # change_net_error 即出现"切换网络"失败的提醒
                 change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
                 time_sleep(2, "确实找到了失败按钮，需要再次切换，先关闭提醒")
@@ -4923,10 +4923,11 @@ def syncswap_remove_LP(browser, wait, excel_path,excel_row, write_excel_column, 
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  Galaxy领取NFT上的项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
 
-Odyssey_url = "https://galaxy.eco/arbitrum/campaign/GCCNzUtQiW/"  # 2022,8,5,领取odesseyNFT
+Odyssey_url = "https://galaxy.eco/arbitrum/campaign/GCCNzUtQiW/"  # 2022,8,5,领取odessey NFT
+galaxy_op_hop_NFT = "https://galaxy.eco/HopProtocol/campaign/GCmydUtumN/" #2022，8，11，领取op的hop NFT
 
 # 领取ORB的奥德赛 NFT
-def claim_orb_NFT(browser, wait):
+def galaxy_claim_orb_odyssey_NFT(browser, wait):
     time_sleep(2, "准备打开 orb ")
     new_tab(browser, Odyssey_url)
     time_sleep(10, "正在打开 orb ")
@@ -4977,6 +4978,69 @@ def claim_orb_NFT(browser, wait):
     except:
         print("这个号领不了NFT")
         return "失败"
+
+#由于这个任务不需要小狐狸确认，所以通过是否已经claimed 来判断是否领取成功
+def galaxy_claim_op_hop_NFT(browser, wait):
+    time_sleep(2, "准备打开 orb ")
+    new_tab(browser, galaxy_op_hop_NFT)
+    time_sleep(30, "正在打开 orb ")
+    switch_tab_by_handle(browser, 1, 0)  # Mac下调试，切换到被撸网站
+    # switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
+    # time_sleep(6, "waiting")
+    # browser.refresh()
+    # time_sleep(6, "waiting")
+    # browser.refresh()
+    # time_sleep(6, "waiting")
+    # browser.refresh()
+    # time_sleep(6, "waiting")  # 多刷新几次，防止说不能cliam
+
+    # 连接小狐狸
+    # try:
+    #     connect_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="topNavbar"]/div/div[2]/div[2]/div[1]/div[2]/button/span')))
+    #     if "Connect Wallet" in connect_button.text:
+    #         time_sleep(2)
+    #         browser.execute_script("arguments[0].click();", connect_button)
+
+    #         fox_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[3]/div/div/div/div[2]/div[2]/div')))
+    #         time_sleep(2)
+    #         browser.execute_script("arguments[0].click();", fox_button)
+    # except:
+    #     print("可能已经连接了小狐狸")
+
+    #==================  查看有多少个数量可以领
+    available_num_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[@class='text-base ml-1 text-bold']")))
+    claimed_num_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[@class='text-base ml-1 mr-3 text-bold']")))
+    if claimed_num_button.text == "1": #说明这个号已经领取成功
+        print("这个号领取成功!")
+        return "领取成功"
+    else:
+        if available_num_button.text == "1": #说明这个号确实可以领，但还没有领
+            print("找到的available数量是：",available_num_button.text)
+            for i in range(1,5):
+                print(f"开始第{i}次领取")
+                claim_button = wait.until(EC.element_to_be_clickable((By.XPATH,'//*[@id="app"]/div/main/div/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div/button/span')))
+                time_sleep(7, "claim button found")
+                browser.execute_script("arguments[0].click();", claim_button)
+
+                time_sleep(60,"60秒后查看是否到账")
+                claimed_num_button = wait.until(
+                    EC.element_to_be_clickable((By.XPATH, "//span[@class='text-base ml-1 mr-3 text-bold']")))
+                if claimed_num_button.text == "1":  # 说明这个号已经领取成功
+                    print("领取成功!")
+                    return "领取成功"
+                else:
+                    time_sleep(2, "已经点击领取，但60秒后还未到账")
+                    browser.refresh()
+                    time_sleep(20, "刷新浏览器后继续")
+                    if i == 4:
+                        print("尝试领取4次，依旧失败")
+                        return "失败"
+                    continue
+        else:
+            print("这个号领不了NFT")
+            return "失败"
+
+
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
