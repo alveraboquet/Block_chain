@@ -34,7 +34,7 @@ while 1:  #到时要把对应的txt行数删掉
                 fox_change_account(browser, wait, i)  # 换号，选列表里的
 
                 ##=========== 开始做任务
-                CID_text = DO_TXT(r"json_CID.txt", i).read_x_line()
+                CID_text = DO_TXT(r"../json_CID.txt", i).read_x_line()
                 print("这次用的CID_text是", CID_text)
                 save_record = zksync_mint_NFT(browser, wait, CID_text)
 
