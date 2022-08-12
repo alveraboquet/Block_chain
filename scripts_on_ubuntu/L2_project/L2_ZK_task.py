@@ -103,10 +103,10 @@ excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_操作后.xlsx'
 # C列 = ETH转USDC, D列 = USDC转ETH
 # E列 = 提供流动性, F列 = 解除流动性
 
-write_success_to_excel_column = "D"  #把成功或失败记录到excel的列
+write_success_to_excel_column = "B"  #把成功或失败记录到excel的列
 write_major_token_to_excel_column = "F"  #记录主要代币是什么
 
-read_from_excel_column = "D" #从excel中的哪一列读取状态? 判断是不是要做任务?
+read_from_excel_column = "B" #从excel中的哪一列读取状态? 判断是不是要做任务?
 excel_start_row = 2
 browser_wait_times = 15
 
