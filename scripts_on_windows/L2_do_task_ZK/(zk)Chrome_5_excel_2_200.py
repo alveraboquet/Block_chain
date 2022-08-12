@@ -130,7 +130,7 @@ def ZK_zigzag_in_out(browser, wait):
 #user data 5：#excel表格2~200，相差0，chrome 2~201，Chrome5Q
 
 for i in range(62, 201):
-    # one_sign =str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "N"))
+    # one_sign =str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_OP_操作后.xlsx').read(i, "N"))
     # if "1" in one_sign:
     fail_sign = Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "N")
     if fail_sign != "成功":

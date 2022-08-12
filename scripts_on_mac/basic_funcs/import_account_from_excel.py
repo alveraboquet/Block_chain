@@ -4,7 +4,7 @@ from functions import *
 wait, browser = my_mac_chrome()
 login_metamask(browser, wait, metamask_pw, metamask_home)
 
-excel_path = "/Users/spencer/PycharmProjects/Blockchain项目/eth1000_操作后.xlsx"
+excel_path = "/Users/spencer/PycharmProjects/Blockchain项目/eth1000_OP_操作后.xlsx"
 #点击图标——》导入账户——》粘贴私钥——》导入
 for i in range(2, 202):
     key = Do_Excel(excel_path).read(i, "Y")

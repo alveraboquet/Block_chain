@@ -12,8 +12,8 @@ while True:
     for i in range(2, 201):
         print(f"=======在找号{i}")
         #============ 首先确定要转的源是哪个，比如 from 源是 ZK
-        # if str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "I")) == "1" or str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "I")) == "·1":  # OP 转钱
-        # if Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "K") != "成功":
+        # if str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_OP_操作后.xlsx').read(i, "I")) == "1" or str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_OP_操作后.xlsx').read(i, "I")) == "·1":  # OP 转钱
+        # if Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_OP_操作后.xlsx').read(i, "K") != "成功":
             # try:
         print(f"==========第{i}个号需要从 OP 转到其它 L2=========")
         ##=============准备浏览器
@@ -112,7 +112,7 @@ while True:
         time_sleep(a, f"++++++++++随机等待时间{a}")
             # except:
             #     print(f"{i}出错了")
-            #     Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').plain_write(i, "K", "×")
+            #     Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_OP_操作后.xlsx').plain_write(i, "K", "×")
             #     a = random.randint(6, 8)
             #     time_sleep(a, f"++++++++++随机等待时间{a}")
             #     try:

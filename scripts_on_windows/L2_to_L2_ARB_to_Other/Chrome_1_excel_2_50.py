@@ -200,7 +200,7 @@ for i in range(26, 51):
         print(f"=======在找号{i}")
         #============ 首先确定要转的源是哪个，比如 from 源是 ZK
         if str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "H")) == "1" or str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "H")) == "·1":  # ARB 转钱
-            # if Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "G") != "·成功":
+            # if Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_OP_操作后.xlsx').read(i, "G") != "·成功":
             try:
                 print(f"==========第{i}个号需要从 ARB 转到其它 L2=========")
                 ##=============准备浏览器

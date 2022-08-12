@@ -200,7 +200,7 @@ def OP_clipper():
         return info, major_token
 
 
-excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_操作后.xlsx'
+excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_OP_操作后.xlsx'
 #excel中, 标志列(用于记录任务成功或失败)
 # B列 = goerli转到zk上,
 # C列 = ETH转USDC, D列 = USDC转ETH

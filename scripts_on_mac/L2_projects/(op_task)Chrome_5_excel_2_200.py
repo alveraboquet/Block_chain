@@ -199,7 +199,7 @@ def OP_clipper():
 #user data 4：excel表格151~200，相差149，chrome2~51，Chrome4
 #user data 5：#excel表格2~200，相差0，chrome 2~201，Chrome5
 # 得从第二个号开始才有钱
-excel_path= "/Users/spencer/PycharmProjects/Blockchain项目/eth1000_操作后.xlsx"
+excel_path= "/Users/spencer/PycharmProjects/Blockchain项目/eth1000_OP_操作后.xlsx"
 
 for i in range(109, 201):
         # one_sign = str(Do_Excel(excel_path).read(i, "I"))

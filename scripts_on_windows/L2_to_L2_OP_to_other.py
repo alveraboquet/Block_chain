@@ -123,7 +123,7 @@ def L2_orb_L2(browser, wait, from_source, to_destination):
         # # ==== 保证源里面有钱，否则记录出错，关闭浏览器
         # if L2_ETH_value <= 0.01:
         #     print(f"第{i}个号出错了，没有钱")
-        #     balance_string = Do_Excel('eth1000_操作后.xlsx', "Sheet_from_ZK").write(i, 10,
+        #     balance_string = Do_Excel('eth1000_OP_操作后.xlsx', "Sheet_from_ZK").write(i, 10,
         #                                                                          f"第{i}个号出错了，只有{L2_ETH_value}ETH")
         #     browser.quit()
 

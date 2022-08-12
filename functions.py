@@ -293,11 +293,11 @@ class Do_Excel:
 #自己写一个，加点延时
 def Write_Excel(i,j,your_value):
     #加载文件
-    wb = load_workbook("../eth1000_操作后.xlsx")
+    wb = load_workbook("../eth1000_OP_操作后.xlsx")
     ws = wb.active
     ws.cell(i,j, value =  your_value)
     time.sleep(1)
-    wb.save("eth1000_操作后.xlsx")
+    wb.save("eth1000_OP_操作后.xlsx")
     wb.close()
 
 #将字典型字符串转为字典，返回的是字典
@@ -2452,7 +2452,7 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
 def find_excel_zk_account(i, j):
     zk_account_buffer = []
     for i in range(i, j):
-        if Do_Excel('../eth1000_操作后.xlsx').read(i, 7) == "1":  # zk 在第7列
+        if Do_Excel('../eth1000_OP_操作后.xlsx').read(i, 7) == "1":  # zk 在第7列
             print(f"第{i}个号需要做zk")
             zk_account_buffer.append(i)
     return zk_account_buffer

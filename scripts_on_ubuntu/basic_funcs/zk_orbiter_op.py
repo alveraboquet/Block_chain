@@ -182,7 +182,7 @@ def zk_orb_ARB(write_success_to_excel_column):
         Do_Excel(excel_path).write(i, "W", info)
 
 
-excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_操作后.xlsx'
+excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_OP_操作后.xlsx'
 write_success_to_excel_column = "L"  #把成功或失败记录到excel的列
 read_from_excel_column = "L" #从excel中的哪一列读取状态? 判断是不是要做任务?
 excel_start_row = 2

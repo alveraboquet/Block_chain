@@ -125,7 +125,7 @@ def L2_orb_L2(browser, wait, from_source, to_destination):
         # # ==== 保证源里面有钱，否则记录出错，关闭浏览器
         # if L2_ETH_value <= 0.01:
         #     print(f"第{i}个号出错了，没有钱")
-        #     balance_string = Do_Excel('eth1000_操作后.xlsx', "Sheet_from_ZK").write(i, 10,
+        #     balance_string = Do_Excel('eth1000_OP_操作后.xlsx', "Sheet_from_ZK").write(i, 10,
         #                                                                          f"第{i}个号出错了，只有{L2_ETH_value}ETH")
         #     browser.quit()
 
@@ -251,7 +251,7 @@ while True:
                 time.sleep(2)
 
                 ##===== 找到 L2 源的金额，法一：从excel上找 ；法二：找实时金额，比如zk的余额从 orb 上找
-                # balance_string = Do_Excel('eth1000_操作后.xlsx', "Sheet_from_ZK").read(i, 6)
+                # balance_string = Do_Excel('eth1000_OP_操作后.xlsx', "Sheet_from_ZK").read(i, 6)
                 # balance_dict = dict_type_string_to_dict(balance_string)
                 # L2_ETH_value = balance_dict['zksync'] # 得到该生态上的值，是 float 类型
 

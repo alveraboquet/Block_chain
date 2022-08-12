@@ -181,7 +181,7 @@ for i in range(3, 52):
         except:
             ##=========== 使用指定工作表，保存信息到excel
             print(f"----第{i}出错了，是excel没关闭吗？")
-            # Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').write(i, 15, f"第{i}出错了")
+            # Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_OP_操作后.xlsx').write(i, 15, f"第{i}出错了")
             time_sleep(6, "出错了")
             browser.quit()
             continue

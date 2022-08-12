@@ -95,8 +95,8 @@ def ZK_zigzag_in_out(browser, wait):
         return fox_info
 
 
-excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_操作后.xlsx'
-excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_操作后.xlsx'
+excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_OP_操作后.xlsx'
+excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_OP_操作后.xlsx'
 
 #excel中, 标志列(用于记录任务成功或失败)
 # B列 = goerli转到zk上,

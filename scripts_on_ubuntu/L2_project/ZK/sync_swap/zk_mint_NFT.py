@@ -2,7 +2,7 @@ import sys
 sys.path.append('/home/parallels/ubuntu_op/Block_chain')
 sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
 from functions import *
-excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_操作后.xlsx'
+excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_OP_操作后.xlsx'
 
 write_success_to_excel_column = "E"  #把成功或失败记录到excel的列
 read_from_excel_column = "E" #从excel中的哪一列读取状态? 判断是不是要做任务?

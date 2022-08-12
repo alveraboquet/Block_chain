@@ -143,7 +143,7 @@ for i in range(2,3):
     # time.sleep(2)
 
     ####### 使用指定工作表
-    my_excel = openpyxl.load_workbook('eth1000_操作后.xlsx')  # 有路径应带上路径
+    my_excel = openpyxl.load_workbook('eth1000_OP_操作后.xlsx')  # 有路径应带上路径
     sheet = my_excel.active  # 当前激活的工作表
 
     ######读取哪个生态上的初始资金比较多。写一个生态资金对比函数
@@ -161,7 +161,7 @@ for i in range(2,3):
     # save_record = mainnet_ZK_official_ZK(browser, wait, L1_ETH_value)
 
     sheet.cell(row=i, column=14, value= save_record)
-    my_excel.save('eth1000_操作后.xlsx')
+    my_excel.save('eth1000_OP_操作后.xlsx')
 
     # 这里要设置随机等待时间
     a = random.randint(2, 5)

@@ -237,7 +237,7 @@ while True:
     for i in range(13, 201):
         print(f"=======在找号{i}")
         #============ 首先确定要转的源是哪个，比如 from 源是 ZK
-        # sign = str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "I"))
+        # sign = str(Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_OP_操作后.xlsx').read(i, "I"))
         fail = Do_Excel(r'C:\Users\Terry\PycharmProjects\autopy\L2\eth1000_操作后.xlsx').read(i, "K")
         # if "1" in sign:  # ZK 转钱
         if fail != "·成功":

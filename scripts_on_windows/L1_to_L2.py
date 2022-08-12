@@ -256,8 +256,8 @@ while True:
                 # situation, save_record = mainnet_ZK_official_ZK(browser, wait, L1_ETH_value)          # 测试通过
 
                 # =====记录转账值到excel
-                Do_Excel('back_up_excel/eth1000_操作后.xlsx').write(i, 2, situation)
-                Do_Excel('back_up_excel/eth1000_操作后.xlsx').write(i, 4, save_record)
+                Do_Excel('back_up_excel/eth1000_OP_操作后.xlsx').write(i, 2, situation)
+                Do_Excel('back_up_excel/eth1000_OP_操作后.xlsx').write(i, 4, save_record)
 
                 # 这里要设置随机等待时间
                 a = random.randint(30, 300)

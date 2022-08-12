@@ -123,7 +123,7 @@ def L2_orb_L2(browser, wait, from_source, to_destination):
         # # ==== 保证源里面有钱，否则记录出错，关闭浏览器
         # if L2_ETH_value <= 0.01:
         #     print(f"第{i}个号出错了，没有钱")
-        #     balance_string = Do_Excel('eth1000_操作后.xlsx', "Sheet_from_ZK").write(i, 10,
+        #     balance_string = Do_Excel('eth1000_OP_操作后.xlsx', "Sheet_from_ZK").write(i, 10,
         #                                                                          f"第{i}个号出错了，只有{L2_ETH_value}ETH")
         #     browser.quit()
 
@@ -221,9 +221,9 @@ def L2_orb_L2(browser, wait, from_source, to_destination):
 while True:
     for i in range(100, 101):
         print(f"在找号{i}")
-        if Do_Excel('eth1000_操作后.xlsx').read(i, "E") == "1": #注意是字符串的 “1”
+        if Do_Excel('eth1000_OP_操作后.xlsx').read(i, "E") == "1": #注意是字符串的 “1”
             # 且 Zk 之前没有转过，才进行操作
-            if Do_Excel('eth1000_操作后.xlsx').read(i, "G") != "·成功":
+            if Do_Excel('eth1000_OP_操作后.xlsx').read(i, "G") != "·成功":
                 try:
                     print(f"========= 第 {i} 个号需要从 OP 转到其它 L2 ======")
                     ##=============准备浏览器
@@ -253,15 +253,15 @@ while True:
                     if a == 1:
                         info = L2_orb_L2(browser, wait, "Optimism", "zkSync")  # 测试通过
                         print(info)  # 记录该info
-                        Do_Excel('eth1000_操作后.xlsx').plain_write(i, "G", "成功")
-                        Do_Excel('eth1000_操作后.xlsx').write(i, "J", "1")
-                        Do_Excel('eth1000_操作后.xlsx').write(i, "W", info)
+                        Do_Excel('eth1000_OP_操作后.xlsx').plain_write(i, "G", "成功")
+                        Do_Excel('eth1000_OP_操作后.xlsx').write(i, "J", "1")
+                        Do_Excel('eth1000_OP_操作后.xlsx').write(i, "W", info)
                     elif a == 2:
                         info = L2_orb_L2(browser, wait, "Optimism", "Arbitrum")  # 测试通过
                         print(info)  # 记录该info
-                        Do_Excel('eth1000_操作后.xlsx').plain_write(i, "G", "成功")
-                        Do_Excel('eth1000_操作后.xlsx').write(i, "H", "1")
-                        Do_Excel('eth1000_操作后.xlsx').write(i, "W", info)
+                        Do_Excel('eth1000_OP_操作后.xlsx').plain_write(i, "G", "成功")
+                        Do_Excel('eth1000_OP_操作后.xlsx').write(i, "H", "1")
+                        Do_Excel('eth1000_OP_操作后.xlsx').write(i, "W", info)
 
                     # ======== 操作结束，关闭浏览器
                     a = random.randint(20, 300)
@@ -271,7 +271,7 @@ while True:
                     time_sleep(a, f"++++++++++随机等待时间{a}, 下一个号是{i+1}")
                 except:
                     print(f"号{i}出错了")
-                    Do_Excel('eth1000_操作后.xlsx').plain_write(i, "G", "出错了")
+                    Do_Excel('eth1000_OP_操作后.xlsx').plain_write(i, "G", "出错了")
                     a = random.randint(20, 100)
                     time_sleep(a, f"++++++++++随机等待时间{a}, 下一个号是{i+1}")
                     browser.quit()
