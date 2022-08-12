@@ -19,6 +19,7 @@ import string
 from itertools import chain
 from random import choice, sample
 from openpyxl import Workbook,load_workbook
+import linecache #用于读取txt文档
 
 ##===========切换IP相关
 url_dashboard = "http://127.0.0.1:9090/ui/#/proxies"
@@ -65,6 +66,22 @@ hop_url = "https://app.hop.exchange/#/send?token=ETH"
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 通用函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓#
 
+#txt索引从第一行开始
+class DO_TXT:
+    def __init__(self, input_path, input_x_line):
+        self.path = input_path
+        self.line = input_x_line
+    def read_x_line(self):
+        result = linecache.getline(self.path, self.line)
+        return result
+    def delet_x_line(self):
+        file = open(self.path)
+        lines = file.readlines()
+        del lines[self.line-1:self.line]
+        file.close()
+        file_new = open(self.path, "w")
+        file_new.writelines(lines)
+        file_new.close()
 
 
 # 保存剪切板数据
@@ -2429,7 +2446,6 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
     # time_sleep(5)
 
 
-
 #寻找excel 里，需要做zk任务的号。原理是看是否标记为 “1”
 #参数 i和j 是excel 的行起点、终点
 #返回一个列表
@@ -2440,6 +2456,77 @@ def find_excel_zk_account(i, j):
             print(f"第{i}个号需要做zk")
             zk_account_buffer.append(i)
     return zk_account_buffer
+
+
+zksybc_nft_url = "https://wallet.zksync.io/account/nft/"
+# 该函数用于mint zk 的NFT，其中CID_text 是要输入的CID（预先准备）
+def zksync_mint_NFT(browser, wait, CID_text):
+    time_sleep(5, "准备打开 zksync NFT ")
+    new_tab(browser, zksybc_nft_url)
+    time_sleep(20, "正在打开 zksync NFT ")
+    browser.refresh()
+    time_sleep(30, "refresh ")
+    browser.refresh()
+    time_sleep(30, "refresh ")
+    switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
+
+    ##=======开始链接钱包
+    zk_connect_wallet(browser, wait)
+    #======开始mint NFT
+    #1）点击NFT
+    NFTs_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='NFTs']")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", NFTs_button)
+
+    #2)点击 mint NFT 页面
+    mint_NFT_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()[contains(., 'Mint NFT')]]")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", mint_NFT_button)
+
+    #3)输入CID号码
+    input_CID_box = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='0x hash or CID']")))
+    time_sleep(2)
+    input_CID_box.send_keys(str(CID_text))  #
+
+    #4）授权
+    Authorize_to_Mint_NFT = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[text()='Authorize to Mint NFT']")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", Authorize_to_Mint_NFT)
+    time_sleep(5, "等待小狐狸确认授权")
+
+    #5)小狐狸确认授权
+    switch_tab_by_handle(browser, 1, 1)  # mac下调试，切换到小狐狸
+    fox_confirm_sign(browser, wait)
+
+    #6）正式Mint NFT
+    switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
+    fromal_mint_NFT_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button//div[text()='Mint NFT']")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", fromal_mint_NFT_button)
+
+    try:
+        time_sleep(5, "等待Proceed_to_Mint_NFT出现")
+        Proceed_to_Mint_NFT_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()[contains(.,'Proceed')]]")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", Proceed_to_Mint_NFT_button)
+        time_sleep(5, "等待小狐狸确认mint")
+    except:
+        print("可能是不需要等待 proceed")
+
+    # 7)小狐狸确认授权
+    switch_tab_by_handle(browser, 1, 1)  # mac下调试，切换到小狐狸
+    fox_confirm_sign(browser, wait)
+
+    # 8)查看是否mint成功
+    time_sleep(10, "等待查看是否成功 mint")
+    switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
+    try:
+        OK_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()[contains(.,'Ok')]]")))
+        print("找到ok，确实 mint 成功！")
+        return "成功"
+    except:
+        print("没有找到ok，可能mint失败")
+        return "失败"
 
 
 ##↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ zksync的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
