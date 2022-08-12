@@ -1,4 +1,4 @@
-from Basic_files.functions import *
+from functions import *
 
 #============ZK上的项目
 ZK_url = "https://wallet.zksync.io/transaction/deposit"  # 官方桥，L1转L2
@@ -128,65 +128,66 @@ def ZK_zigzag_in_out(browser, wait):
 #user data 3：excel表格101~150，相差99，chrome2~51，Chrome3
 #user data 4：excel表格151~200，相差149，chrome2~51，Chrome4
 #user data 5：#excel表格2~200，相差0，chrome 2~201，Chrome5Q
-excel_path = '/Users/spencer/PycharmProjects/Blockchain项目/eth1000_操作后.xlsx'
+excel_path = '/Users/spencer/PycharmProjects/Block_chain/eth1000_操作后.xlsx'
 for i in range(2, 201):
     # one_sign =str(Do_Excel(excel_path).read(i, "N"))
     # if "1" in one_sign:
     fail_sign = Do_Excel(excel_path).read(i, "K")
     if fail_sign != "·成功":
         print(f"第{i} 个号需要做zk")
-        try:
+        # try:
                 ##=========== 准备浏览器
 
-            wait, browser = my_mac_chrome()
+        wait, browser = my_mac_chrome()
 
-            ##=========== 预备步骤：切换IP。先打开
-            open_clash_dashboard(browser, wait, url_dashboard)
-            # switch_tab_by_handle(browser, 0, 0)  # 再切回 clash
-            ip_switcher(browser, wait, url_google)  # 这里会新建一个标签页
+        ##=========== 预备步骤：切换IP。先打开
+        open_clash_dashboard(browser, wait, url_dashboard)
+        # switch_tab_by_handle(browser, 0, 0)  # 再切回 clash
+        # ip_switcher(browser, wait, url_google)  # 这里会新建一个标签页
+        random_select_clash_ip(browser, wait)
 
-            ##=========== 清理缓存（从上面新建的标签页里，打开下面的链接）
-            delete_cookie(browser)
+        ##=========== 清理缓存（从上面新建的标签页里，打开下面的链接）
+        delete_cookie(browser)
 
-            ##=========== 登陆小狐狸，
-            login_metamask(browser, wait, metamask_pw, metamask_home, "Ethereum")
-            switch_tab_by_handle(browser, 1, 0)  # 切换到小狐狸
-            # 小狐狸换号
-            print(f"=========================================开始换号{i} ==============")
-            fox_change_account(browser, wait, i)  #换号，选列表里的
+        ##=========== 登陆小狐狸，
+        login_metamask(browser, wait, metamask_pw, metamask_home, "Ethereum")
+        switch_tab_by_handle(browser, 1, 0)  # 切换到小狐狸
+        # 小狐狸换号
+        print(f"=========================================开始换号{i} ==============")
+        fox_change_account(browser, wait, i)  #换号，选列表里的
 
-            ##=========== 开始做任务
-            save_record = ZK_zigzag_in_out(browser, wait)
-            #保存信息到excel
-            if "ZK zigzag" in save_record:
-                Do_Excel(excel_path).write(i, "V", save_record)  #写到账号所在的行，zk_accounts[i] 不用改，就是用 excel 里的行
-                Do_Excel(excel_path).write(i, "P", "哈哈")
-                time_sleep(30, f"{save_record}，日志写入excel成功，30 秒后反向操作")
-            else:
-                Do_Excel(excel_path).write(i, "V", save_record)  # 写到账号所在的行，zk_accounts[i] 不用改，就是用 excel 里的行
-                time_sleep(30, f"{save_record}，日志写入excel成功，30 秒后反向操作")
-            #===========反向操作
-            save_record = ZK_zigzag_in_out(browser, wait)
-            ##保存信息到excel
-            if "ZK zigzag" in save_record:
-                Do_Excel(excel_path).write(i, "V", save_record)
-                Do_Excel(excel_path).write(i, "P", "哈√")
-                time_sleep(2, f"{save_record}，日志写入excel成功")
-            else:
-                Do_Excel(excel_path).write(i, "V", save_record)  # 写到账号所在的行，zk_accounts[i] 不用改，就是用 excel 里的行
-                time_sleep(2, f"{save_record}，日志写入excel成功")
-            ##=========== 这里要设置随机等待时间
-            Do_Excel(excel_path).plain_write(i, "K", "·成功")
-            a = random.randint(10, 15)
-            time_sleep(a, f"++++++++++随机等待时间{a}")
-            browser.quit()
-            a = random.randint(10, 15)
-            time_sleep(a, f"++++++++++随机等待时间{a}")
+        ##=========== 开始做任务
+        save_record = ZK_zigzag_in_out(browser, wait)
+        #保存信息到excel
+        if "ZK zigzag" in save_record:
+            Do_Excel(excel_path).write(i, "V", save_record)  #写到账号所在的行，zk_accounts[i] 不用改，就是用 excel 里的行
+            Do_Excel(excel_path).write(i, "P", "哈哈")
+            time_sleep(30, f"{save_record}，日志写入excel成功，30 秒后反向操作")
+        else:
+            Do_Excel(excel_path).write(i, "V", save_record)  # 写到账号所在的行，zk_accounts[i] 不用改，就是用 excel 里的行
+            time_sleep(30, f"{save_record}，日志写入excel成功，30 秒后反向操作")
+        #===========反向操作
+        save_record = ZK_zigzag_in_out(browser, wait)
+        ##保存信息到excel
+        if "ZK zigzag" in save_record:
+            Do_Excel(excel_path).write(i, "V", save_record)
+            Do_Excel(excel_path).write(i, "P", "哈√")
+            time_sleep(2, f"{save_record}，日志写入excel成功")
+        else:
+            Do_Excel(excel_path).write(i, "V", save_record)  # 写到账号所在的行，zk_accounts[i] 不用改，就是用 excel 里的行
+            time_sleep(2, f"{save_record}，日志写入excel成功")
+        ##=========== 这里要设置随机等待时间
+        Do_Excel(excel_path).plain_write(i, "K", "·成功")
+        a = random.randint(10, 15)
+        time_sleep(a, f"++++++++++随机等待时间{a}")
+        browser.quit()
+        a = random.randint(10, 15)
+        time_sleep(a, f"++++++++++随机等待时间{a}")
         #
-        except:
-            ##=========== 使用指定工作表，保存信息到excel
-            print(f"----第{i}出错了，是excel没关闭吗？")
-            Do_Excel(excel_path).plain_write(i, "K", "×")
-            time_sleep(6, "出错了")
-            browser.quit()
-            continue
+        # except:
+        #     ##=========== 使用指定工作表，保存信息到excel
+        #     print(f"----第{i}出错了，是excel没关闭吗？")
+        #     Do_Excel(excel_path).plain_write(i, "K", "×")
+        #     time_sleep(6, "出错了")
+        #     browser.quit()
+        #     continue

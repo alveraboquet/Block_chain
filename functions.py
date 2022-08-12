@@ -19,6 +19,7 @@ import string
 from itertools import chain
 from random import choice, sample
 from openpyxl import Workbook,load_workbook
+import linecache #用于读取txt文档
 
 ##===========切换IP相关
 url_dashboard = "http://127.0.0.1:9090/ui/#/proxies"
@@ -65,6 +66,22 @@ hop_url = "https://app.hop.exchange/#/send?token=ETH"
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 通用函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓#
 
+#txt索引从第一行开始
+class DO_TXT:
+    def __init__(self, input_path, input_x_line):
+        self.path = input_path
+        self.line = input_x_line
+    def read_x_line(self):
+        result = linecache.getline(self.path, self.line)
+        return result
+    def delet_x_line(self):
+        file = open(self.path)
+        lines = file.readlines()
+        del lines[self.line-1:self.line]
+        file.close()
+        file_new = open(self.path, "w")
+        file_new.writelines(lines)
+        file_new.close()
 
 
 # 保存剪切板数据
@@ -144,12 +161,12 @@ def my_chrome(chrome_user_num):
     return wait, browser
 
 #构建浏览器
-def my_mac_chrome():
+def my_mac_chrome(time_out=30):
     # 获取驱动的路径
     driver_path = "/usr/local/bin/chromedriver" # chromedriver完整路径，path是重点。如果不行，试试chromedriver.exe
     # print(driver_path)
 
-    TIME_OUT = 30  # 设置显示等待的超时时间，尽量设置的长一点，考虑到网络可能缓慢
+    TIME_OUT = time_out  # 设置显示等待的超时时间，尽量设置的长一点，考虑到网络可能缓慢
     option = ChromeOptions()
     # option.add_argument('--headless')#是否开启无头模式
     # option.add_argument('--disable-gpu')#屏蔽浏览器引擎
@@ -335,7 +352,7 @@ def delete_cookie(browser):
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 小狐狸的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓#
 
 #登陆小狐狸，直到登陆成功.
-def login_metamask(browser, wait, metamask_pw, metamask_home, net_error=None):
+def login_metamask(browser, wait, metamask_pw, metamask_home, netname=None):
     print("我已进入login_metamask，开始登陆小狐狸")
     # new_tab(browser, metamask_home)
     browser.get(metamask_home)
@@ -345,42 +362,39 @@ def login_metamask(browser, wait, metamask_pw, metamask_home, net_error=None):
     time.sleep(1)
     send_password.send_keys(Keys.ENTER)
     time_sleep(25,"正在打开小狐狸")
-    for i in range(1,20):
+    for i in range(1,10):
         try:
             just_wait = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='identicon__address-wrapper']")))
             break
         except:
             # browser.refresh()
             time_sleep(5, "已经输入小狐狸登陆，还未进入主页，继续等待")
-    if net_error:
-        time_sleep(5, "小狐狸小狐狸change net")
-        fox_change_network(browser, wait, net_error)
-        time_sleep(5, "小狐狸change net")
-        fox_change_network(browser, wait, net_error)
-        time_sleep(5, "小狐狸change net")
-        fox_change_network(browser, wait, net_error)
+    if netname: #如果有参数，说明要切换网络
+        for i in range(1,6): #尝试切换5次
+            time_sleep(5, f"小狐狸准备切换网络，第{i}次")
+            fox_change_network(browser, wait, netname)
+            try:  #如果出现"切换网络"失败，则关闭提示
+                time_sleep(30, "准备查看是否网络失败")
+                # change_net_error 即出现"切换网络"失败的提醒
+                change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
+                time_sleep(2, "确实找到了失败按钮，需要再次切换，先关闭提醒")
 
-    #如果出现切换网络失败，则关闭提示
-    try:
-        #这是切换网络提示的按钮
-        time_sleep(3, "准备查看是否网络失败")
-        change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
-        # time_sleep(2)
-        # browser.execute_script("arguments[0].click();", change_net_error)
-        while change_net_error: #如果真的存在切换网络提示的按钮，则切换
-            print("找到了切换网络提示的按钮，下面尝试切换网络")
-            fox_change_network(browser, wait, net_error)
-            time_sleep(10,"再查看是有有网络切换提示按钮")
-            change_net_error = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-content"]/div/div[3]/div[1]/div[2]/div/div/button[1]')))
-    
-        #=====下面是关闭错误提示的代码
-        # close_change_network = browser.find_element(By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')
-        # # close_change_network = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')))
-        # time_sleep(2)
-        # ActionChains(browser).click(close_change_network).perform()  # 模拟鼠标点
-        # print("关闭切换网络失败的提醒")
-    except:
-        print("小狐狸可能没有遇到切换网络失败的问题")
+                # =====下面是关闭错误提示的代码。需要用鼠标模拟点击，因为有after
+                # close_change_network = browser.find_element(By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')
+                close_change_network = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#app-content > div > div.main-container-wrapper > div.loading-overlay > div.page-container__header-close')))
+                time_sleep(2)
+                ActionChains(browser).click(close_change_network).perform()  # 模拟鼠标点
+                time_sleep(2,"已经关闭了错误提醒")
+                if i == 5:
+                    print(f"已经尝试切换了{i}次，还是失败，关闭浏览器")
+                    browser.close()
+                else:
+                    print("已经关闭切换网络失败的提醒，准备再次切换")
+                    continue
+
+            except:
+                print("√ √ √ 小狐狸可能没有遇到切换网络失败的问题")
+                break
 
 #先不考虑
 def fox_commom_confirm(browser, wait):
@@ -2063,7 +2077,7 @@ def random_select_clash_ip(browser, wait):
         EC.visibility_of_all_elements_located((By.XPATH, '//*[@id="root"]/div/div[2]/div/div[1]/div/ul/li[1]/div/div[2]/div/ul/li[@class="cursor-pointer"]')))
     ip_num = random.randint(3, len(list(IPs)) - 26)  # 随机取一个 ip 序列
     browser.execute_script("arguments[0].click();", IPs[ip_num])
-    time_sleep(5)
+    time_sleep(5, "已经切换了随机节点")
     
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ zksync的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓#
@@ -2293,14 +2307,14 @@ def ZK_zigzag_choose_token(browser, wait, token):
 def get_ZK_zigzag_balance(browser, wait):
     print("进入get_ZK_zigzag_balance()，获取zigzag上的ETH余额")
     # browser.refresh()
-    # time_sleep(8)
+    # time_sleep(5)
     #点击图标"
-    icon_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[1]/button')))
+    icon_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='StyledButton-sc-19l6nhk-0 cHQUGM IconButton-sc-1wt1b69-0 AccountButton__IconButton-sc-1vtrp04-0 lagfdI JHywm']")))
     time_sleep(3)
     browser.execute_script("arguments[0].click();", icon_button)
     
     #点击L2
-    L2_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div[1]/div[2]/div[1]/div/div[1]/ul/li[2]/div')))
+    L2_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[text()='l2']")))
     time_sleep(3)
     browser.execute_script("arguments[0].click();", L2_button)
 
@@ -2432,7 +2446,6 @@ def zk_zigzag_prepare_swap(browser, wait, L2_ETH_value, buy_or_sell):
     # time_sleep(5)
 
 
-
 #寻找excel 里，需要做zk任务的号。原理是看是否标记为 “1”
 #参数 i和j 是excel 的行起点、终点
 #返回一个列表
@@ -2443,6 +2456,77 @@ def find_excel_zk_account(i, j):
             print(f"第{i}个号需要做zk")
             zk_account_buffer.append(i)
     return zk_account_buffer
+
+
+zksybc_nft_url = "https://wallet.zksync.io/account/nft/"
+# 该函数用于mint zk 的NFT，其中CID_text 是要输入的CID（预先准备）
+def zksync_mint_NFT(browser, wait, CID_text):
+    time_sleep(5, "准备打开 zksync NFT ")
+    new_tab(browser, zksybc_nft_url)
+    time_sleep(20, "正在打开 zksync NFT ")
+    browser.refresh()
+    time_sleep(30, "refresh ")
+    browser.refresh()
+    time_sleep(30, "refresh ")
+    switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
+
+    ##=======开始链接钱包
+    zk_connect_wallet(browser, wait)
+    #======开始mint NFT
+    #1）点击NFT
+    NFTs_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='NFTs']")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", NFTs_button)
+
+    #2)点击 mint NFT 页面
+    mint_NFT_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()[contains(., 'Mint NFT')]]")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", mint_NFT_button)
+
+    #3)输入CID号码
+    input_CID_box = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='0x hash or CID']")))
+    time_sleep(2)
+    input_CID_box.send_keys(str(CID_text))  #
+
+    #4）授权
+    Authorize_to_Mint_NFT = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[text()='Authorize to Mint NFT']")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", Authorize_to_Mint_NFT)
+    time_sleep(5, "等待小狐狸确认授权")
+
+    #5)小狐狸确认授权
+    switch_tab_by_handle(browser, 1, 1)  # mac下调试，切换到小狐狸
+    fox_confirm_sign(browser, wait)
+
+    #6）正式Mint NFT
+    switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
+    fromal_mint_NFT_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button//div[text()='Mint NFT']")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", fromal_mint_NFT_button)
+
+    try:
+        time_sleep(5, "等待Proceed_to_Mint_NFT出现")
+        Proceed_to_Mint_NFT_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()[contains(.,'Proceed')]]")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", Proceed_to_Mint_NFT_button)
+        time_sleep(5, "等待小狐狸确认mint")
+    except:
+        print("可能是不需要等待 proceed")
+
+    # 7)小狐狸确认授权
+    switch_tab_by_handle(browser, 1, 1)  # mac下调试，切换到小狐狸
+    fox_confirm_sign(browser, wait)
+
+    # 8)查看是否mint成功
+    time_sleep(10, "等待查看是否成功 mint")
+    switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
+    try:
+        OK_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()[contains(.,'Ok')]]")))
+        print("找到ok，确实 mint 成功！")
+        return "成功"
+    except:
+        print("没有找到ok，可能mint失败")
+        return "失败"
 
 
 ##↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ zksync的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
@@ -4922,6 +5006,134 @@ def syncswap_remove_LP(browser, wait, excel_path,excel_row, write_excel_column, 
         print("成功!! 已经记录到excel")
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  syncswap的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  Galaxy领取NFT上的项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+Odyssey_url = "https://galaxy.eco/arbitrum/campaign/GCCNzUtQiW/"  # 2022,8,5,领取odessey NFT
+galaxy_op_hop_NFT = "https://galaxy.eco/HopProtocol/campaign/GCmydUtumN/" #2022，8，11，领取op的hop NFT
+
+# 领取ORB的奥德赛 NFT
+def galaxy_claim_orb_odyssey_NFT(browser, wait):
+    time_sleep(2, "准备打开 orb ")
+    new_tab(browser, Odyssey_url)
+    time_sleep(10, "正在打开 orb ")
+    switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
+    time_sleep(6, "waiting")
+    browser.refresh()
+    time_sleep(6, "waiting")
+    browser.refresh()
+    time_sleep(6, "waiting")
+    browser.refresh()
+    time_sleep(6, "waiting")  # 多刷新几次，防止说不能cliam
+
+    # 连接小狐狸
+    # try:
+    #     connect_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="topNavbar"]/div/div[2]/div[2]/div[1]/div[2]/button/span')))
+    #     if "Connect Wallet" in connect_button.text:
+    #         time_sleep(2)
+    #         browser.execute_script("arguments[0].click();", connect_button)
+
+    #         fox_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[3]/div/div/div/div[2]/div[2]/div')))
+    #         time_sleep(2)
+    #         browser.execute_script("arguments[0].click();", fox_button)
+    # except:
+    #     print("可能已经连接了小狐狸")
+    try:
+        claim_button = wait.until(EC.element_to_be_clickable((By.XPATH,
+                                                              '//*[@id="app"]/div/main/div/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div/button/span')))
+        time_sleep(7, "button found")
+        browser.execute_script("arguments[0].click();", claim_button)
+        time_sleep(15)
+        switch_tab_by_handle(browser, 1, 1)  # 切换到被撸网站
+        fox_info = fox_confirm_galaxy(browser, wait)
+        time_sleep(20)
+        switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
+
+        if "成功" in fox_info:
+            try:
+                submitted_button = wait.until(
+                    EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[3]/div/div/div/div[1]')))
+                if "submitted" in submitted_button.text:
+                    print("领取成功!")
+                    return "领取成功"
+            except:  # 小狐狸虽然确认成功了，但实际没有cliam成功
+                return "失败,小狐狸虽然确认成功了，但实际没有cliam成功"
+        else:
+            print("这个号领不了NFT")
+            return "失败"
+    except:
+        print("这个号领不了NFT")
+        return "失败"
+
+#由于这个任务不需要小狐狸确认，所以通过是否已经claimed 来判断是否领取成功
+def galaxy_claim_op_hop_NFT(browser, wait):
+    time_sleep(2, "准备打开 orb ")
+    new_tab(browser, galaxy_op_hop_NFT)
+    time_sleep(30, "正在打开 orb ")
+    # switch_tab_by_handle(browser, 1, 0)  # Mac下调试，切换到被撸网站
+    switch_tab_by_handle(browser, 2, 0)  # 切换到被撸网站
+    # time_sleep(6, "waiting")
+    # browser.refresh()
+    # time_sleep(6, "waiting")
+    # browser.refresh()
+    # time_sleep(6, "waiting")
+    # browser.refresh()
+    # time_sleep(6, "waiting")  # 多刷新几次，防止说不能cliam
+
+    # 连接小狐狸
+    # try:
+    #     connect_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="topNavbar"]/div/div[2]/div[2]/div[1]/div[2]/button/span')))
+    #     if "Connect Wallet" in connect_button.text:
+    #         time_sleep(2)
+    #         browser.execute_script("arguments[0].click();", connect_button)
+
+    #         fox_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/div[3]/div/div/div/div[2]/div[2]/div')))
+    #         time_sleep(2)
+    #         browser.execute_script("arguments[0].click();", fox_button)
+    # except:
+    #     print("可能已经连接了小狐狸")
+    try:
+        #==================  查看有多少个数量可以领
+        available_num_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[@class='text-base ml-1 text-bold']")))
+        claimed_num_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[@class='text-base ml-1 mr-3 text-bold']")))
+        if claimed_num_button.text != "0": #说明这个号已经领取成功
+            print("这个号领取成功!")
+            return "领取成功"
+        else:
+            if available_num_button.text != "0": #说明这个号确实可以领，但还没有领
+                print("找到的available数量是：",available_num_button.text)
+                for i in range(1,5):
+                    print(f"开始第{i}次领取")
+                    claim_button = wait.until(EC.element_to_be_clickable((By.XPATH,'//*[@id="app"]/div/main/div/div/div/div/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div/button/span')))
+                    time_sleep(7, "claim button found")
+                    browser.execute_script("arguments[0].click();", claim_button)
+
+                    time_sleep(60,"60秒后查看是否到账")
+                    claimed_num_button = wait.until(
+                        EC.element_to_be_clickable((By.XPATH, "//span[@class='text-base ml-1 mr-3 text-bold']")))
+                    if claimed_num_button.text == "1":  # 说明这个号已经领取成功
+                        print("领取成功!")
+                        return "领取成功"
+                    else:
+                        time_sleep(2, "已经点击领取，但60秒后还未到账")
+                        browser.refresh()
+                        time_sleep(20, "刷新浏览器后继续")
+                        if i == 4:
+                            print("尝试领取4次，依旧失败")
+                            return "失败"
+                        continue
+            else:
+                print("这个号领不了NFT")
+                return "失败"
+    except:
+        print("这个号领不了NFT")
+        browser.quit()
+        return "失败"
+
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
 
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
