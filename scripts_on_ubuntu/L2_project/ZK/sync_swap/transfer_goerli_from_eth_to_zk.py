@@ -6,7 +6,7 @@ import os,inspect
 current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 os.chdir(current_dir)
 import sys
-sys.path.append('../')
+sys.path.append('../../../')
 
 
 from functions import *
