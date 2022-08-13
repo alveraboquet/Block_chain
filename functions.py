@@ -2183,7 +2183,7 @@ def zk_connect_wallet(browser, wait):
             EC.element_to_be_clickable((By.XPATH, "//span[@class='svelte-1799bj2' and text()='MetaMask']")))
         time_sleep(3)
         browser.execute_script("arguments[0].click();", MetaMask_button)
-        time_sleep(5,"")
+        time_sleep(5,"已经链接小狐狸")
     except:
         print("zk_connect_wallet(),没有找到小狐狸，是否有影响？")
     time_sleep(5)
@@ -2508,6 +2508,7 @@ def zksync_mint_NFT(browser, wait, CID_text):
 
     ##=======开始链接钱包
     zk_connect_wallet(browser, wait)
+
     #======开始mint NFT
     #1）点击NFT
     NFTs_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='NFTs']")))
