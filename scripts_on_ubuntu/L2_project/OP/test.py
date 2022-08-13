@@ -1,5 +1,3 @@
-import random
-stable_coin_list = ["USDC", "USDT", "DAI"]
-to_source = random.choice(stable_coin_list)
-print(to_source)
-
+i = 10
+if i in range(1,20):
+    print("在范围之内")
