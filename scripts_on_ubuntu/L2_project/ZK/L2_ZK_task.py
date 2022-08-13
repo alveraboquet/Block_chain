@@ -95,8 +95,7 @@ def ZK_zigzag_in_out(browser, wait):
         return fox_info
 
 
-excel_path= '/home/parallels/ubuntu_zk/Block_chain/eth1000_OP_操作后.xlsx'
-excel_path= '/home/parallels/ubuntu_op/Block_chain/eth1000_OP_操作后.xlsx'
+excel_path= '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/L2_project/ZK/eth1000_Zk_操作后.xlsx'
 
 #excel中, 标志列(用于记录任务成功或失败)
 # B列 = goerli转到zk上,
@@ -122,14 +121,9 @@ while 1:
                         ##=========== 准备浏览器
                     wait, browser = my_linux_chrome()
 
-                    ##=========== 预备步骤：切换IP。先打开
+                    ##=========== 预备步骤：切换IP， 清理缓存
                     open_clash_dashboard(browser, wait, url_dashboard)
-                    # switch_tab_by_handle(browser, 0, 0)  # 再切回 clash
-                    # ip_switcher(browser, wait, url_google)  # 这里会新建一个标签页
                     random_select_clash_ip(browser, wait)
-
-
-                    ##=========== 清理缓存（从上面新建的标签页里，打开下面的链接）
                     delete_cookie(browser)
 
                     ##=========== 登陆小狐狸，

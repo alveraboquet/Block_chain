@@ -2183,7 +2183,7 @@ def zk_connect_wallet(browser, wait):
             EC.element_to_be_clickable((By.XPATH, "//span[@class='svelte-1799bj2' and text()='MetaMask']")))
         time_sleep(3)
         browser.execute_script("arguments[0].click();", MetaMask_button)
-        time_sleep(5,"已经链接小狐狸")
+        time_sleep(8,"已经链接小狐狸")
     except:
         print("zk_connect_wallet(),没有找到小狐狸，是否有影响？")
     time_sleep(5)
@@ -2499,7 +2499,7 @@ def find_excel_zk_account(i, j):
 zksybc_nft_url = "https://wallet.zksync.io/account/nft/"
 # 该函数用于mint zk 的NFT，其中CID_text 是要输入的CID（预先准备）
 def zksync_mint_NFT(browser, wait, CID_text):
-    time_sleep(5, "准备打开 zksync NFT ")
+    time_sleep(5, "准备打开 zksync NFT ， 请确保切换到了对应网络")
     new_tab(browser, zksybc_nft_url)
     time_sleep(10, "正在打开 zksync NFT ")
     browser.refresh()
