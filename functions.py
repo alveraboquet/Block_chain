@@ -2183,6 +2183,7 @@ def zk_connect_wallet(browser, wait):
             EC.element_to_be_clickable((By.XPATH, "//span[@class='svelte-1799bj2' and text()='MetaMask']")))
         time_sleep(3)
         browser.execute_script("arguments[0].click();", MetaMask_button)
+        time_sleep(5,"")
     except:
         print("zk_connect_wallet(),没有找到小狐狸，是否有影响？")
     time_sleep(5)
@@ -2500,11 +2501,9 @@ zksybc_nft_url = "https://wallet.zksync.io/account/nft/"
 def zksync_mint_NFT(browser, wait, CID_text):
     time_sleep(5, "准备打开 zksync NFT ")
     new_tab(browser, zksybc_nft_url)
-    time_sleep(20, "正在打开 zksync NFT ")
+    time_sleep(10, "正在打开 zksync NFT ")
     browser.refresh()
-    time_sleep(30, "refresh ")
-    browser.refresh()
-    time_sleep(30, "refresh ")
+    time_sleep(10, "refresh ")
     switch_tab_by_handle(browser, 2, 0)  # mac下调试，切换到被撸网站
 
     ##=======开始链接钱包

@@ -1,20 +1,24 @@
 #pycharm通过git同步代码：窗口右上角粉色小箭头➡️
+import sys
+sys.path.append('/home/parallels/ubuntu_op/Block_chain')
+sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
 from functions import *
 
-excel_path = '/Users/spencer/PycharmProjects/Block_chain/eth1000_操作后.xlsx'
+
+excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/L2_project/ZK/eth1000_Zk_操作后.xlsx'
 write_success_to_excel_column = "E"  #把成功或失败记录到excel的列
 read_from_excel_column = "E" #从excel中的哪一列读取状态? 判断是不是要做任务?
-excel_start_row = 4
-browser_wait_times = 10
+excel_start_row = 3
+browser_wait_times = 20
 while 1:
     for i in range(excel_start_row, 101):
         success_or_fail = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         if success_or_fail !="成功":
             try:
-                print(f"第 {i} 个号需要做zk")
+                print(f"第 {i} 个号需要做 zk mint NFT")
                 ##=========== 准备浏览器、切换IP、清理缓存
-                wait, browser = my_mac_chrome(time_out = browser_wait_times)
-                # wait, browser = my_linux_chrome(time_out=browser_wait_times)
+                # wait, browser = my_mac_chrome(time_out = browser_wait_times)
+                wait, browser = my_linux_chrome(time_out=browser_wait_times)
                 open_clash_dashboard(browser, wait, url_dashboard)
                 random_select_clash_ip(browser, wait)
                 delete_cookie(browser)
