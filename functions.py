@@ -2,6 +2,7 @@
 #思路是去订阅这个网站https://www.storkapp.me/
 
 # pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pandas
+from sqlite3 import Time
 import pandas as pd
 import random
 import time, os, re
@@ -359,7 +360,7 @@ def login_metamask(browser, wait, metamask_pw, metamask_home, netname=None):
     time_sleep(3)
     send_password = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='password']")))
     send_password.send_keys(metamask_pw)
-    time.sleep(1)
+    time.sleep(2)
     send_password.send_keys(Keys.ENTER)
     time_sleep(25,"正在打开小狐狸")
     for i in range(1,10):
@@ -860,6 +861,57 @@ def fox_confirm_OP(browser, wait):
         except:
             print("小狐狸尝试拒绝失败，是否影响？")
         return "fox_confirm_OP()小狐狸点击【签名】失败了，是否影响？"
+
+
+#小狐狸【确认】允许使用代币
+def fox_confirm_allow_token(browser, wait):
+    print('fox_confirm_allow_token, 多种swap 网站通用')
+    browser.refresh()
+    time_sleep(8)
+    try:
+        # 签名
+        sign_button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@class='button btn--rounded btn-primary page-container__footer-button']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", sign_button)
+        print("小狐狸签名成功")
+        return "小狐狸签名成功"
+    except:
+        print("fox_confirm_allow_token 小狐狸点击【签名】失败了，是否影响？")
+        #尝试去拒绝
+        try:
+            cancel_button = wait.until(EC.element_to_be_clickable(
+                (By.XPATH, "//button[@class='button btn--rounded btn-secondary page-container__footer-button']")))
+            time_sleep(2)
+            browser.execute_script("arguments[0].click();", cancel_button)
+        except:
+            print("小狐狸尝试拒绝失败，是否影响？")
+        return "fox_confirm_allow_token 小狐狸点击【签名】失败了，是否影响？"
+
+#小狐狸【确认】允许Bentobox
+def fox_confirm_allow_bentobox(browser, wait):
+    print('fox_confirm_allow_bentobox, 多种swap 网站通用')
+    browser.refresh()
+    time_sleep(8)
+    try:
+        # 签名
+        sign_button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@class='button btn--rounded btn-primary']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", sign_button)
+        print("小狐狸签名成功")
+        return "小狐狸签名成功"
+    except:
+        print("fox_confirm_allow_bentobox 小狐狸点击【签名】失败了，是否影响？")
+        #尝试去拒绝
+        try:
+            cancel_button = wait.until(EC.element_to_be_clickable(
+                (By.XPATH, "//button[@class='button btn--rounded btn-secondary']")))
+            time_sleep(2)
+            browser.execute_script("arguments[0].click();", cancel_button)
+        except:
+            print("小狐狸尝试拒绝失败，是否影响？")
+        return "fox_confirm_allow_token 小狐狸点击【签名】失败了，是否影响？"
 
 #小狐狸【确认】showme
 def fox_confirm_gmx_referal(browser, wait):
@@ -1453,7 +1505,7 @@ def zipswap_prepare_transfer(browser, wait, L2_ETH_value, from_token, to_token):
 
     # ==== 提交订单 Swap
     swap_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@id='swap-button']")))
-    time_sleep(3,"等待提交订单")
+    time_sleep(8,"等待提交订单")
     browser.execute_script("arguments[0].click();", swap_button)
 
     # ======comfirm swap
@@ -1468,7 +1520,7 @@ def zipswap_prepare_transfer(browser, wait, L2_ETH_value, from_token, to_token):
 
 # 实时获取 op 上eth 的金额多少
 def get_OP_ETH_and_select_from_to_token_by_zipswap(browser, wait, from_token, to_token):
-    print("我已进入get_OP_ETH_and_select_from_to_token_by_zipswap，实时获取 OP 上 ETH 的金额多少，确定用什么代币")
+    print("我已进入get_OP_ETH_and_select_from_to_token_by_zipswap，实时获取 OP 上 最大代币 的金额多少，确定用什么代币")
 
     # =======选择 from, 列表
     select_a_token = wait.until(
@@ -1498,21 +1550,18 @@ def get_OP_ETH_and_select_from_to_token_by_zipswap(browser, wait, from_token, to
     search_a_token.send_keys(Keys.ENTER)
     time_sleep(2)
 
+    # === 查找最大金额
     try:
-        ETH_balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="swap-currency-input"]/div/div[2]/div/div[1]/div')))
-        USDC_balance_button = wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="swap-currency-output"]/div/div[2]/div/div[1]/div')))
-        print("zipswap找到的按钮是", ETH_balance_button.text, USDC_balance_button.text) #返回的是 "balance 0.0332 ETH"
-        ETH_a = ETH_balance_button.text
-        ETH_b = ETH_a.split()
-        ETH_c = ETH_b[1]
+        max_balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="swap-currency-input"]/div/div[2]/div/div[1]/div')))
 
-        USDC_a = USDC_balance_button.text
-        USDC_b = USDC_a.split()
-        USDC_c = USDC_b[1]
-        print(f"分割后，最终找到的 ETH 金额是：{ETH_c}， USDC 金额是：{USDC_c}")
+        print("zipswap找到的按钮是", max_balance_button.text) #返回的是 "balance 0.0332 ETH"
+        max_a = max_balance_button.text
+        max_b = max_a.split()
+        max_c = max_b[1]
 
-        return float(ETH_c), float(USDC_c)
+        print(f"分割后，最终找到的 ETH 金额是：{max_c}")
+
+        return float(max_c)
     except:
         print("get_OP_ETH_by_zipswap，没有找到 OP 上代币的金额")
 
@@ -1522,53 +1571,68 @@ def get_OP_ETH_and_select_from_to_token_by_zipswap(browser, wait, from_token, to
 
 # 实时获取 op 上eth 的金额多少
 def get_OP_ETH_and_select_from_to_token_by_clipper(browser, wait, from_token, to_token):
-    print("我已进入get_OP_ETH_and_select_from_to_token_by_clipper，实时获取 OP 上 ETH 的金额多少")
+    print("我已进入get_OP_ETH_and_select_from_to_token_by_clipper，实时获取 OP 上 最大代币 的金额多少")
 
-    # ==== 找 from
+    # ==== 一, 找 from
     select_a_token = wait.until(
         EC.element_to_be_clickable((By.XPATH, '//div[@id="rfq-container"]/div/div[2]/div[1]//div[@class="token"]')))
     time_sleep(2)
     browser.execute_script("arguments[0].click();", select_a_token)
+   
+    ###======新方法,用搜索法
 
-    # =====选择用哪个币
-    select_from_token = wait.until(EC.element_to_be_clickable((By.XPATH, f"//div[@class='items']//div//span[text()='{from_token}']")))
-    time_sleep(2)
-    browser.execute_script("arguments[0].click();", select_from_token)
+    # from 输入框
+    from_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Name, symbol or address']")))
+    time_sleep(3)
+    from_button.send_keys(from_token)
+    
+    time_sleep(3,"再确认选择该代币, 第一个")
+    first_token_xpath = "//div[@id='tokenItemsDiv']/div[1]/div"
+    select_first_token_button = wait.until(EC.element_to_be_clickable((By.XPATH, first_token_xpath)))
+    time_sleep(3)
+    browser.execute_script("arguments[0].click();", select_first_token_button)
+    time_sleep(6,"已经选择 from 代币, 等待响应")
 
-    #尝试寻找余额
-    try:
-        ETH_balance_button = wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="rfq-container"]/div/div[2]/div[1]/div[1]/small')))
-        print("clipper找到的按钮是", ETH_balance_button.text)  # 返回的是 "Balance 0.005505 ETH"
-        ETH_a = ETH_balance_button.text
-        ETH_b = ETH_a.split()
-        ETH_c = ETH_b[1]
-
-        print(f"分割后，最终找到的金额是：{ETH_c}")
-    except:
-        print(f"get_OP_ETH_and_select_from_to_token_by_clipper，没有找到 OP 上 {from_token} 的金额")
-
-    # ==== 找 to ，下拉框
-    to_token_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='Select token']")))
+    # ==== 二, 找 to ，下拉框
+    to_token_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='token']/span[text()='Select token']")))
     time_sleep(2)
     browser.execute_script("arguments[0].click();", to_token_list)
 
-    # =====选择用哪个币
-    select_to_token = wait.until(EC.element_to_be_clickable((By.XPATH, f"//div[@class='items']//div//span[text()='{to_token}']")))
-    time_sleep(2)
-    browser.execute_script("arguments[0].click();", select_to_token)
+    #to 输入框
+    to_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Name, symbol or address']")))
+    time_sleep(3)
+    to_button.send_keys(to_token)
+    
+    time_sleep(3,"再确认选择该代币, 第一个")
+    first_token_xpath = "//div[@id='tokenItemsDiv']/div[1]/div"
+    select_first_token_button = wait.until(EC.element_to_be_clickable((By.XPATH, first_token_xpath)))
+    time_sleep(3)
+    browser.execute_script("arguments[0].click();", select_first_token_button)
+    time_sleep(6,"已经选择 to 代币, 等待响应")
 
-    time_sleep(2, "准备找余额")
+    #尝试寻找余额
     try:
-        USDC_balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="rfq-container"]/div/div[2]/div[3]/div[1]/small')))
-        print("clipper找到的按钮是", USDC_balance_button.text)  # 返回的是 "Balance 0.005505 ETH"
-        USDC_a = USDC_balance_button.text
-        USDC_b = USDC_a.split()
-        USDC_c = USDC_b[1]
-        print(f"分割后，最终找到的金额是：{USDC_c}")
+        max_balance_button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="rfq-container"]/div/div[2]/div[1]/div[1]/small')))
+        print("clipper找到的按钮是", max_balance_button.text)  # 返回的是 "Balance 0.005505 ETH"
+        max_a = max_balance_button.text
+        max_b = max_a.split()
+        max_c = max_b[1]
+
+        print(f"分割后，最终找到的金额是：{max_c}")
     except:
-        print(f"get_OP_ETH_and_select_from_to_token_by_clipper，没有找到 OP 上 {to_token} 的金额")
-    return float(ETH_c), float(USDC_c)
+        print(f"get_OP_ETH_and_select_from_to_token_by_clipper，没有找到 OP 上 {from_token} 的金额")
+    # 下面是 to 的金额
+    # try:
+    #     USDC_balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="rfq-container"]/div/div[2]/div[3]/div[1]/small')))
+    #     print("clipper找到的按钮是", USDC_balance_button.text)  # 返回的是 "Balance 0.005505 ETH"
+    #     USDC_a = USDC_balance_button.text
+    #     USDC_b = USDC_a.split()
+    #     USDC_c = USDC_b[1]
+    #     print(f"分割后，最终找到的金额是：{USDC_c}")
+    # except:
+    #     print(f"get_OP_ETH_and_select_from_to_token_by_clipper，没有找到 OP 上 {to_token} 的金额")
+    return float(max_c)
 
 #判断 clipper 是否要连接钱包
 def clipper_whether_connect_wallet(browser, wait):
@@ -1586,7 +1650,7 @@ def clipper_connect_wallet(browser, wait):
     #先等全部元素加载出来，
     print("我已进入clipper_connect_wallet，clipper准备连接小狐狸钱包")
     for i in range(0, 5): #最多刷新5次
-        print(f"刷新第{i}次（最多5次）预防 pika 加载不完全")
+        print(f"刷新第{i}次（最多5次）预防 clipper 加载不完全")
         try:
             clipper_connect_wallet = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__next']/div[1]/div/header/div[2]/div/button[1]/span[1]")))
             break
@@ -1632,36 +1696,9 @@ def allow_clipper_use_USDC(browser, wait):
         return True
 
 #判断 clipper 准备转账
-def clipper_prepare_transfer(browser, wait, L2_ETH_value, from_token, to_token):
+def clipper_prepare_transfer(browser, wait, L2_max_value, from_token, to_token):
     print("我已进入clipper_prepare_transfer，clipper 选择代币、转账")
-    if from_token == "USDC":
-        try:
-            # ==== 找 from
-            print("需要交换 from 和 to")
-            select_a_token = wait.until(
-                EC.element_to_be_clickable((By.XPATH, '//div[@id="rfq-container"]/div/div[2]/div[1]//div[@class="token"]')))
-            time_sleep(2)
-            browser.execute_script("arguments[0].click();", select_a_token)
-
-            # =====选择用哪个币
-            select_from_token = wait.until(
-                EC.element_to_be_clickable((By.XPATH, f"//div[@class='items']//div//span[text()='{from_token}']")))
-            time_sleep(2)
-            browser.execute_script("arguments[0].click();", select_from_token)
-
-            #选择from后，to会自动交换
-            # ==== 找 to ，下拉框
-            # to_token_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='Select token']")))
-            # time_sleep(2)
-            # browser.execute_script("arguments[0].click();", to_token_list)
-            #
-            # # =====选择用哪个币
-            # select_to_token = wait.until(
-            #     EC.element_to_be_clickable((By.XPATH, f"//div[@class='items']//div//span[text()='{to_token}']")))
-            # time_sleep(2)
-            # browser.execute_script("arguments[0].click();", select_to_token)
-        except:
-            print("交换 from 和 to 出错了，可能已经交换了")
+    
     #==============输入交易金额
     time_sleep(5,"准备输入金额")
     input_amount = wait.until(
@@ -1670,16 +1707,16 @@ def clipper_prepare_transfer(browser, wait, L2_ETH_value, from_token, to_token):
 
     # 随机金额
     point = random.randint(3, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
-    input_value = round(random.uniform(L2_ETH_value * 0.7, L2_ETH_value * 0.8), point)
+    input_value = round(random.uniform(L2_max_value * 0.7, L2_max_value * 0.8), point)
     try_times = 0
-    while float(L2_ETH_value) - input_value < 0.005:
+    while float(L2_max_value) - input_value < 0.005:
         point = random.randint(3, 4)  # 最起码保留3位小数
-        input_value = round(random.uniform(L2_ETH_value * 0.3, L2_ETH_value * 0.7), point)
+        input_value = round(random.uniform(L2_max_value * 0.3, L2_max_value * 0.7), point)
         try_times = try_times + 1
         if try_times == 100:
             print("余额不足，直接报错")
             return 0 #说明余额不足，直接报错即可
-    print(f"本次从 {from_token} 转到 {to_token} 的随机金额是{input_value}，将来预估余额是：{float(L2_ETH_value) - input_value}")
+    print(f"本次从 {from_token} 转到 {to_token} 的随机金额是{input_value}，将来预估余额是：{float(L2_max_value) - input_value}")
     input_amount.send_keys(str(input_value))
     time_sleep(10,"已经输入金额")
 
@@ -3003,10 +3040,11 @@ def matcha_whether_transfer_success(browser, wait):
     success_button = wait.until(EC.element_to_be_clickable(
         (By.XPATH, '//*[@id="trading-page-container"]/div[2]/div/div/aside/div[1]/div/div/div/div[2]/div[2]')))
     return success_button.text
+
 #抹茶，准备换钱，输入货币、金额
 # from_token，可选"Ethereum"， "USD Coin"，"sUSD"
-# 法一
-def matcha_input_coin_amount(browser, wait, L2_balance, from_token, to_token):
+# 法一. 以前的方法
+def matcha_input_coin_amount_old(browser, wait, L2_balance, from_source, to_token):
     print("我已经进入matcha_input_coin_amount(), 准备换钱，输入货币、金额")
 
     # ================= 一、先选择 to，兑换成什么货币。防止选不上Ethereum
@@ -3121,15 +3159,120 @@ def matcha_input_coin_amount(browser, wait, L2_balance, from_token, to_token):
         return f" OP matcha 完成，从 {from_token} 换 {to_token} 金额 {input_value}"
     except:
         print("尝试 place order 失败了")
-    # # 五、小狐狸有可能需要改变网络
-    # try:
-    #     change_network_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='BaseButton-zyn1rf-0 Buttons__MatchaPrimaryButton-jj6r82-0 jHAYTI gmLCmA' and text()='Change network']")))
-    #     browser.execute_script("arguments[0].click();", change_network_button)
-    #     print("matcha_prepare_change_coin(), 已经点击change_network_button")
-    # except:
-    #     print("matcha_prepare_change_coin(), 已经点击change_network_button失败，可能是不需要")
 
-# 法二
+# 法二. 用搜索的方法
+def matcha_input_coin_amount_new(browser, wait, L2_balance, from_source, to_source):
+    print("我已经进入matcha_input_coin_amount(), 准备换钱，输入货币、金额")
+
+    #=====================先点击to的下拉列表
+    to_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//button/div[text()[contains(.,'ETH')]]")))
+    time_sleep(3, "to_list button found")
+    browser.execute_script("arguments[0].click();", to_list)
+
+    #输入框
+    to_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@class='ChangeTokenActionSheet__StyledInput-sc-1pl3sgj-15 hIbkAm']")))
+    time_sleep(3)
+    to_button.send_keys(to_source)
+    
+    time_sleep(3,"再确认选择该代币, 第一个")
+    first_token_xpath = "//div[@class='ChangeTokenActionSheet__AssetsContainer-sc-1pl3sgj-3 gUZwQm']/div[1]/div"
+    select_first_token_button = wait.until(EC.element_to_be_clickable((By.XPATH, first_token_xpath)))
+    time_sleep(3)
+    browser.execute_script("arguments[0].click();", select_first_token_button)
+    time_sleep(6,"已经选择代币, 等待响应")
+
+    try:
+        print("尝试找 I understand")
+        I_understand_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()='I understand']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", I_understand_button)
+        print("已经点击 I understand")
+    except:
+        print("to 时，尝试点击 I understand 点击失败，可能没出现")
+    
+    #===================再点击from的下拉列表
+    from_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//button/div[text()[contains(.,'Choose')]]")))
+    time_sleep(3, "from_list button found")
+    browser.execute_script("arguments[0].click();", from_list)
+
+    #输入框
+    from_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@class='ChangeTokenActionSheet__StyledInput-sc-1pl3sgj-15 hIbkAm']")))
+    time_sleep(3)
+    from_button.send_keys(from_source)
+    
+    time_sleep(3,"再确认选择该代币, 第一个")
+    first_token_xpath = "//div[@class='ChangeTokenActionSheet__AssetsContainer-sc-1pl3sgj-3 gUZwQm']/div[1]/div"
+    select_first_token_button = wait.until(EC.element_to_be_clickable((By.XPATH, first_token_xpath)))
+    time_sleep(3)
+    browser.execute_script("arguments[0].click();", select_first_token_button)
+    time_sleep(5,"等待响应")
+
+    try:
+        print("尝试找 I understand")
+        I_understand_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()='I understand']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", I_understand_button)
+        print("已经点击 I understand")
+    except:
+        print("from 时，尝试点击 I understand 点击失败，可能没出现")
+
+    #================ 三、选择 from 要换多少
+    try:
+        pay_input_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[4]/div[2]/div[1]//input[@class='Input__SwapInput-jrcd0l-4 dOXKmv']")))
+        print("找到了输入金额框")   
+    except:
+        print("没有找到输入金额的框Find intput botton wrong!!")
+
+    point = random.randint(3, 4)  # ETH时，小数点最起码要有2位，因为L1的金额一般是两位小数以上
+    input_value = round(random.uniform(L2_balance * 0.7, L2_balance * 0.8), point)  #随机金额
+    try_times = 0
+    while float(L2_balance) - input_value < 0.005: #如果会使余额小于 0.005
+        point = random.randint(3, 4)  # ETH时，小数点最起码要有2位，因为L1的金额一般是两位小数以上
+        input_value = round(random.uniform(L2_balance * 0.3, L2_balance * 0.7), point)  # 随机金额
+        try_times = try_times + 1
+        if try_times == 100:
+            print("余额不足，直接报错")
+            return 0  # 说明余额不做，直接报错即可
+    
+    print(f"随机转账的{from_source}金额是：{input_value}，将来预估余额是：{float(L2_balance) - input_value}")
+    pay_input_button.send_keys(str(input_value))
+    time_sleep(5, f"matcha_input_coin_amount(), 已经输入要换的{from_source}")
+
+    #================ 四、选择review order
+    review_order_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text() = 'Review Order']")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", review_order_button)
+    print("matcha_input_coin_amount(), 已经点击review order")
+    time_sleep(5)
+
+    # =============== 五、可能会让你是否同意让其访问某种代币，比如 USDC、DAI
+    try:
+        confirm_token_button = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, '//*[@id="trading-page-container"]/div[2]/div/div/aside/div[1]/div/div/div/div[3]/button')))
+        if "Approve" in confirm_token_button.text:
+            print("可能会让你是否同意授权 Approve")
+            browser.execute_script("arguments[0].click();", confirm_token_button)
+            time_sleep(3)
+            switch_tab_by_handle(browser, 1, 1)  # 切到小狐狸
+            fox_confirm_L2_swap(browser, wait)
+            switch_tab_by_handle(browser, 2, 0)  # 切到 matcha
+    except:
+        print("可能不需要授权")
+
+    # ================ 六、选择 place order
+    try:
+        place_order_button = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[text() = 'Place Order']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", place_order_button)
+        print("matcha_input_coin_amount(), 已经点击 place order")
+        time_sleep(5)
+        return f" OP matcha 完成，从 {from_source} 换 {to_source} 金额 {input_value}"
+    except:
+        print("尝试 place order 失败了")
+   
+
+# 
 def matcha_formal_change_coin(browser, wait):
     print("进入matcha_formal_change_coin，正式下单")
     place_order_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='CheckoutCommonLayout__BottomBarContainer-jgkqw7-6 hMlefr']/button")))
@@ -5135,9 +5278,513 @@ def galaxy_claim_op_hop_NFT(browser, wait):
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
 
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   uniswap的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
 
-## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
 
-# transfer_goerli_from_eth_to_zk()
-###测试下
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  uniswap的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ OP项目 的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+####一些url
+lifi_url = "https://transferto.xyz/swap"
+ARB_url = "https://bridge.arbitrum.io/"
+ZK_url = "https://wallet.zksync.io/transaction/deposit"
+OP_url = "https://app.optimism.io/bridge"
+test_url = "https://www.baidu.com/"
+
+#==OP上的项目
+op_pika_url = "https://app.pikaprotocol.com/trade/ETH-USD"
+op_showme_url = "https://optimismair.showme.fan/"
+op_zipswap_url = "https://zipswap.fi/#/swap"
+op_clipper_url = "https://clipper.exchange/app/swap"
+op_uniswap_url = "https://app.uniswap.org/#/swap?chain=optimism"
+op_sushiswap_url = "https://app.sushi.com/swap?chainId=10"
+op_curve_url = "https://optimism.curve.fi/"
+
+matcha_url = "https://matcha.xyz/login"
+
+
+
+#==================================下面是 OP 的任务
+# from_token，可选"Ethereum"， "USD Coin"，"sUSD"
+def OP_matcha(browser, wait, from_source, to_source):
+
+    new_tab(browser, matcha_url)
+    time_sleep(5, "等待抹茶加载")
+    switch_tab_by_handle(browser, 2, 0)  # 切换到抹茶
+    time_sleep(8, "等待抹茶加载")
+
+    # 如果没有连接小狐狸钱包，则先去连接钱包
+    time_sleep(3, "准备判断小狐狸是否连接钱包")
+    if matcha_fox_icon_exit(browser, wait) != 1: # 返回值是1，说明有小狐狸图标，说明已经连接了小狐狸
+        print("Match没有连接小狐狸，先去连接")
+        matcha_connect_wallet(browser, wait)  # 先连接钱包
+         
+    time_sleep(2, "提醒：请记得先把抹茶上的网络切为 OP")
+    if matcha_whether_change_net(browser, wait) != "Optimism":
+        matcha_change_net(browser, wait)
+
+    # 获取余额
+    max_token, L2_balance = get_OP_token_balance_by_matcha(browser, wait)
+    # 选择 from , to
+    matcha_input_coin_amount_new(browser, wait, L2_balance, from_source, to_source)  #准备换钱
+
+    print("切换到小狐狸")
+    switch_tab_by_handle(browser, 1, 1)  
+    fox_info = fox_confirm_OP(browser, wait)  # 小狐狸确认交易
+    time_sleep(5)
+    switch_tab_by_handle(browser, 2, 0)  # 切换到matcha
+    time_sleep(3)
+
+    # 转账后，20秒后，查询OP上的USDC、DAI是否到账
+    time_sleep(20,"准备查询是否 matcha Success？")
+    transfer_status = matcha_whether_transfer_success(browser, wait)
+
+    if "成功" in fox_info:
+        if transfer_status == "Success!":
+            print("matcha 确实换钱 Success！")
+            return "OP matcha 任务完成；" + fox_info
+        else:
+            return " matcha 还是换钱失败" 
+    elif "失败" in fox_info:
+        return fox_info
+
+#做 OP上的 zipswap
+def OP_zipswap(browser, wait, from_source, to_source):
+    print("开始OP_zipswap任务")
+    new_tab(browser, op_zipswap_url)
+    time_sleep(15, "等待zipswap加载")
+    switch_tab_by_handle(browser, 2, 0)  # 切换到zipswap
+
+    #======连接钱包
+    if zipswap_whether_connect_wallet(browser, wait) == "Connect Wallet":
+        print("需要连接钱包")
+        zipswap_connect_wallet(browser, wait)
+        time.sleep(5)
+        switch_tab_by_handle(browser, 1, 1)  # 切换到第0个标签页：小狐狸
+        fox_confirm_connect_network(browser, wait)  # 小狐狸【批准】、【切换网络】
+        switch_tab_by_handle(browser, 2, 0)  # 切换到第1个标签页：被撸网站
+
+    #=========实时获取 OP上的ETH金额，返回浮点型数据
+    # L2_ETH_value = get_OP_ETH_by_zipswap(wait)
+    L2_max_value = get_OP_ETH_and_select_from_to_token_by_zipswap(browser, wait, from_source, to_source)
+
+    #======选择代币、输入金额、确认交易， #from，to可选"ETH"， "USDC"，"USDT"
+    detail = zipswap_prepare_transfer(browser, wait, L2_max_value, from_source, to_source)
+    time_sleep(8)
+
+    #========小狐狸确认
+    switch_tab_by_handle(browser, 1, 1)  # 切换到第0个标签页：小狐狸
+    fox_info = fox_confirm_OP(browser, wait)
+
+    #关闭zipswap
+    switch_tab_by_handle(browser, 2, 0)  # 切换到第
+    time_sleep(5)
+
+    #=======判断是否成功
+    time_sleep(15, "准备检查clipper是否成功")
+    try:
+        success_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='sc-1jvskkm-2 flClZu']/div")))
+    except:
+        success_info = "失败"
+        print("没有成功")
+
+    if "Submitted" in success_info.text:
+        print("zigswap 成功")
+        return " OP zigswap 任务成功" + detail + fox_info
+    else:
+        return "失败" + detail + fox_info
+
+#做 OP上的 clipper
+def OP_clipper(browser, wait, from_source, to_source):
+    print("开始OP_clipper任务")
+    new_tab(browser, op_clipper_url)
+    time_sleep(15, "等待 clipper 加载")
+    switch_tab_by_handle(browser, 2, 0)
+    time_sleep(3)
+
+    #连接钱包
+    if clipper_whether_connect_wallet(browser, wait) == "Connect your wallet":
+        print("需要连接钱包")
+        clipper_connect_wallet(browser, wait)
+        time_sleep(5)
+ 
+    #============选择代币、输入金额、确认交易，返回浮点数
+    # L2_ETH_value = get_OP_ETH_by_clipper(wait)
+    L2_max_value = get_OP_ETH_and_select_from_to_token_by_clipper(browser, wait, from_source, to_source)
+
+    detail = clipper_prepare_transfer(browser, wait, L2_max_value, from_source, to_source)
+    time_sleep(3)
+
+    #=======小狐狸确认交易
+    switch_tab_by_handle(browser, 1, 1)  # 切换到第0个标签页：小狐狸
+    info = fox_confirm_OP(browser, wait)
+    time_sleep(5)
+    switch_tab_by_handle(browser, 2, 0)  # 切换到
+    
+    #=======判断是否成功
+    time_sleep(15, "准备检查clipper是否成功")
+    try:
+        success_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='success_notification']//h2")))
+    except:
+        success_info = "失败"
+        print("没有成功")
+
+    if "Submitted" in success_info.text:
+        return " OP clipper 任务成功"  
+    else:
+        return "失败" 
+
+#做 OP 上的 uniswap
+def OP_uniswap(browser, wait, from_source, to_source):
+    #========== 小狐狸网络切换成OP
+    # switch_tab_by_handle(browser, 1, 0)
+    # fox_change_network(browser, wait, "Optimism")
+    # time_sleep(5)
+    major_token = "" #记录经过swap后的主要代币是什么
+    print("开始OP_uniswap任务")
+    new_tab(browser, op_uniswap_url)
+    time_sleep(5, "等待 uniswao 加载")
+    switch_tab_by_handle(browser, 2, 0) 
+    time_sleep(10, "等待 uniswao 加载")
+
+    # 由于登录就有小狐狸帐号,所以不要重新连接小狐狸
+    # 搜索from和to
+    #先点击from的下拉列表
+    from_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='swap-currency-input']//button/span")))
+    time_sleep(3, "from_list button found")
+    browser.execute_script("arguments[0].click();", from_list)
+
+    from_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='token-search-input']")))
+    time_sleep(3)
+    from_button.send_keys(from_source)
+    time_sleep(3,"再发送回车确认")
+    from_button.send_keys(Keys.ENTER)
+
+    #  =======找余额. 放在上面步骤from之下, 这样可以避免和下面to的余额冲突
+    time_sleep(5,"准备寻找金额")
+    L2_ETH_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='sc-18nh1jk-0 horBTe css-1lpcios']")))
+    a = L2_ETH_button.text #类似 ---> 余额： 0.009156
+    b = a.split()[-1]
+    print("提取到的纯金额是: ", b)
+    L2_ETH_value = float(b)
+
+    #再点击to的下拉列表
+    to_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='swap-currency-output']//button/span")))
+    time_sleep(3, "to_list button found")
+    browser.execute_script("arguments[0].click();", to_list)
+
+    to_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='token-search-input']")))
+    time_sleep(3)
+    to_button.send_keys(to_source)
+    time_sleep(3,"再发送回车确认")
+    to_button.send_keys(Keys.ENTER)
+    time_sleep(5,"等待响应")
+    
+    # 输入金额
+    #法一: 选择最大金额. 但用ETH作为from时有bug:点击max, 但实际没有max
+    if from_source != "ETH":
+        max_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()[contains(.,'Max')]]")))
+        time_sleep(3, "max_button button found")
+        browser.execute_script("arguments[0].click();", max_button)
+        time_sleep(8, "已经点击max,等待响应")
+    else: #法二:选择比例法
+        # =======输入金额框
+        input_amount_box = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//div[@id='swap-currency-input']//input")))
+        time_sleep(3,"找金额输入框")
+        
+        # ====随机比例
+        point = random.randint(3, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+        input_value = round(random.uniform(L2_ETH_value * 0.6, L2_ETH_value * 0.8), point)
+        try_times = 1
+        while float(L2_ETH_value) - input_value < 0.005: #如果会使余额小于 0.005
+            point = random.randint(3, 4)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+            input_value = round(random.uniform(L2_ETH_value * 0.2, L2_ETH_value * 0.7), point)
+            try_times = try_times + 1
+            if try_times == 100:
+                print("余额不足，直接报错")
+                return 0  #说明余额不做，直接报错即可
+        input_amount_box.send_keys(str(input_value))
+        time_sleep(8, "已经输入金额,等待响应")
+
+    #准备确认交易. 可能会出现 allow 
+    if from_source != "ETH":
+        try:
+            uniswap_allow_token(browser, wait)
+        except:
+            print("可能是之前allow 过了,不需要重新授权")
+    
+    #点击 swap 按钮
+    time_sleep(5,"准备查看swap按钮")
+    swap_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@id = 'swap-button']")))
+    time_sleep(3, "swap button button found")
+    browser.execute_script("arguments[0].click();", swap_button)
+
+    #点击confirm swap按钮
+    flag = 0
+    while flag == 0:
+        try:
+            confirm_swap_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@id= 'confirm-swap-or-send']")))
+            time_sleep(3, "confirm_swap_button button found")
+            browser.execute_script("arguments[0].click();", confirm_swap_button)
+            flag = 1 #说明确实点击到了confirm_swap
+            break
+        except:
+            #尝试点击accept按钮,有时价格会更新
+            accept_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()= 'Accept']")))
+            time_sleep(3, "accept_button button found")
+            browser.execute_script("arguments[0].click();", accept_button)
+            continue
+    #切换到小狐狸确认
+    switch_tab_by_handle(browser, 1, 1) 
+    fox_confirm_allow_token(browser, wait)
+
+    #切换回被鲁网站,查看是否成功
+    time_sleep(10,"准备查看是否成功")
+    switch_tab_by_handle(browser, 2, 0) 
+    time_sleep(10,"准备查看是否成功")
+    try:
+        success_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[text()= 'Success']")))
+        return "成功"
+    except:
+        return "失败"
+    
+  
+def OP_sushiswap(browser, wait, from_source, to_source):
+
+    print("开始 OP_sushiswap 任务")
+    new_tab(browser, op_sushiswap_url)
+    time_sleep(5, "等待 sushiswap 加载")
+    switch_tab_by_handle(browser, 2, 0) 
+    time_sleep(10, "等待 sushiswap 加载")
+
+    # 由于登录就有小狐狸帐号,所以不要重新连接小狐狸
+    # 搜索from和to
+    #先点击from的下拉列表
+    from_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='asset-select-trigger-0']")))
+    time_sleep(3, "from_list button found")
+    browser.execute_script("arguments[0].click();", from_list)
+
+    from_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='token-search-input']")))
+    time_sleep(3)
+    from_button.send_keys(from_source)
+    time_sleep(3,"再发送回车确认")
+    from_button.send_keys(Keys.ENTER)
+
+
+    #再点击to的下拉列表
+    to_list = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@id='asset-select-trigger-1']")))
+    time_sleep(3, "to_list button found")
+    browser.execute_script("arguments[0].click();", to_list)
+
+    to_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='token-search-input']")))
+    time_sleep(3)
+    to_button.send_keys(to_source)
+    time_sleep(3,"再发送回车确认")
+    to_button.send_keys(Keys.ENTER)
+    time_sleep(5,"等待响应")
+    
+    # 输入金额.随机选用一种方法
+    # random_way = random.randint(1,2)
+    #法一: 选择最大金额. 但用ETH作为from时有bug:点击max, 但实际没有max
+    
+    print("本次采用最大化金额法")
+    max_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/div[1]//div[text()[contains(.,'Balance')]]")))
+    time_sleep(3, "max_button button found")
+    browser.execute_script("arguments[0].click();", max_button)
+    time_sleep(8, "已经点击max,等待响应")
+    
+
+    #准备确认交易. from 不是ETH时可能会出现 Approve BentoBox , Approve USDC
+    if from_source != "ETH":
+        try:
+            #查看是哪一种allow
+            allow_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/button[1]")))
+            if "BentoBox" in allow_button.text:
+                sushiswap_allow_Bentobox(browser, wait)
+
+            elif "Approve" in allow_button.text:
+                #无论如何都要试一试使用USDC
+                sushiswap_allow_token(browser, wait)
+        except:
+            print("可能是之前allow 过了,不需要重新授权")
+ 
+            
+    else: #如果是用ETH转出去,可能会有一个 Bentobox
+        try:
+            sushiswap_allow_Bentobox(browser, wait)
+        except:
+            print("可能是不需要授权Bentobox")
+    
+    # 可能出现swap anyway
+    try: #
+        print("尝试 swap anyway")
+        swap_anyway_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()[contains(.,'Swap Anyway')]]")))
+        print(swap_anyway_button.text)
+        browser.quit()
+        return "失败流动性不足, 取消交易"
+    except:
+        print("可能不要swap anyway")
+        time_sleep(3, "waiting")
+
+    #点击 swap 按钮
+    time_sleep(5,"准备查看swap按钮")
+    swap_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@id = 'swap-button']")))
+    time_sleep(3, "swap button button found")
+    browser.execute_script("arguments[0].click();", swap_button)
+    time_sleep(10, "已经点击 swap button")
+
+    
+    #点击confirm swap按钮
+    confirm_swap_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@id= 'confirm-swap-or-send']")))
+    time_sleep(3, "confirm_swap_button button found")
+    browser.execute_script("arguments[0].click();", confirm_swap_button)
+    time_sleep(5, "已经点击 confirm swap button")
+
+
+    #切换到小狐狸确认
+    switch_tab_by_handle(browser, 1, 1) 
+    fox_confirm_allow_token(browser, wait)
+
+    #切换回被鲁网站,查看是否成功
+    time_sleep(10,"准备查看是否成功")
+    switch_tab_by_handle(browser, 2, 0) 
+    time_sleep(10,"准备查看是否成功")
+    try:
+        success_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[text()= 'Transaction submitted']")))
+        return "成功"
+    except:
+        return "失败"
+ 
+
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  uniswap 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+#允许 uniswap是使用token
+def uniswap_allow_token(browser, wait):
+    #点击allow
+    allow_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()[contains(.,'Allow')]]")))
+    time_sleep(3, "allow_button button found")
+    browser.execute_script("arguments[0].click();", allow_button)
+
+    #切换到小狐狸
+    switch_tab_by_handle(browser, 1, 1)  # 切换到第0个标签页：小狐狸
+    fox_confirm_allow_token(browser, wait)
+    time_sleep(2)
+    switch_tab_by_handle(browser, 2, 0)  # 切换到第0个标签页：小狐狸
+    time_sleep(2)
+
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  uniswap 的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  sushiswap 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+#允许 sushiswap 使用token
+def sushiswap_allow_token(browser, wait):
+    #点击allow. 这里必须用 //div[@class='flex flex-col gap-3']/button[1] 这种方法.因为如果用id的话,可能会有两个
+    allow_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/button[1]")))
+    time_sleep(3, "allow button found")
+    browser.execute_script("arguments[0].click();", allow_button)
+
+    #切换到小狐狸
+    switch_tab_by_handle(browser, 1, 1)  # 切换到第0个标签页：小狐狸
+    fox_confirm_allow_token(browser, wait)
+    time_sleep(2)
+    switch_tab_by_handle(browser, 2, 0)  # 切换到第0个标签页
+    time_sleep(3)
+
+#允许 sushiswap 使用 Bentobox
+def sushiswap_allow_Bentobox(browser, wait):
+    #点击allow
+    allow_Bentobox_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/button[1]")))
+    time_sleep(3, "allow Bentobox button found")
+    browser.execute_script("arguments[0].click();", allow_Bentobox_button)
+
+    #切换到小狐
+    switch_tab_by_handle(browser, 1, 1)  # 切换到第0个标签页：小狐狸
+    fox_confirm_allow_bentobox(browser, wait)
+    time_sleep(2)
+    switch_tab_by_handle(browser, 2, 0)  # 切换到第0个标签页
+    time_sleep(3)
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  sushiswap 的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  debank 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+debank_url = "https://debank.com/"
+
+def debank_whether_connect_wallet(browser, wait):
+    print("开始 debank_whether_connect_wallet 任务")
+    try:
+        login_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Log in')]]")))
+        time_sleep(3, "login button found")
+        browser.execute_script("arguments[0].click();", login_button)
+
+        fox_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='WalletSelectorModal_walletList__1R_dC']/div[2]/button")))
+        time_sleep(3, "fox button found")
+        browser.execute_script("arguments[0].click();", fox_button)
+    except:
+        print("可能是不需要链接小狐狸")
+        
+
+
+#network_name可选:Ethereum, Optimism, Arbitrum等
+def get_balance_from_debank(browser, wait, network_name):
+    print("开始 get_balance_from_debank 任务")
+    new_tab(browser, debank_url)
+    time_sleep(15, "等待 debank 加载")
+    switch_tab_by_handle(browser, 2, 0)  # 一定要切换!!切换到
+
+    #链接小狐狸
+    debank_whether_connect_wallet(browser, wait)
+    
+    #选择需要查看的网络
+    xpath_path = f"//div[text()[contains(.,'{network_name}')]]"
+    click_network = wait.until(EC.element_to_be_clickable((By.XPATH, xpath_path)))
+    time_sleep(3, "找到了要查看余额的网络,即将点击")
+    browser.execute_script("arguments[0].click();", click_network)
+    time_sleep(5,"等待切换到对应网络")
+   
+    # 查看有多少个代币
+    coin_list = wait.until(EC.presence_of_all_elements_located((By.XPATH,"//div[@class='db-table-body']/div")))
+    print("总共有多少个代币:", len(coin_list))
+
+    # #获取代币余额
+    balance_dict = {} #创建一个空字典,用于装余额
+    for i in range(1, len(coin_list) + 1):
+        xpath_way = f"//div[@class='db-table-body']/div[{i}]//div[@class='db-table-cell']/div/div[2]"
+        coin_name_button = wait.until(EC.element_to_be_clickable((By.XPATH, xpath_way)))
+        coin_name = coin_name_button.text
+        print(f"第{i}个代币名字是: ", coin_name)
+
+        #余额的路径
+        xpath_way = f"//div[@class='db-table-body']/div[{i}]/div[@class='db-table-row']/div[4]"
+        balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, xpath_way)))
+        a = balance_button.text # 形如 $4
+        coin_balance = a.split("$")[-1]
+        print(f"第{i}个代币的余额是: ", coin_balance)
+        balance_dict[coin_name] = int(coin_balance) #添加到字典里
+    print("所有代币及金额是:",balance_dict)
+    max_token = max(balance_dict,key=balance_dict.get)
+    print("金额最多的代币是:", max_token)
+    browser.close() #关闭这个 debank 网页
+    time_sleep(3,"已经关闭了网页")
+    switch_tab_by_handle(browser, 1, 0)  # 一定要切换回去,给selenium一个指针,否则无法新建标签页.
+    time_sleep(3,"准备打开新网页")
+
+    return max_token
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  debank的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  ZK 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+
+
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
