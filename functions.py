@@ -5059,18 +5059,22 @@ def syncswap_remove_LP(browser, wait, excel_path,excel_row, write_excel_column, 
     new_tab(browser, sync_swap_remove)
     time_sleep(5,"等待网络加载")
     switch_tab_by_handle(browser, 2, 0)
-    wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[5]/div/div/div/button')))
-    print("找到的文字是:",wallet_button.text)
+    try:
+        path = "//button[@class='MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButtonBase-root  css-1wwmuyk']"
+        wallet_button = wait.until(EC.element_to_be_clickable((By.XPATH, path)))
+        print("找到的文字是:",wallet_button.text)
     
-    if "Connect" in wallet_button.text:#如果没有链接钱包,则链接钱包
-        #连接小狐狸钱包
-        time_sleep(1, "准备点击连接钱包")
-        browser.execute_script("arguments[0].click();", wallet_button)
-        time_sleep(5, "等等小狐狸出现")
-        fox_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[2]/div/div/div[2]/div[2]/div[1]')))
-        time_sleep(1, "小狐狸出现了,准备点击")
-        browser.execute_script("arguments[0].click();", fox_button)
-        time_sleep(10, "已经点击小狐狸")
+        if "Connect" in wallet_button.text:#如果没有链接钱包,则链接钱包
+            #连接小狐狸钱包
+            time_sleep(1, "准备点击连接钱包")
+            browser.execute_script("arguments[0].click();", wallet_button)
+            time_sleep(5, "等等小狐狸出现")
+            fox_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container"]/div/div/div[2]/div/div/div[2]/div[2]/div[1]')))
+            time_sleep(1, "小狐狸出现了,准备点击")
+            browser.execute_script("arguments[0].click();", fox_button)
+            time_sleep(10, "已经点击小狐狸")
+    except:
+        print("没有找到钱包按钮, 可能是不要链接钱包?")
     
     time_sleep(2, "准备重新打开网站")
     browser.get(sync_swap_remove)
