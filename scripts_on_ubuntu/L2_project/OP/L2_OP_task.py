@@ -14,7 +14,7 @@ while 1:
     for i in range(excel_start_row, 201):
         success_or_fail = Do_Excel(excel_path,sheetname='SheetJS').read(i, read_from_excel_column)
         if success_or_fail !="成功":
-            try:
+            # try:
                 print(f"第 {i} 个号需要做 op")
                 ##============= 一, 准备浏览器、切换IP、清理缓存
                 wait, browser = my_linux_chrome(time_out=browser_wait_times)
@@ -33,46 +33,69 @@ while 1:
 
                 # ============= 四, 从 Debank 上获取某个网络余额
                 from_source = get_balance_from_debank(browser, wait, "Optimism")
+                
+                #=================这次是要全部换成OP
+                # 先用"save_some_OP"模式, 之后在 stable_coin_list 中移除 OP
                 if from_source == "ETH":                  
-                    stable_coin_list = ["USDC", "DAI"]
-                    # stable_coin_list = ["USDT", "USDT"]
-                    to_source = random.choice(stable_coin_list)
-                    # return "不要接着做任务了, 因为想把所有代币换位ETH"
-                else: #说明稳定币的余额更多
+                    to_source = "OP"
+                    your_mode = "max_all"
+                elif from_source == "USDC": #说明稳定币的余额更多
+                    to_source = "OP"
+                    your_mode = "max_all"
+                elif from_source == "DAI":
+                    to_source = "OP"
+                    your_mode = "max_all"
+                elif from_source == "OP":
                     to_source = "ETH"
+                    your_mode = "save_some_token"
 
+                    
                 # ============= 五, 开始做任务
-                print(f"本次要从 {from_source} 转到 {to_source}")                
-                if i in range(2,40):
-                    a = random.randint(1,2)
-                    if a == 1:
-                        save_record = OP_zipswap(browser, wait, from_source, to_source)
-                    else:
-                        save_record = OP_sushiswap(browser, wait, from_source, to_source)
-                elif i in range(40,80):
-                    a = random.randint(1,2)
-                    if a == 1:
-                        save_record = OP_uniswap(browser, wait, from_source, to_source)
-                    else:
-                        save_record = OP_matcha(browser, wait, from_source, to_source)
-                elif i in range(80,120):
-                    a = random.randint(1,2)
-                    if a == 1:
-                        save_record = OP_sushiswap(browser, wait, from_source, to_source)
-                    else:
-                        save_record = OP_clipper(browser, wait, from_source, to_source)
-                elif i in range(120,160):
-                    a = random.randint(1,2)
-                    if a == 1:
-                        save_record = OP_uniswap(browser, wait, from_source, to_source)
-                    else:
-                        save_record = OP_zipswap(browser, wait, from_source, to_source)
-                elif i in range(160,201):
-                    a = random.randint(1,2)
-                    if a == 1:
-                        save_record = OP_sushiswap(browser, wait, from_source, to_source)
-                    else:
-                        save_record = OP_clipper(browser, wait, from_source, to_source)
+                print(f"本次要从 {from_source} 转到 {to_source}")    
+
+                save_record = OP_sushiswap(browser, wait, from_source, to_source, mode = your_mode)
+
+                # if from_source == "ETH":                  
+                #     # stable_coin_list = ["USDC", "DAI"]
+                #     # stable_coin_list = ["USDT", "USDT"]
+                #     to_source = random.choice(stable_coin_list)
+                #     # return "不要接着做任务了, 因为想把所有代币换位ETH"
+                # else: #说明稳定币的余额更多
+                #     to_source = "ETH"
+
+                # # ============= 五, 开始做任务
+                # print(f"本次要从 {from_source} 转到 {to_source}")    
+            
+                # if i in range(2,40):
+                #     a = random.randint(1,2)
+                #     if a == 1:
+                #         save_record = OP_zipswap(browser, wait, from_source, to_source)
+                #     else:
+                #         save_record = OP_sushiswap(browser, wait, from_source, to_source)
+                # elif i in range(40,80):
+                #     a = random.randint(1,2)
+                #     if a == 1:
+                #         save_record = OP_uniswap(browser, wait, from_source, to_source)
+                #     else:
+                #         save_record = OP_matcha(browser, wait, from_source, to_source)
+                # elif i in range(80,120):
+                #     a = random.randint(1,2)
+                #     if a == 1:
+                #         save_record = OP_sushiswap(browser, wait, from_source, to_source)
+                #     else:
+                #         save_record = OP_clipper(browser, wait, from_source, to_source)
+                # elif i in range(120,160):
+                #     a = random.randint(1,2)
+                #     if a == 1:
+                #         save_record = OP_uniswap(browser, wait, from_source, to_source)
+                #     else:
+                #         save_record = OP_zipswap(browser, wait, from_source, to_source)
+                # elif i in range(160,201):
+                #     a = random.randint(1,2)
+                #     if a == 1:
+                #         save_record = OP_sushiswap(browser, wait, from_source, to_source)
+                #     else:
+                #         save_record = OP_clipper(browser, wait, from_source, to_source)
 
 
                 print("记录是：",save_record)
@@ -87,11 +110,11 @@ while 1:
                 browser.quit()
                 a = random.randint(10, 15)
                 time_sleep(a, f"++++++++++随机等待时间{a}")
-            except:
-                print("出错了,将会记录到excel中")
-                Do_Excel(excel_path, sheetname='SheetJS').plain_write(i, write_success_to_excel_column, "×")
-                a = random.randint(10, 15)
-                time_sleep(a, f"++++++++++随机等待时间{a}")
-                browser.quit()
+            # except:
+            #     print("啊啊啊!出错了,将会记录到excel中")
+            #     Do_Excel(excel_path, sheetname='SheetJS').plain_write(i, write_success_to_excel_column, "×")
+            #     a = random.randint(10, 15)
+            #     time_sleep(a, f"++++++++++随机等待时间{a}")
+            #     browser.quit()
 
 

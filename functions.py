@@ -5553,8 +5553,8 @@ def OP_uniswap(browser, wait, from_source, to_source):
     except:
         return "失败"
     
-  
-def OP_sushiswap(browser, wait, from_source, to_source):
+#mode. 1-->最大化ETH模式    0-->比例化USDC等代币
+def OP_sushiswap(browser, wait, from_source, to_source, mode):
 
     print("开始 OP_sushiswap 任务")
     new_tab(browser, op_sushiswap_url)
@@ -5588,16 +5588,37 @@ def OP_sushiswap(browser, wait, from_source, to_source):
     to_button.send_keys(Keys.ENTER)
     time_sleep(5,"等待响应")
     
-    # 输入金额.随机选用一种方法
-    # random_way = random.randint(1,2)
-    #法一: 选择最大金额. 但用ETH作为from时有bug:点击max, 但实际没有max
+    # 输入金额.
+    if mode == "max_all":
+        #法一: 选择最大金额. 但用ETH作为from时有bug:点击max, 但实际没有max
+        print("本次采用最大化金额法")
+        max_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/div[1]//div[text()[contains(.,'Balance')]]")))
+        time_sleep(3, "max_button button found")
+        browser.execute_script("arguments[0].click();", max_button)
+        time_sleep(8, "已经点击max,等待响应")
     
-    print("本次采用最大化金额法")
-    max_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/div[1]//div[text()[contains(.,'Balance')]]")))
-    time_sleep(3, "max_button button found")
-    browser.execute_script("arguments[0].click();", max_button)
-    time_sleep(8, "已经点击max,等待响应")
-    
+    elif mode == "save_some_token":
+        #法二: 部分金额法.比如源是OP, 保留3~5个OP代币
+        print("本次采用比例化金额法")
+        time_sleep(3, "提取金额....")
+        balance_box_path = "//div[@class='relative filter z-10']/div[1]/div[@class='flex flex-col gap-3']/div[1]//div[@class='text-sm leading-5 font-medium cursor-pointer select-none flex text-secondary whitespace-nowrap']"
+        balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, balance_box_path)))
+        balance_string = balance_button.text #类似 Balance:13.3942
+        balance_a = balance_string.split()[-1]
+        L2_max_value = float(balance_a)
+        print("恭喜提取到的金额是:", L2_max_value)
+
+        # =======找输入金额框
+        time_sleep(3,"准备找输入金额框")
+        input_amount_box = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='relative filter z-10']/div[1]/div[@class='flex flex-col gap-3']/div[1]//input")))
+        time_sleep(2,"已经找到了输入框")
+
+        # 随机金额. 留取3~5个OP币
+        point = random.randint(1, 2)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+        input_value = round(random.uniform(L2_max_value - 5, L2_max_value -3), point)
+        print(f"本次从 {from_source} 转到 {to_source} 的随机金额是{input_value}，将来预估余额是：{float(L2_max_value) - input_value}")
+        input_amount_box.send_keys(str(input_value))
+        time_sleep(10,"已经输入金额")
 
     #准备确认交易. from 不是ETH时可能会出现 Approve BentoBox , Approve USDC
     if from_source != "ETH":
@@ -5607,12 +5628,18 @@ def OP_sushiswap(browser, wait, from_source, to_source):
             if "BentoBox" in allow_button.text:
                 sushiswap_allow_Bentobox(browser, wait)
 
-            elif "Approve" in allow_button.text:
+        except:
+            print("可能是之前allow 过了,不需要重新授权")
+    if from_source != "ETH":
+        try:
+            #查看是哪一种allow
+            allow_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/button[1]")))
+
+            if "Approve" in allow_button.text:
                 #无论如何都要试一试使用USDC
                 sushiswap_allow_token(browser, wait)
         except:
             print("可能是之前allow 过了,不需要重新授权")
- 
             
     else: #如果是用ETH转出去,可能会有一个 Bentobox
         try:
