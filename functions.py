@@ -5810,7 +5810,7 @@ def get_balance_from_debank(browser, wait, network_name):
     switch_tab_by_handle(browser, 1, 0)  # 一定要切换回去,给selenium一个指针,否则无法新建标签页.
     time_sleep(3,"准备打开新网页")
 
-    return max_token
+    return max_token, balance_dict
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  debank的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
