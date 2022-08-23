@@ -7,7 +7,7 @@ excel_path = '/home/parallels/ubuntu_op/Block_chain/scripts_on_ubuntu/L2_project
 
 write_success_to_excel_column = "H"  #把成功或失败记录到excel的列
 read_from_excel_column = "H" #从excel中的哪一列读取状态? 判断是不是要做任务?
-excel_start_row = 4
+excel_start_row = 122
 browser_wait_times = 20
 
 while 1:
@@ -52,7 +52,7 @@ while 1:
                 time_sleep(3,"不需要转到ETH")
                 browser.quit()
                 time.sleep(3)
-                break
+                continue
 
             # elif 'OP' in balance_dict.keys():
             #     print("OP 确实存在")
