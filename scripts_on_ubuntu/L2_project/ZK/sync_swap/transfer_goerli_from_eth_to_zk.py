@@ -32,7 +32,6 @@ ip_switcher(browser, wait, url_google)
 #登錄小狐狸
 login_metamask(browser, wait, metamask_pw, metamask_home)
 
-
 #切換到i小狐狸,準備換號
 switch_tab_by_handle(browser, 1, 0)
 fox_change_account(browser, wait, excel_start)
