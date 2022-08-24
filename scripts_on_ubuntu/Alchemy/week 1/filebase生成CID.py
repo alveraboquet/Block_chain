@@ -90,7 +90,7 @@ file_button  = browser.find_element(By.XPATH, "//label[text()[contains(.,'File')
 
 # time_sleep(2,"准备注入java")
 # browser.execute_script("arguments[0].type='visible';", file_button)
-time_sleep(2,"准备上传")
+time_sleep(2,"准备上传文件")
 file_button.send_keys("/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/photos/1.png")
 
 
