@@ -7,7 +7,11 @@ excel_path = '/home/parallels/ubuntu_op/Block_chain/scripts_on_ubuntu/L2_project
 
 write_success_to_excel_column = "H"  #把成功或失败记录到excel的列
 read_from_excel_column = "H" #从excel中的哪一列读取状态? 判断是不是要做任务?
+<<<<<<< HEAD
+excel_start_row = 133
+=======
 excel_start_row = 3
+>>>>>>> 39ac72a507d231d38e400749ac9436ae2346c394
 browser_wait_times = 20
 
 while 1:
