@@ -3,7 +3,7 @@
   "external_url": "Alchemy.com",
   "image": "https://ipfs.filebase.io/ipfs/QmRTiXbxTCSUDeMHfCGVXThwbFVUHW4MQgd4wgWxSMU6Qm",
   "name": "A cool NFT", 
-  "attributes": [
+  "attributes":[
     {
       "trait_type": "Base", 
       "value": "Starfish"
@@ -42,5 +42,5 @@
       "display_type": "number", 
       "trait_type": "Generation", 
       "value": 2
-    }
+    }]
   }

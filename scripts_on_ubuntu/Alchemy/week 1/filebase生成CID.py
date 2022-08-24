@@ -83,15 +83,15 @@ browser.execute_script("arguments[0].click();", upload_button)
 
 #选择file
 # file_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='py-1']/form[1]/input[2]")))
-file_button  = browser.find_element(By.XPATH, "//div[@class='py-1']/form[1]/input[1]")
+file_button  = browser.find_element(By.XPATH, "//label[text()[contains(.,'File')]]//span/input")
 
-# time_sleep(2,"准备点击上传")
+# time_sleep(2,"准备点击上传")/
 # browser.execute_script("arguments[0].click();", file_button)
 
-time_sleep(2,"准备注入java")
-browser.execute_script("arguments[0].type='visible';", file_button)
+# time_sleep(2,"准备注入java")
+# browser.execute_script("arguments[0].type='visible';", file_button)
 time_sleep(2,"准备上传")
-file_button.send_keys("/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/pics/幻灯片5.png")
+file_button.send_keys("/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/photos/1.png")
 
 
 
@@ -109,6 +109,4 @@ time_sleep(a, f"++++++++++随机等待时间{a}")
 browser.quit()
 a = random.randint(10, 15)
 time_sleep(a, f"++++++++++随机等待时间{a}")
-
-
 
