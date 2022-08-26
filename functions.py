@@ -206,7 +206,7 @@ def my_linux_chrome(time_out=30):
     # option.add_argument('--disable-gpu')#屏蔽浏览器引擎
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-dev-shm-usage')
-    option.add_argument('--disable-gpu')
+    # option.add_argument('--disable-gpu')
     option.add_argument("--disable-blink-features=AutomationControlled")  # 禁用启用Blink运行时的功能
     option.add_experimental_option('excludeSwitches', ['enable-automation'])  # 防止被网站识别
     option.add_experimental_option('useAutomationExtension', False)
