@@ -6259,7 +6259,7 @@ def edit_json_file(json_path, pic_CID):
         # 修改CID的值
         data["image"] = whole_pic_CID
         data["name"] = RandomWords().get_random_word()  # 随机一个名字
-        print("=========修改 image 的链接为:", whole_pic_CID)
+        print("====修改 image 的链接为:", whole_pic_CID)
         # print('================')
         # print(data)
         with open(json_path, 'w') as f2:
@@ -6302,12 +6302,12 @@ def filebase_upload_pic_file_in_bucket(browser, wait, pic_path):
     time_sleep(2,"准备选择file上传")
     file_button.send_keys(pic_path)
 
-    time_sleep(15,"等待上传图片......")
+    time_sleep(20,"等待上传图片......")
 
     #获取图片的CID
     pic_CID = wait.until(EC.element_to_be_clickable((By.XPATH, "//tbody/tr[1]//span[@id='ipfs_cid']")))
     pic_CID_text = pic_CID.text 
-    print("=============获取到的图片CID是:", pic_CID_text)
+    print("========获取到的图片CID是:", pic_CID_text)
     return pic_CID_text
 
 #=======================上传json文件,并获得CID
@@ -6320,12 +6320,12 @@ def filebase_upload_json_file_in_bucket(browser, wait, json_path):
     file_button  = browser.find_element(By.XPATH, "//label[text()[contains(.,'File')]]//span/input")
     time_sleep(2,"准备选择file上传")
     file_button.send_keys(json_path)
-    time_sleep(15,"等待上传json文件......")
+    time_sleep(20,"等待上传json文件......")
 
     # 获取json 的CID
     json_CID = wait.until(EC.element_to_be_clickable((By.XPATH, "//tbody/tr[2]//span[@id='ipfs_cid']")))
     json_CID_text = json_CID.text 
-    print("===============获取到json的CID是:", json_CID_text)
+    print("============获取到json的CID是:", json_CID_text)
     return json_CID_text
 
 def filebase_random_create_bucket_and_enter(browser, wait):
@@ -6346,7 +6346,7 @@ def filebase_random_create_bucket_and_enter(browser, wait):
     confirm_bucket_name = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@id='save_bucket']")))
     time_sleep(2,"准备创建bucket")
     browser.execute_script("arguments[0].click();", confirm_bucket_name)
-    time_sleep(20, "已经点击创建bucket")
+    time_sleep(10, "已经点击创建bucket")
 
     #======================进入bucket
     # c = 'cd1183'
