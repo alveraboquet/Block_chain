@@ -10,7 +10,7 @@ from faker import Faker
 fake = Faker()
 
 excel_start_row = 20 #从excel第几行开始
-write_jsonCID_to_excel_column = 'G' #结果记录到哪一列
+write_jsonCID_to_excel_column = 'H' #结果记录到哪一列
 
 json_path = "/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/metadata.json"
 excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/alchemy可用邮箱手动整理版.xlsx'
@@ -53,6 +53,7 @@ while 1:
             
             ##=========== 准备浏览器
             wait, browser = my_linux_chrome(time_out=browser_wait_times)
+            browser.set_page_load_timeout(61) #设置网页加载最多1分钟
             browser.get(filebaseURL)
             switch_tab_by_handle(browser, 0, 0)  # 切换到filebase
 

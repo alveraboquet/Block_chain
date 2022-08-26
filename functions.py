@@ -6102,6 +6102,7 @@ def alchemy_delete_app(browser, wait, keyword):
         print("App个数：", num_result)
     except:
         print("没有找到app列表, 可能是没有app")
+        num_result = 1
     #循环删除不要的app, 比如非 Rinkeby
     for i in range(1,num_result+1):
         try:
@@ -6135,13 +6136,14 @@ def alchemy_delete_app(browser, wait, keyword):
                 browser.execute_script("arguments[0].click();", Confirm_Delete_App)
                 time_sleep(30,"已经确认删除")
         except:
-            time_sleep(3, "删除app出错了")
+            time_sleep(1, "删除app出错了")
             Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'Dashboard')]]")))
             time_sleep(2,"准备点击dashboard")
             browser.execute_script("arguments[0].click();", Dashboard_button)
 
 #获取app的https 和 api等信息
 def get_alchemy_app_info(browser, wait, app_name):
+    print("开始去获取 app 的 https 和 api等信息")
     app_name_xpath = f"//tbody//a[text()[contains(.,'{app_name}')]]"
     App_name_button = wait.until(EC.element_to_be_clickable((By.XPATH, app_name_xpath)))    
     time_sleep(2, "找到了新建的app")
@@ -6159,6 +6161,85 @@ def get_alchemy_app_info(browser, wait, app_name):
     print("https_info获取到的数据是", https_info)
 
     return https_info, api_info
+
+#从alchemy出领取测试币
+def get_alchemy_faucet(browser, wait):
+    #=================================== 领水
+    app_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//tbody[@class='table-body']/tr[3]/td[1]/a")))
+    time_sleep(2,"准备点击进入app, 打算去领水")
+    browser.execute_script("arguments[0].click();", app_button)
+
+
+    get_test_ETH = wait.until(EC.element_to_be_clickable((By.XPATH,"//a[text()[contains(.,'Get Test ETH')]]")))
+    time_sleep(2,"准备点击进入水龙头")
+    browser.execute_script("arguments[0].click();", get_test_ETH)
+
+    switch_tab_by_handle(browser, 2, 0)  # 切换到
+
+    #============查看是不是要登录
+    login_flag = True
+    try_times = 0
+    while login_flag:
+        #去检查需不需要登录
+        browser.refresh()
+        time_sleep(10, "领水网页刷新")
+        try:
+            login_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[text()[contains(.,'Please signup or login')]]")))
+            print("需要登录login")
+            login_flag = True
+        except:
+            print("可能是已经登录了")
+            login_flag = False
+        #需要的话去登录
+        if login_flag:
+            try:
+                try_times +=1
+                login_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Alchemy Login')]]")))
+                time_sleep(2,"准备登录")
+                browser.execute_script("arguments[0].click();", login_button)
+                time_sleep(20,"已经点击登录alchemy")
+
+            except:
+                browser.refresh()
+                time_sleep(15, "登录失败, 重新登录")
+        print(f"第{try_times}次领水尝试登录")        
+        if try_times == 5:
+            browser.quit()
+
+
+    #=========循环领取
+    faucet_flag = True
+    try_times = 0
+    while faucet_flag:
+        browser.refresh()
+        time_sleep(10, "进入领水, 等待刷新")
+        #去检查需不需要领. 如果是空,说明需要领取
+        try:
+            blank_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='alchemy-faucet-table-data col']")))
+            print("领取列表是空的,需要领水")
+        except:
+            print("可能是已经领到了")
+            faucet_flag = False
+        #需要的话去领
+        if faucet_flag:
+            try:
+                try_times +=1
+                address_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@type='address']")))
+                time_sleep(2,"准备输入小狐狸帐号")
+                address_button.send_keys(fox_address)
+
+                confirm_send = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='button']//span")))
+                time_sleep(2,"准备点击send")
+                # browser.execute_script("arguments[0].click();", confirm_login)
+                ActionChains(browser).click(confirm_send).perform()  # 用模拟鼠标点
+
+                time_sleep(30,"已经点击send")
+            except:
+                browser.refresh()
+                time_sleep(15, "领取失败, 重新领")
+        print(f"第{try_times}次领水~~~")   
+        if try_times == 5:
+            browser.quit()
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  Alchemy 的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
