@@ -59,7 +59,7 @@ while 1:
                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_jsonCID_to_excel_column, full_json_CID)
 
                 browser.quit()
-                time_sleep(20,"===纯倒计时")
+                time_sleep(random.randint(10, 25),"===纯倒计时")
                 
             except:
                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_jsonCID_to_excel_column, "×")
@@ -69,6 +69,6 @@ while 1:
                 except:
                     print("可能已经推出浏览器了")
                 a = random.randint(10, 15)
-                time_sleep(a, f"@ @ @ @ @ 超时出错了, 随机等待时间{a} @ @ @ @")    
+                time_sleep(a, f"@ @ @ @ @ 超时出错了, 随机等待时间 {a} @ @ @ @")    
 
 

@@ -6265,7 +6265,9 @@ def edit_json_file(json_path, pic_CID):
         with open(json_path, 'w') as f2:
             json.dump(data, f2)  # 写入f2文件到本地
             f2.close() #打开后需要关闭，否则文件无变化，导致CID一直一样
+        time.sleep(2)
         f.close()
+        time.sleep(2)
 
 def login_filebase(browser, wait, filebase_email, filebase_pw):
     print("尝试登录")
@@ -6318,7 +6320,7 @@ def filebase_upload_json_file_in_bucket(browser, wait, json_path):
     file_button  = browser.find_element(By.XPATH, "//label[text()[contains(.,'File')]]//span/input")
     time_sleep(2,"准备选择file上传")
     file_button.send_keys(json_path)
-    time_sleep(8,"等待上传json文件......")
+    time_sleep(15,"等待上传json文件......")
 
     # 获取json 的CID
     json_CID = wait.until(EC.element_to_be_clickable((By.XPATH, "//tbody/tr[2]//span[@id='ipfs_cid']")))
@@ -6344,7 +6346,7 @@ def filebase_random_create_bucket_and_enter(browser, wait):
     confirm_bucket_name = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@id='save_bucket']")))
     time_sleep(2,"准备创建bucket")
     browser.execute_script("arguments[0].click();", confirm_bucket_name)
-    time_sleep(10)
+    time_sleep(20, "已经点击创建bucket")
 
     #======================进入bucket
     # c = 'cd1183'
