@@ -6,6 +6,10 @@ from sqlite3 import Time
 import pandas as pd
 import random
 import time, os, re
+import requests
+import json
+import re
+import sys
 import ast # 用于将字典型字符串转为字典
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -21,6 +25,176 @@ from itertools import chain
 from random import choice, sample
 from openpyxl import Workbook,load_workbook
 import linecache #用于读取txt文档
+from faker import Faker
+fake = Faker()
+
+##===========================脆球邮箱相关
+#找alchemy的注册激活链接
+def cuiqiu_find_alchemy_activate_email(email_to_be_activate):
+    #从脆球官网获取
+    cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
+    cuiqiu_mail_id = '608142'
+    #循环检索邮箱. email_to_be_activate 表示待激活的邮箱
+    not_find_yet = True
+    try_times = 0
+    while not_find_yet:
+        activate_link = '' #空链接
+        #获取邮件列表
+        url = "https://domain-open-api.cuiqiu.com/v1/box/list"
+        payload={'mail_id': cuiqiu_mail_id,
+        'token': cuiqiu_token,
+        'start_time': '2022-08-24',
+        'end_time': '2023-08-25',
+        'page': '1',
+        'limit': '10'}
+        files=[
+
+        ]
+        headers = {}
+        response = requests.request("POST", url, headers=headers, data=payload, files=files)
+        result = response.text 
+
+        #==================================获取邮件id
+        #字符串转json
+        json1 = json.loads(result)
+        # print(json1)
+        # print(type(json1))
+        print("===================")
+        #转为列表
+        email_list = json1['data']['list']
+        # print(email_list)
+
+        result_box_id = 'kong'
+        for i in email_list:
+            # print(i, type(i))
+            if email_to_be_activate in str(i):
+                if 'Verify your email' in str(i):
+                    # print(i)
+                    print("待激活的邮件id是:", i['id'])
+                    result_box_id = i['id']
+                    time_sleep(8, "已经找到了激活邮件, 需要提取下链接")
+                    not_find_yet = False #防止死循环
+                else:
+                    time_sleep(60, f"没有找到激活邮件, 重试{try_times}次")
+        try_times +=1
+        if try_times == 10:
+            print("重试了10分钟,还是失败")
+            return "not receive active email" 
+
+    #===================== 获取邮件详情. 提取激活链接
+    # # box_id 通过 v1/box/list 获取邮箱列表接口获取
+    url = "https://domain-open-api.cuiqiu.com/v1/box/detail"
+
+    payload={'mail_id': cuiqiu_mail_id,
+    'token': cuiqiu_token,
+    'box_id': result_box_id}
+    files=[
+
+    ]
+    headers = {}
+
+    response = requests.request("POST", url, headers=headers, data=payload, files=files)
+
+    result = response.text
+    # print("邮件详情是: ",result)
+
+    urls = re.findall('[a-zA-z]+://[^\s]*', result)
+    print(urls)
+    print("===================")
+
+    for url in urls:
+        if url.startswith("http://url6420.alchemy.com/ls/click?"):
+            print("激活链接是:", url[:-2])
+            not_find_yet = False
+            activate_link = url[:-2] #找到了激活链接
+            time_sleep(1, "提取到了激活链接")
+            return activate_link
+
+#Alchemy填写项目描述
+def fill_in_alchemy_project_des(browser, wait):
+    print("开始填写alchemy项目描述, 刚开始注册帐号的时候需要")
+    des1_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='My Team']")))
+    time_sleep(2,"准备输入描述1")
+    des1_button.send_keys(fake.sentence())
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    des2_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='...']")))
+    time_sleep(2,"准备输入描述2")
+    des2_button.send_keys("NFT")
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    Ethereum_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Ethereum']")))
+    time_sleep(2,"准备选择Ethereum")
+    browser.execute_script("arguments[0].click();", Ethereum_button)
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    free_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Free']")))
+    time_sleep(2,"准备选择Free")
+    browser.execute_script("arguments[0].click();", free_button)
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    #跳过信用卡
+    skip_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Skip for now']")))
+    time_sleep(2,"准备选择Free")
+    browser.execute_script("arguments[0].click();", skip_button)
+
+    build_button = wait.until(EC.element_to_be_clickable((By.XPATH,'''//button[text()="Let's Build!"]''')))
+    time_sleep(2,"准备选择 build ")
+    browser.execute_script("arguments[0].click();", build_button)
+    time_sleep(20,"已经点击 build ")
+
+#开始打开浏览器激活
+def cuiqiu_browser_active_alchemy_link(activate_link):
+    print("开始激活alchemy发来的邮件")
+    alread_click_verify = False
+    alread_build = False
+    ##============ 准备浏览器, 激活帐号
+    browser_wait_times = 10
+    print("登录alchemy")
+    wait, browser = my_linux_chrome(time_out=browser_wait_times)
+    alchemy_login_url = activate_link
+
+    #=======清理下缓存
+    delete_cookie(browser)
+
+    #=============正式开始
+    browser.get(alchemy_login_url)
+    time_sleep(5, "等待 alchemy 加载")
+    switch_tab_by_handle(browser, 1, 0)  # 切换到
+
+    #===========================================激活帐号
+    try:
+        Verify_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Verify']")))
+        time_sleep(2,"准备点击 Verify")
+        browser.execute_script("arguments[0].click();", Verify_button)
+        time_sleep(30,"=====已经点击 Verify, 请写入excel")
+        alread_click_verify = True
+    except:
+        print("点击verify失败")
+        alread_click_verify = False
+
+    # ==================填写描述
+    try:
+        fill_in_alchemy_project_des(browser, wait)
+        alread_build = True
+    except:
+        print("可能是不需要填写alchemy项目描述, 或哪里出错了")
+        alread_build = False
+
+    return alread_click_verify, alread_build
+
 
 ##===========切换IP相关
 url_dashboard = "http://127.0.0.1:9090/ui/#/proxies"

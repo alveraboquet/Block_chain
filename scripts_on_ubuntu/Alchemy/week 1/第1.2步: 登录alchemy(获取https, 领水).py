@@ -64,52 +64,12 @@ while login_flag:
     print(f"第{try_times}次登录alchemy")   
     if try_times == 5:
         browser.quit()
+
 # #==================填写描述
 try:
-    des1_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='My Team']")))
-    time_sleep(2,"准备输入描述1")
-    des1_button.send_keys(fake.sentence())
-
-    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
-    time_sleep(2,"准备点击Next")
-    browser.execute_script("arguments[0].click();", next_button)
-
-    des2_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='NFTs, DeFi, ...']")))
-    time_sleep(2,"准备输入描述2")
-    des2_button.send_keys("NFT")
-
-    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
-    time_sleep(2,"准备点击Next")
-    browser.execute_script("arguments[0].click();", next_button)
-
-    Ethereum_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Ethereum']")))
-    time_sleep(2,"准备选择Ethereum")
-    browser.execute_script("arguments[0].click();", Ethereum_button)
-
-    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
-    time_sleep(2,"准备点击Next")
-    browser.execute_script("arguments[0].click();", next_button)
-
-    free_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Free']")))
-    time_sleep(2,"准备选择Free")
-    browser.execute_script("arguments[0].click();", free_button)
-
-    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
-    time_sleep(2,"准备点击Next")
-    browser.execute_script("arguments[0].click();", next_button)
-
-    #跳过信用卡
-    skip_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Skip for now']")))
-    time_sleep(2,"准备选择Free")
-    browser.execute_script("arguments[0].click();", skip_button)
-
-    build_button = wait.until(EC.element_to_be_clickable((By.XPATH,'''//button[text()="Let's Build!"]''')))
-    time_sleep(2,"准备选择 build ")
-    browser.execute_script("arguments[0].click();", build_button)
-    time_sleep(15,"已经点击 build ")
-
+    fill_in_alchemy_project_des(browser, wait)
 except:
-    print("可能是不需要填写各种描述")
+    print("可能是不需要填写alchemy项目描述")
 
 # ===================创建app
 if create_app == 1:
