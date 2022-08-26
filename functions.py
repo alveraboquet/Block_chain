@@ -5624,6 +5624,19 @@ def OP_sushiswap(browser, wait, from_source, to_source, mode):
         input_amount_box.send_keys(str(input_value))
         time_sleep(10,"已经输入金额")
 
+    elif mode == "buy_some_token":#只买指定数量的目标币,如5个OP, 则输入0.001 ETH
+        # =======找输入金额框
+        time_sleep(3,"准备找输入金额框")
+        input_amount_box = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='relative filter z-10']/div[1]/div[@class='flex flex-col gap-3']/div[1]//input")))
+        time_sleep(2,"已经找到了输入框")
+
+        # 随机金额. 
+        point = random.randint(3, 5)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+        input_value = round(random.uniform(0.001, 0.003), point)
+        print(f"本次从 {from_source} 转到 {to_source} 的随机金额是{input_value}，将来预估余额是：{float(L2_max_value) - input_value}")
+        input_amount_box.send_keys(str(input_value))
+        time_sleep(10,"已经输入金额")
+
     #准备确认交易. from 不是ETH时可能会出现 Approve BentoBox , Approve USDC
     if from_source != "ETH":
         try:
