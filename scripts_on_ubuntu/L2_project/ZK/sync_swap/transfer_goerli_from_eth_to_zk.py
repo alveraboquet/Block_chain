@@ -19,7 +19,7 @@ zksync_goerli_bridge = 'https://portal.zksync.io/bridge'
 zhsync_home = "https://wallet.zksync.io/"
 excel_path = "/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/L2_project/ZK/sync_swap/sync_swap_50-之后变为200号.xlsx"
 
-excel_start = 140
+excel_start = 180
 browser_wait_times = 30
 wait, browser = my_linux_chrome(time_out=browser_wait_times)
 
