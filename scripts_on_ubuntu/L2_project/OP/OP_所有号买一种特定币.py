@@ -30,38 +30,11 @@ while 1:
             fox_change_account(browser, wait, i)  #换号，选列表里的
 
 
-            # ============= 四, 从 Debank 上获取某个网络余额. 返回最大金额和代币列表.
-            max_source, my_balance_dict = get_balance_from_debank(browser, wait, "Optimism")
-            #=====这次是要全部换成OP
-            if 'USDC' in my_balance_dict.keys():
-                print("USDC 确实存在")
-                from_source = "USDC"
-                to_source = "ETH"
-                your_mode = "max_all"
-
-            elif 'DAI' in my_balance_dict.keys():
-                print("DAI 确实存在")
-                from_source = "DAI"
-                to_source = "ETH"
-                your_mode = "max_all"
-
-            elif 'USDT' in my_balance_dict.keys():
-                print("USDT 确实存在")
-                from_source = "USDT"
-                to_source = "ETH"
-                your_mode = "max_all"
-            else:
-                time_sleep(3,"不需要转到ETH")
-                browser.quit()
-                time.sleep(3)
-                continue
-
-            # elif 'OP' in balance_dict.keys():
-            #     print("OP 确实存在")
-            #     from_source == "USDT"
-            #     to_source = "ETH"
-            #     your_mode = "max_all"
-                
+            # ============= 四, 买一种特定币, 比如op
+            
+            from_source = "ETH"
+            to_source = "OP"
+            your_mode = 'buy_some_token'
             # ============= 五, 开始做任务
             print(f"哈哈! 本次要从 {from_source} 转到 {to_source}")    
 
