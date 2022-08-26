@@ -26,6 +26,7 @@ from random import choice, sample
 from openpyxl import Workbook,load_workbook
 import linecache #用于读取txt文档
 from faker import Faker
+from random_word import RandomWords
 fake = Faker()
 
 ##===========================脆球邮箱相关
@@ -6244,7 +6245,123 @@ def get_alchemy_faucet(browser, wait):
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  Alchemy 的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
 
-## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   filebase的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+#=============== 修改json文件
+def edit_json_file(json_path, pic_CID):
+    whole_pic_CID = f'https://ipfs.filebase.io/ipfs/{pic_CID}'
+    with open(json_path, 'r+') as f:
+        # 读取demp.json文件内容
+        data = json.load(f)
+        # print(data)
+        # print('================')
+        # print(data["image"])
+
+        # 修改CID的值
+        data["image"] = whole_pic_CID
+        data["name"] = RandomWords().get_random_word()  # 随机一个名字
+        print("=========修改 image 的链接为:", whole_pic_CID)
+        # print('================')
+        # print(data)
+        with open(json_path, 'w') as f2:
+            json.dump(data, f2)  # 写入f2文件到本地
+            f2.close() #打开后需要关闭，否则文件无变化，导致CID一直一样
+        f.close()
+
+def login_filebase(browser, wait, filebase_email, filebase_pw):
+    print("尝试登录")
+    send_password = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='user_email']")))
+    time_sleep(2,"准备输入用户名")
+    send_password.send_keys(filebase_email)
+    time.sleep(2)
+
+    send_password = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='user_password']")))
+    time_sleep(2,"准备输入密码")
+    send_password.send_keys(filebase_pw)
+
+    remember_me = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='user_remember_me']")))
+    time_sleep(2,"准备点击记住我")
+    browser.execute_script("arguments[0].click();", remember_me)
+
+
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='submit']")))
+    time_sleep(2,"准备点击登录")
+    browser.execute_script("arguments[0].click();", confirm_login)  
+
+
+#=========在进入bucket后,上传图片文件,并获得图片CID
+def filebase_upload_pic_file_in_bucket(browser, wait, pic_path):
+    print("===上传图片")
+    upload_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@id='menu-button']")))
+    time_sleep(2,"准备点击upload")
+    browser.execute_script("arguments[0].click();", upload_button)
+
+    #==========选择file按钮
+    file_button  = browser.find_element(By.XPATH, "//label[text()[contains(.,'File')]]//span/input")
+    time_sleep(2,"准备选择file上传")
+    file_button.send_keys(pic_path)
+
+    time_sleep(15,"等待上传图片......")
+
+    #获取图片的CID
+    pic_CID = wait.until(EC.element_to_be_clickable((By.XPATH, "//tbody/tr[1]//span[@id='ipfs_cid']")))
+    pic_CID_text = pic_CID.text 
+    print("=============获取到的图片CID是:", pic_CID_text)
+    return pic_CID_text
+
+#=======================上传json文件,并获得CID
+def filebase_upload_json_file_in_bucket(browser, wait, json_path):
+    print("===上传json")
+    upload_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@id='menu-button']")))
+    time_sleep(2,"准备点击upload")
+    browser.execute_script("arguments[0].click();", upload_button)
+
+    file_button  = browser.find_element(By.XPATH, "//label[text()[contains(.,'File')]]//span/input")
+    time_sleep(2,"准备选择file上传")
+    file_button.send_keys(json_path)
+    time_sleep(8,"等待上传json文件......")
+
+    # 获取json 的CID
+    json_CID = wait.until(EC.element_to_be_clickable((By.XPATH, "//tbody/tr[2]//span[@id='ipfs_cid']")))
+    json_CID_text = json_CID.text 
+    print("===============获取到json的CID是:", json_CID_text)
+    return json_CID_text
+
+def filebase_random_create_bucket_and_enter(browser, wait):
+    print("===随机创建bucket并进入")
+    create_bucket = wait.until(EC.element_to_be_clickable((By.XPATH,"//span//button[text()[contains(.,'Create Bucket')]]")))
+    time_sleep(2,"准备创建bucket")
+    browser.execute_script("arguments[0].click();", create_bucket)
+
+    c = fake.md5()
+    print("bucket 名字是:",c)
+
+    send_bucket_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='bucket_name']")))
+    time_sleep(2,"准备输入bucket name")
+    send_bucket_name.send_keys(c)
+    time.sleep(2)
+
+    #创建bucket
+    confirm_bucket_name = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@id='save_bucket']")))
+    time_sleep(2,"准备创建bucket")
+    browser.execute_script("arguments[0].click();", confirm_bucket_name)
+    time_sleep(10)
+
+    #======================进入bucket
+    # c = 'cd1183'
+    login_bucket = wait.until(EC.element_to_be_clickable((By.XPATH,f"//p[text()[contains(.,'{c}')]]")))
+    time_sleep(2,"准备进入bucket")
+    browser.execute_script("arguments[0].click();", login_bucket)
+    time_sleep(10, "已经点进进入bucket")
+
+def filebase_return_to_bucket(browser, wait):
+    #=============回到bucket首页
+    try:
+        back_to_bucket = wait.until(EC.element_to_be_clickable((By.XPATH,"//nav/a[text()[contains(.,' Buckets')]]")))
+        time_sleep(2,"准备回到bucket")
+        browser.execute_script("arguments[0].click();", back_to_bucket)
+        print("已经点击回到bucket")
+    except:
+        print("程序一开始, 点击返回bucket失败")
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
