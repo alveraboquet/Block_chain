@@ -65,7 +65,7 @@ while 1:
                 time.sleep(2)
 
                 send_password = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='user_password']")))
-                time_sleep(2,"准备输入用户名")
+                time_sleep(2,"准备输入密码")
                 send_password.send_keys(filebase_pw)
 
                 remember_me = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='user_remember_me']")))
