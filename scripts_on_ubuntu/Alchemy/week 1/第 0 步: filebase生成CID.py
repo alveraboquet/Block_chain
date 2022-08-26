@@ -31,7 +31,7 @@ while 1:
                 print(f" {i} 号没有ipfs, 需要做创建ipfs")
                 ##=========== 准备浏览器
                 wait, browser = my_linux_chrome(time_out=browser_wait_times)
-                browser.set_page_load_timeout(61) #设置网页加载最多1分钟
+                browser.set_page_load_timeout(121) #设置网页加载最多1分钟
                 browser.get(filebaseURL)
                 switch_tab_by_handle(browser, 0, 0)  # 切换到filebase
 
@@ -63,7 +63,6 @@ while 1:
                 
             except:
                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_jsonCID_to_excel_column, "×")
-
                 try:
                     browser.quit()
                 except:
