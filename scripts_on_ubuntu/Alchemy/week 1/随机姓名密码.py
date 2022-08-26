@@ -28,3 +28,20 @@ for i in range(13,150):
     pw = fake.password()
     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, "D", pw)
 
+
+from faker import Faker
+fake = Faker()
+
+lastname = fake.last_name()
+firstname = fake.first_name()
+pw = fake.password()
+company = fake.company()
+md5 = fake.md5()
+sentence = fake.sentence()
+
+# print("姓:", lastname)
+# print("名:", firstname)
+# print("密码:", pw)
+# print("company:", company)
+# print("md5:", md5)
+# print("sentence:", sentence)

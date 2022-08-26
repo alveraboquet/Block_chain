@@ -8,34 +8,21 @@ import re
 from faker import Faker
 fake = Faker()
 
-lastname = fake.last_name()
-firstname = fake.first_name()
-pw = fake.password()
-company = fake.company()
-md5 = fake.md5()
-sentence = fake.sentence()
-
-# print("姓:", lastname)
-# print("名:", firstname)
-# print("密码:", pw)
-# print("company:", company)
-# print("md5:", md5)
-# print("sentence:", sentence)
-#从脆球官网获取
-cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
-cuiqiu_mail_id = '608142'
 
 excel_row = 23   #待注册的邮箱. 新的一批号,从第20往后开始
 write_resent_to_excel_column = "D" #通过查看resent, 来判断是否发送激活链接
-write_active_excel_column = "E"
-email_excel_column = "B"
-pw_excel_column = "C"
+write_active_excel_column = "E" #激活信息
+email_excel_column = "B" #邮箱
+pw_excel_column = "C"  #密码
 
 excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/alchemy可用邮箱手动整理版.xlsx'
 
 browser_wait_times = 10
 alchemyURL = f"https://auth.alchemyapi.io/signup?redirectUrl=https%3A%2F%2Fdashboard.alchemy.com%2Fsignup%2F%3Freferrer_origin%3DDIRECT"
 alchemy_official_URL = f"https://www.alchemy.com"
+#从脆球官网获取
+cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
+cuiqiu_mail_id = '608142'
 
 while 1:
     for i in range(excel_row, 120):
@@ -59,28 +46,8 @@ while 1:
             browser.get(alchemyURL)
             switch_tab_by_handle(browser, 1, 0)  # 切换到
 
-            #===============================================注册, 输入个人信息
-            first_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Gavin']")))
-            time_sleep(2,"准备输入姓")
-            first_name.send_keys(fake.last_name())
-            time.sleep(2)
-
-            second_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Belson']")))
-            time_sleep(2,"准备输入名")
-            second_name.send_keys(fake.first_name())
-
-            email_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='gavin@hooli.com']")))
-            time_sleep(2,"准备输入邮箱")
-            email_button.send_keys(email_account)
-
-            pw_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='••••••••']")))
-            time_sleep(2,"准备输入密码")
-            pw_button.send_keys(email_pw)
-
-            confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//form/button[text()='Sign up']")))
-            time_sleep(2,"准备点击登录")
-            browser.execute_script("arguments[0].click();", confirm_login)
-            time_sleep(10,"纯倒计时,等待查看resent按钮")
+            #=======================注册, 输入个人信息
+            signup_alchemy_random_info(browser, wait, email_account, email_pw)
 
             #=========循环查看是不是有resent按钮
             check_resent_flag = True
@@ -142,10 +109,7 @@ while 1:
                         browser.quit()
                         a = random.randint(10, 15)
                         time_sleep(a, f"++++++++++随机等待时间{a}")
-                # else:
-                #     print("邮箱激活成功")
-                #     active_email_flag = False
-                #     time_sleep(5, "休息一下")
+                
 
                 
 

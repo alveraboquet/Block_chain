@@ -110,50 +110,6 @@ def cuiqiu_find_alchemy_activate_email(email_to_be_activate):
             time_sleep(1, "提取到了激活链接")
             return activate_link
 
-#Alchemy填写项目描述
-def fill_in_alchemy_project_des(browser, wait):
-    print("开始填写alchemy项目描述, 刚开始注册帐号的时候需要")
-    des1_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='My Team']")))
-    time_sleep(2,"准备输入描述1")
-    des1_button.send_keys(fake.sentence())
-
-    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
-    time_sleep(2,"准备点击Next")
-    browser.execute_script("arguments[0].click();", next_button)
-
-    des2_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='...']")))
-    time_sleep(2,"准备输入描述2")
-    des2_button.send_keys("NFT")
-
-    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
-    time_sleep(2,"准备点击Next")
-    browser.execute_script("arguments[0].click();", next_button)
-
-    Ethereum_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Ethereum']")))
-    time_sleep(2,"准备选择Ethereum")
-    browser.execute_script("arguments[0].click();", Ethereum_button)
-
-    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
-    time_sleep(2,"准备点击Next")
-    browser.execute_script("arguments[0].click();", next_button)
-
-    free_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Free']")))
-    time_sleep(2,"准备选择Free")
-    browser.execute_script("arguments[0].click();", free_button)
-
-    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
-    time_sleep(2,"准备点击Next")
-    browser.execute_script("arguments[0].click();", next_button)
-
-    #跳过信用卡
-    skip_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Skip for now']")))
-    time_sleep(2,"准备选择Free")
-    browser.execute_script("arguments[0].click();", skip_button)
-
-    build_button = wait.until(EC.element_to_be_clickable((By.XPATH,'''//button[text()="Let's Build!"]''')))
-    time_sleep(2,"准备选择 build ")
-    browser.execute_script("arguments[0].click();", build_button)
-    time_sleep(20,"已经点击 build ")
 
 #开始打开浏览器激活
 def cuiqiu_browser_active_alchemy_link(activate_link):
@@ -506,7 +462,7 @@ def read_excel():
 def delete_cookie(browser):
     print("进入delete_cookie()，清理缓存、cookie")
     # 清除缓存提示框
-    clean_url = "https://www.google.com"
+    clean_url = "https://www.baidu.com"
     new_tab(browser, clean_url)
     # 2S 等待时间
     time_sleep(2)
@@ -514,11 +470,11 @@ def delete_cookie(browser):
 
     clean_url = "chrome://settings/clearBrowserData"
     browser.get(clean_url)
-    time_sleep(2,"准备清缓存")
+    time_sleep(2,"准备清缓存, 记得谷歌清缓存选择'all time'")
     clearButton = browser.execute_script(
         "return document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm')")
     clearButton.click()
-    time_sleep(5, "清理完毕")
+    time_sleep(2, "清理完毕")
     # browser.close()
 
 ##↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ 通用函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
@@ -5988,8 +5944,292 @@ def get_balance_from_debank(browser, wait, network_name):
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  debank的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
-## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  ZK 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  Alchemy 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+#Alchemy填写项目描述
+def fill_in_alchemy_project_des(browser, wait):
+    print("开始填写alchemy项目描述, 刚开始注册帐号的时候需要")
+    des1_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='My Team']")))
+    time_sleep(2,"准备输入描述1")
+    des1_button.send_keys(fake.sentence())
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    des2_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='...']")))
+    time_sleep(2,"准备输入描述2")
+    des2_button.send_keys("NFT")
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    Ethereum_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Ethereum']")))
+    time_sleep(2,"准备选择Ethereum")
+    browser.execute_script("arguments[0].click();", Ethereum_button)
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    free_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Free']")))
+    time_sleep(2,"准备选择Free")
+    browser.execute_script("arguments[0].click();", free_button)
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    #跳过信用卡
+    skip_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Skip for now']")))
+    time_sleep(2,"准备选择Free")
+    browser.execute_script("arguments[0].click();", skip_button)
+
+    build_button = wait.until(EC.element_to_be_clickable((By.XPATH,'''//button[text()="Let's Build!"]''')))
+    time_sleep(2,"准备选择 build ")
+    browser.execute_script("arguments[0].click();", build_button)
+    time_sleep(20,"已经点击 build ")
+
+#Alchemy创建rinkeby项目
+def alchemy_create_rinkeby_app(browser, wait):
+    print("开始创建rinkeby项目")
+    create_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Create')]]")))
+    time_sleep(2,"准备创建")
+    browser.execute_script("arguments[0].click();", create_button)
+
+    name_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='name']")))
+    time_sleep(2,"准备输入name")
+    app_name = fake.last_name()
+    name_button.send_keys(app_name)
+
+    desc_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='description']")))
+    time_sleep(2,"准备输入desc")
+    desc_button.send_keys(fake.first_name())
+
+    #下拉列表
+    try:
+        down_list_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='select-input-container css-1tyu61v']//div[@class='css-1hkumgc']/span")))
+        time_sleep(2,"准备点击下拉")
+        # browser.execute_script("arguments[0].click();", down_list_button)
+        ActionChains(browser).click(down_list_button).perform()  # 必须用模拟鼠标点
+    except:
+        print("下拉没找到哦啊")
+
+    # #选择rinkeby
+    rinkeby_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='css-1hkumgc']/span[text()[contains(.,'Rinkeby')]]")))
+    time_sleep(2,"准备选择 rinkeby")
+    browser.execute_script("arguments[0].click();", rinkeby_button)
+    # ActionChains(browser).click(rinkeby_button).perform()  # 模拟鼠标点
+
+    #确定创建
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='submit']")))
+    time_sleep(2,"准备点击创建")
+    browser.execute_script("arguments[0].click();", confirm_login)
+    time_sleep(20,"已经点击创建")
+    return app_name
+
+#注册Alchemy时,填写随机信息
+def signup_alchemy_random_info(browser, wait, email_account, email_pw):
+    first_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Gavin']")))
+    time_sleep(2,"准备输入姓")
+    first_name.send_keys(fake.last_name())
+    time.sleep(2)
+
+    second_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Belson']")))
+    time_sleep(2,"准备输入名")
+    second_name.send_keys(fake.first_name())
+
+    email_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='gavin@hooli.com']")))
+    time_sleep(2,"准备输入邮箱")
+    email_button.send_keys(email_account)
+
+    pw_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='••••••••']")))
+    time_sleep(2,"准备输入密码")
+    pw_button.send_keys(email_pw)
+
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//form/button[text()='Sign up']")))
+    time_sleep(2,"准备点击登录")
+    browser.execute_script("arguments[0].click();", confirm_login)
+    time_sleep(10,"纯倒计时,等待查看resent按钮")
+
+# 登录alchemy时,填写帐号密码
+def alchemy_login(browser, wait, email_to_login, email_pw):
+    email_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='gavin@hooli.com']")))
+    time_sleep(2,"准备输入邮箱")
+    email_button.send_keys(email_to_login)
+
+    pw_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='••••••••']")))
+    time_sleep(2,"准备输入密码")
+    pw_button.send_keys(email_pw)
+
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='submit']")))
+    time_sleep(2,"准备点击登录")
+    # browser.execute_script("arguments[0].click();", confirm_login)
+    ActionChains(browser).click(confirm_login).perform()  # 用模拟鼠标点
+    # time_sleep(2,"再点一次")
+    # ActionChains(browser).click(confirm_login).perform()  # 用模拟鼠标点
+
+#官方限制最多5个app, 删除一些不必要的app
+def alchemy_delete_app(browser, wait, keyword):
+    #查看第一个app的名字
+    try:
+        first_app_name = wait.until(EC.element_to_be_clickable((By.XPATH,"//tbody[@class='table-body']/tr[1]/td[1]/div/a")))
+        if first_app_name.text == "Demo App":
+            time_sleep(2,"是官方app, 需要进去删除")
+            browser.execute_script("arguments[0].click();", first_app_name)
+
+            Delete_App = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Delete App')]]")))
+            time_sleep(2,"准备点击删除")
+            browser.execute_script("arguments[0].click();", Delete_App)
+            #
+            Delete_App_input = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='Demo App']")))
+            time_sleep(2,"找到输入框")
+            Delete_App_input.send_keys("Demo App")
+
+            Confirm_Delete_App = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Delete Forever')]]")))
+            time_sleep(2,"准备确认删除")
+            browser.execute_script("arguments[0].click();", Confirm_Delete_App)
+            time_sleep(30,"已经确认")
+    except:
+        print("第一个app不是管方app")
+    try:
+        # 删除其他不必要的app, 先查看有多少个app
+        app_nums = wait.until(EC.presence_of_all_elements_located((By.XPATH,"//tbody[@class='table-body']/tr")))
+        num_result = len(list(app_nums))
+        print("App个数：", num_result)
+    except:
+        print("没有找到app列表, 可能是没有app")
+    #循环删除不要的app, 比如非 Rinkeby
+    for i in range(1,num_result+1):
+        try:
+            network_xpath = f"//tbody[@class='table-body']/tr[{i}]/td[3]//span"
+            App_network = wait.until(EC.element_to_be_clickable((By.XPATH, network_xpath)))
+            
+            view_detail_xpath = f"//tbody[@class='table-body']/tr[{i}]//span[text()='View Details']"
+            view_detail_button = wait.until(EC.element_to_be_clickable((By.XPATH, view_detail_xpath)))
+
+            app_net_name = App_network.text #查看App是在那个网络
+            if keyword not in app_net_name:
+                print(f"第{i}个 app 需要删除")
+                time_sleep(2,"需要删除非 Rinkeby 的网络. ")
+                browser.execute_script("arguments[0].click();", view_detail_button)
+                
+                security_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='button']/span")))
+                time_sleep(2,"准备点击删除1")
+                browser.execute_script("arguments[0].click();", security_button)
+
+                Delete_App = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Delete App')]]")))
+                time_sleep(2,"准备点击删除2")
+                browser.execute_script("arguments[0].click();", Delete_App)
+
+                Delete_App_input = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='input-container']//input[@type='text']")))
+                input_text = Delete_App_input.get_attribute("placeholder")
+                time_sleep(2,f"找到输入框,输入: {input_text}")
+                Delete_App_input.send_keys(input_text)
+
+                Confirm_Delete_App = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Delete Forever')]]")))
+                time_sleep(2,"准备确认删除")
+                browser.execute_script("arguments[0].click();", Confirm_Delete_App)
+                time_sleep(30,"已经确认删除")
+        except:
+            time_sleep(3, "删除app出错了")
+            Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'Dashboard')]]")))
+            time_sleep(2,"准备点击dashboard")
+            browser.execute_script("arguments[0].click();", Dashboard_button)
+
+#获取app的https 和 api等信息
+def get_alchemy_app_info(browser, wait, app_name):
+    app_name_xpath = f"//tbody//a[text()[contains(.,'{app_name}')]]"
+    App_name_button = wait.until(EC.element_to_be_clickable((By.XPATH, app_name_xpath)))    
+    time_sleep(2, "找到了新建的app")
+    browser.execute_script("arguments[0].click();", App_name_button)
+
+    viw_key_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'View Key')]]")))
+    time_sleep(2,"准备点击view key")
+    browser.execute_script("arguments[0].click();", viw_key_button)
+
+    api_info_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='app-url-widget m-3']/div[1]//input")))
+    https_info_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='app-url-widget m-3']/div[2]//input")))
+    api_info = api_info_button.get_attribute("value")
+    https_info = https_info_button.get_attribute("value")
+    print("api获取到的数据是", api_info)
+    print("https_info获取到的数据是", https_info)
+
+    return https_info, api_info
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  Alchemy 的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
 
 
-## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
