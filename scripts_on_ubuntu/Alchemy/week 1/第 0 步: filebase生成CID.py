@@ -151,7 +151,7 @@ while 1:
                 json_CID_text = json_CID.text 
                 print("===============获取到json的CID是:", json_CID_text)
 
-                # 写入到excel
+                # 写入到excel去
                 full_json_CID = "ipfs://" + json_CID_text                
                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_jsonCID_to_excel_column, full_json_CID)
 
