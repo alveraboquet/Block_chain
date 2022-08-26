@@ -64,7 +64,6 @@ while 1:
                 
             except:
                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_jsonCID_to_excel_column, "×")
-
                 try:
                     browser.quit()
                 except:

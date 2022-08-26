@@ -6,7 +6,7 @@ from functions import *
 from faker import Faker
 fake = Faker()
 
-excel_row = 23
+excel_row = 24
 browser_wait_times = 15
 read_active_excel_column = "E" #帐号是否激活了
 https_link_excel_column = "F" # https 放在这一列
@@ -25,11 +25,11 @@ while 1:
     for i in range(excel_row, 120):
         #=======================先查看这个号有没有激活过
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, read_active_excel_column)
-        print("excel中, 是否已激活帐号的数据是:", str(success_or_fail))
+        print(f"excel中, {i} 号是否已激活帐号的数据是:", str(success_or_fail))
 
         if "Y" in str(success_or_fail): #表明这个号已经激活了,但还需要再判断有没有https 链接
             success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, https_link_excel_column)
-            print("excel中, https数据是:", str(success_or_fail))
+            print(f"excel中, {i} 号 https 数据是:", str(success_or_fail))
             # if True: #测试用
             if "https://eth-rinkeby.alchemyapi.io/v2/" not in str(success_or_fail):
                 try:
@@ -40,7 +40,7 @@ while 1:
 
                     ##=========== 准备浏览器, 清理下缓存
                     wait, browser = my_linux_chrome(time_out=browser_wait_times)
-                    browser.set_page_load_timeout(61) #设置网页加载最多1分钟
+                    browser.set_page_load_timeout(121) #设置网页加载最多1分钟
                     open_clash_dashboard(browser, wait, url_dashboard)
                     random_select_clash_ip(browser, wait)
                     delete_cookie(browser)

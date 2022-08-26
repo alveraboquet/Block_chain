@@ -117,6 +117,7 @@ def cuiqiu_browser_active_alchemy_link(activate_link):
     print("开始激活alchemy发来的邮件")
     alread_click_verify = False
     alread_build = False
+    dashboard_flag = False
     ##============ 准备浏览器, 激活帐号
     browser_wait_times = 10
     print("登录alchemy")
@@ -136,7 +137,7 @@ def cuiqiu_browser_active_alchemy_link(activate_link):
         Verify_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Verify']")))
         time_sleep(2,"准备点击 Verify")
         browser.execute_script("arguments[0].click();", Verify_button)
-        time_sleep(30,"=====已经点击 Verify, 请写入excel")
+        time_sleep(30,"=====已经点击 Verify, 请考虑写入excel")
         alread_click_verify = True
     except:
         print("点击verify失败")
@@ -149,8 +150,16 @@ def cuiqiu_browser_active_alchemy_link(activate_link):
     except:
         print("可能是不需要填写alchemy项目描述, 或哪里出错了")
         alread_build = False
-
-    return alread_click_verify, alread_build
+    
+    try:
+        #如果能找到Alchemy的首页,说明已经进入了
+        time_sleep(20, "尝试查看是不是已经进入 Alchemy 了")
+        Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'Dashboard')]]")))
+        dashboard_flag = True
+        print("=======已经登录了 Alchemy")
+    except:
+        print("======没有找到dashboard=====")
+    return dashboard_flag, alread_click_verify, alread_build
 
 
 ##===========切换IP相关
@@ -5751,6 +5760,19 @@ def OP_sushiswap(browser, wait, from_source, to_source, mode):
         # 随机金额. 留取3~5个OP币
         point = random.randint(1, 2)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
         input_value = round(random.uniform(L2_max_value - 5, L2_max_value -3), point)
+        print(f"本次从 {from_source} 转到 {to_source} 的随机金额是{input_value}，将来预估余额是：{float(L2_max_value) - input_value}")
+        input_amount_box.send_keys(str(input_value))
+        time_sleep(10,"已经输入金额")
+
+    elif mode == "buy_some_token":#只买指定数量的目标币,如5个OP, 则输入0.001 ETH
+        # =======找输入金额框
+        time_sleep(3,"准备找输入金额框")
+        input_amount_box = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='relative filter z-10']/div[1]/div[@class='flex flex-col gap-3']/div[1]//input")))
+        time_sleep(2,"已经找到了输入框")
+
+        # 随机金额. 
+        point = random.randint(3, 5)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+        input_value = round(random.uniform(0.001, 0.003), point)
         print(f"本次从 {from_source} 转到 {to_source} 的随机金额是{input_value}，将来预估余额是：{float(L2_max_value) - input_value}")
         input_amount_box.send_keys(str(input_value))
         time_sleep(10,"已经输入金额")
