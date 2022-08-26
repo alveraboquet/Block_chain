@@ -18,9 +18,9 @@ cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
 cuiqiu_mail_id = '608142'
 
 
-excel_row = 18   #待注册的邮箱
+excel_row = 20   #待激活的邮箱
 excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/alchemy可用邮箱手动整理版.xlsx'
-email_to_be_activate =  Do_Excel(excel_path,sheetname='Sheet1').read(excel_row, "C")
+email_to_be_activate =  Do_Excel(excel_path,sheetname='Sheet1').read(excel_row, "B")
 print("待激活邮箱是:", email_to_be_activate)
 
 not_find_yet = True
@@ -30,8 +30,8 @@ while not_find_yet:
     url = "https://domain-open-api.cuiqiu.com/v1/box/list"
     payload={'mail_id': cuiqiu_mail_id,
     'token': cuiqiu_token,
-    'start_time': '2022-08-24',
-    'end_time': '2022-08-26',
+    'start_time': '2022-08-25',
+    'end_time': '2022-08-27',
     'page': '1',
     'limit': '10'}
     files=[

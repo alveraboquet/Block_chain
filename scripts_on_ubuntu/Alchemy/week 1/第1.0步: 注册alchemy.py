@@ -68,28 +68,21 @@ while 1:
             time_sleep(2,"准备输入密码")
             pw_button.send_keys(pw)
 
-            #=========循环确认
-            faucet_flag = True
-            try_times = 0
-            while faucet_flag:
-                # browser.refresh()
-                # time_sleep(10, "进入领水, 等待刷新")
-                #去检查需不需要领. 如果是空,说明需要领取
-                try:  
-                    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Sign up']")))
-                    print("要确认")
-                    faucet_flag = True
-                except:
-                    print("已经确认了")
-                    faucet_flag = False
-                #需要的话去领
-                if faucet_flag:   
-                    try_times += 1
-                    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//form/button[text()='Sign up']")))
-                    time_sleep(2,"准备点击登录")
-                    browser.execute_script("arguments[0].click();", confirm_login)
-                    time_sleep(15,"纯倒计时,等待确认")
-                print(f"第{try_times}次确认~~~")   
-                if try_times == 5:
-                    browser.quit()
+            confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//form/button[text()='Sign up']")))
+            time_sleep(2,"准备点击登录")
+            browser.execute_script("arguments[0].click();", confirm_login)
+            time_sleep(60,"纯倒计时,等待确认")
+
+            #=========查看是不是有resent按钮
+            try:  
+                resent_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Resend email']")))
+                print("找到了resent按钮, 待激活")
+                faucet_flag = True
+            except:
+                print("没有找到resent按钮,可能是注册失败了")
+                Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_to_excel_column, "×")
+
+            #需要去激活邮箱
+            # if faucet_flag:   
+                
 
