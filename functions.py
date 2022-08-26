@@ -117,6 +117,7 @@ def cuiqiu_browser_active_alchemy_link(activate_link):
     print("开始激活alchemy发来的邮件")
     alread_click_verify = False
     alread_build = False
+    dashboard_flag = False
     ##============ 准备浏览器, 激活帐号
     browser_wait_times = 10
     print("登录alchemy")
@@ -136,7 +137,7 @@ def cuiqiu_browser_active_alchemy_link(activate_link):
         Verify_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Verify']")))
         time_sleep(2,"准备点击 Verify")
         browser.execute_script("arguments[0].click();", Verify_button)
-        time_sleep(30,"=====已经点击 Verify, 请写入excel")
+        time_sleep(30,"=====已经点击 Verify, 请考虑写入excel")
         alread_click_verify = True
     except:
         print("点击verify失败")
@@ -149,8 +150,16 @@ def cuiqiu_browser_active_alchemy_link(activate_link):
     except:
         print("可能是不需要填写alchemy项目描述, 或哪里出错了")
         alread_build = False
-
-    return alread_click_verify, alread_build
+    
+    try:
+        #如果能找到Alchemy的首页,说明已经进入了
+        time_sleep(20, "尝试查看是不是已经进入 Alchemy 了")
+        Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'Dashboard')]]")))
+        dashboard_flag = True
+        print("=======已经登录了 Alchemy")
+    except:
+        print("======没有找到dashboard=====")
+    return dashboard_flag, alread_click_verify, alread_build
 
 
 ##===========切换IP相关

@@ -9,7 +9,7 @@ from faker import Faker
 fake = Faker()
 
 
-excel_row = 25   #待注册的邮箱. 新的一批号,从第20往后开始
+excel_row = 34   #待注册的邮箱. 新的一批号,从第20往后开始
 write_resent_to_excel_column = "D" #通过查看resent, 来判断是否发送激活链接
 write_active_excel_column = "E" #激活信息
 email_excel_column = "B" #邮箱
@@ -33,14 +33,14 @@ while 1:
         if "Y" not in str(success_or_fail):
             #注册alchemy
             try:
-                print(f" {i} 号需要注册 alchemy ")
+                print(f" ========== {i} 号需要注册 alchemy ")
                 email_account =  Do_Excel(excel_path,sheetname='Sheet1').read(i, email_excel_column)
                 email_pw = Do_Excel(excel_path,sheetname='Sheet1').read(i, pw_excel_column)
                 print("开始注册, 待注册邮箱, 密码是:", email_account, email_pw)
 
                 ##=========== 准备浏览器
                 wait, browser = my_linux_chrome(time_out=browser_wait_times)
-                browser.set_page_load_timeout(121) #设置网页加载最多1分钟
+                browser.set_page_load_timeout(221) #设置网页加载最多1分钟
                 open_clash_dashboard(browser, wait, url_dashboard)
                 random_select_clash_ip(browser, wait)
                 delete_cookie(browser)
@@ -68,9 +68,16 @@ while 1:
                         a = random.randint(10, 15)
                         time_sleep(a, f"++++++++++已经找到了resent, 随机等待时间{a}")
                     except:
-                        time_sleep(5, "暂时还没有找到resent链接, 等待一下")
+                        time_sleep(5, "**********暂时还没有找到resent链接, 尝试再次点击sign up")
+                        try:#尝试再次点击login
+                            confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//form/button[text()='Sign up']")))
+                            time_sleep(2,"======准备再次点击登录")
+                            browser.execute_script("arguments[0].click();", confirm_login)
+                            print("===========已经再次点击sugn up")
+                        except:
+                            print("===尝试再次点击sign up,失败!!!")
 
-                    if try_times == 5:
+                    if try_times == 8:
                         print("没有找到resent按钮,可能是有验证, 记录到excel")
                         Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_resent_to_excel_column, "×")
                         check_resent_flag = False #不要再检查resent了
@@ -94,25 +101,30 @@ while 1:
                             if activate_link == "not receive active email":
                                 print("没有找到激活链接, 可能是网站没有发送")
                                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "×")
-                            else:
+                            else: #去浏览器激活
                                 print("#找到了激活链接,开始打开浏览器激活")
                                 try_times +=1
                                 #返回: 是否已经点击verify, build
-                                alread_click_verify, alread_build = cuiqiu_browser_active_alchemy_link(activate_link)
+                                dashboard_flag, alread_click_verify, alread_build = cuiqiu_browser_active_alchemy_link(activate_link)
                                 
-                                #如果已经点击了verify为真, 记录Y
-                                if alread_click_verify: 
+                                #如果已经点击了 dashboard_flag 为真, 记录Y
+                                if dashboard_flag: 
                                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "Y")
-                                    
+                                    a = random.randint(200, 1000)
+                                    time_sleep(a, f"-------------注册成功!!==随机等待时间{a}")
+                                    browser.quit()
+                                    a = random.randint(100, 1000)
+                                    time_sleep(a, f"+++++++注册成功, 已经推出了浏览器,机等待时间{a}")
+
                             #读取标识位, 防止死循环
                             success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, write_active_excel_column)
-                            print(f"第{try_times}次去点击激活链接")
+                            print(f"---------第{try_times}次去点击激活链接")
                             if try_times == 5:
                                 print("点击激活链接失败, 记录到excel")
                                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "×")
                                 browser.quit()
                                 a = random.randint(10, 15)
-                                time_sleep(a, f"++++++++++随机等待时间{a}")
+                                time_sleep(a, f"++++++++++@@@@@随机等待时间{a}")
                     except:
                         print("=======激活alchemy失败")
                         try:
