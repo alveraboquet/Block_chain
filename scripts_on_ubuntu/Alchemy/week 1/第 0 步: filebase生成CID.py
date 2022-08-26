@@ -42,10 +42,9 @@ def edit_json_file(json_path, pic_CID):
         f.close()
 
 
-
 while 1:
     for i in range(excel_start_row,201):
-        #=======================如果没有ipfs_json 的话, 开始任务
+        #=======================如果没有ipfs_json 的话, 开始任务吧
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, write_jsonCID_to_excel_column)
         print("excel数据是:", str(success_or_fail))
 
@@ -151,7 +150,7 @@ while 1:
                 json_CID_text = json_CID.text 
                 print("===============获取到json的CID是:", json_CID_text)
 
-                # 写入到excel
+                # 写入到excel去
                 full_json_CID = "ipfs://" + json_CID_text                
                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_jsonCID_to_excel_column, full_json_CID)
 
