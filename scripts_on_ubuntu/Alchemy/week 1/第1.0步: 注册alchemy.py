@@ -20,13 +20,23 @@ sentence = fake.sentence()
 # print("sentence:", sentence)
 
 
-excel_row = 18   #待注册的邮箱
+excel_row = 20   #待注册的邮箱. 新的一批号,从第20个开始
+write_to_excel_column = "D"
 excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/alchemy可用邮箱手动整理版.xlsx'
 email =  Do_Excel(excel_path,sheetname='Sheet1').read(excel_row, "C")
 print("待注册邮箱是:", email)
 
 alchemyURL = f"https://auth.alchemyapi.io/signup?redirectUrl=https%3A%2F%2Fdashboard.alchemy.com%2Fsignup%2F%3Freferrer_origin%3DDIRECT"
 alchemy_official_URL = f"https://www.alchemy.com"
+
+while 1:
+    for i in range(excel_row,201):
+        #=======================如果没有ipfs_json 的话, 开始任务吧
+        success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, write_to_excel_column)
+        print("excel数据是:", str(success_or_fail))
+
+        if "Y" not in str(success_or_fail):
+            print(f" {i} 号没有ipfs, 需要做创建ipfs")
 
 ##=========== 准备浏览器
 print("开始注册")

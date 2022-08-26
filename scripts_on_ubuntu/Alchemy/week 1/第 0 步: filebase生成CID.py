@@ -42,10 +42,9 @@ def edit_json_file(json_path, pic_CID):
         f.close()
 
 
-
 while 1:
     for i in range(excel_start_row,201):
-        #=======================如果没有ipfs_json 的话, 开始任务
+        #=======================如果没有ipfs_json 的话, 开始任务吧
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, write_jsonCID_to_excel_column)
         print("excel数据是:", str(success_or_fail))
 
