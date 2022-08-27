@@ -6,6 +6,10 @@ from sqlite3 import Time
 import pandas as pd
 import random
 import time, os, re
+import requests
+import json
+import re
+import sys
 import ast # 用于将字典型字符串转为字典
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -21,6 +25,142 @@ from itertools import chain
 from random import choice, sample
 from openpyxl import Workbook,load_workbook
 import linecache #用于读取txt文档
+from faker import Faker
+from random_word import RandomWords
+fake = Faker()
+
+##===========================脆球邮箱相关
+#找alchemy的注册激活链接
+def cuiqiu_find_alchemy_activate_email(email_to_be_activate):
+    #从脆球官网获取
+    cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
+    cuiqiu_mail_id = '608142'
+    #循环检索邮箱. email_to_be_activate 表示待激活的邮箱
+    not_find_yet = True
+    try_times = 0
+    while not_find_yet:
+        activate_link = '' #空链接
+        #获取邮件列表
+        url = "https://domain-open-api.cuiqiu.com/v1/box/list"
+        payload={'mail_id': cuiqiu_mail_id,
+        'token': cuiqiu_token,
+        'start_time': '2022-08-24',
+        'end_time': '2023-08-25',
+        'page': '1',
+        'limit': '10'}
+        files=[
+
+        ]
+        headers = {}
+        response = requests.request("POST", url, headers=headers, data=payload, files=files)
+        result = response.text 
+
+        #==================================获取邮件id
+        #字符串转json
+        json1 = json.loads(result)
+        # print(json1)
+        # print(type(json1))
+        print("===================")
+        #转为列表
+        email_list = json1['data']['list']
+        # print(email_list)
+
+        result_box_id = 'kong'
+        for i in email_list:
+            # print(i, type(i))
+            if email_to_be_activate in str(i):
+                if 'Verify your email' in str(i):
+                    # print(i)
+                    print("待激活的邮件id是:", i['id'])
+                    result_box_id = i['id']
+                    time_sleep(8, "已经找到了激活邮件, 需要提取下链接")
+                    not_find_yet = False #防止死循环
+                else:
+                    time_sleep(60, f"没有找到激活邮件, 重试{try_times}次")
+        try_times +=1
+        if try_times == 10:
+            print("重试了10分钟,还是失败")
+            return "not receive active email" 
+
+    #===================== 获取邮件详情. 提取激活链接
+    # # box_id 通过 v1/box/list 获取邮箱列表接口获取
+    url = "https://domain-open-api.cuiqiu.com/v1/box/detail"
+
+    payload={'mail_id': cuiqiu_mail_id,
+    'token': cuiqiu_token,
+    'box_id': result_box_id}
+    files=[
+
+    ]
+    headers = {}
+
+    response = requests.request("POST", url, headers=headers, data=payload, files=files)
+
+    result = response.text
+    # print("邮件详情是: ",result)
+
+    urls = re.findall('[a-zA-z]+://[^\s]*', result)
+    print(urls)
+    print("===================")
+
+    for url in urls:
+        if url.startswith("http://url6420.alchemy.com/ls/click?"):
+            print("激活链接是:", url[:-2])
+            not_find_yet = False
+            activate_link = url[:-2] #找到了激活链接
+            time_sleep(1, "提取到了激活链接")
+            return activate_link
+
+
+#开始打开浏览器激活
+def cuiqiu_browser_active_alchemy_link(activate_link):
+    print("开始激活alchemy发来的邮件")
+    alread_click_verify = False
+    alread_build = False
+    dashboard_flag = False
+    ##============ 准备浏览器, 激活帐号
+    browser_wait_times = 10
+    print("登录alchemy")
+    wait, browser = my_linux_chrome(time_out=browser_wait_times)
+    alchemy_login_url = activate_link
+
+    #=======清理下缓存
+    delete_cookie(browser)
+
+    #=============正式开始
+    browser.get(alchemy_login_url)
+    time_sleep(5, "等待 alchemy 加载")
+    switch_tab_by_handle(browser, 1, 0)  # 切换到
+
+    #===========================================激活帐号
+    try:
+        Verify_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Verify']")))
+        time_sleep(2,"准备点击 Verify")
+        browser.execute_script("arguments[0].click();", Verify_button)
+        time_sleep(30,"=====已经点击 Verify, 请考虑写入excel")
+        alread_click_verify = True
+    except:
+        print("点击verify失败")
+        alread_click_verify = False
+
+    # ==================填写描述
+    try:
+        fill_in_alchemy_project_des(browser, wait)
+        alread_build = True
+    except:
+        print("可能是不需要填写alchemy项目描述, 或哪里出错了")
+        alread_build = False
+    
+    try:
+        #如果能找到Alchemy的首页,说明已经进入了
+        time_sleep(20, "尝试查看是不是已经进入 Alchemy 了")
+        Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'Dashboard')]]")))
+        dashboard_flag = True
+        print("=======已经登录了 Alchemy")
+    except:
+        print("======没有找到dashboard=====")
+    return dashboard_flag, alread_click_verify, alread_build
+
 
 ##===========切换IP相关
 url_dashboard = "http://127.0.0.1:9090/ui/#/proxies"
@@ -206,7 +346,7 @@ def my_linux_chrome(time_out=30):
     # option.add_argument('--disable-gpu')#屏蔽浏览器引擎
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-dev-shm-usage')
-    option.add_argument('--disable-gpu')
+    # option.add_argument('--disable-gpu')
     option.add_argument("--disable-blink-features=AutomationControlled")  # 禁用启用Blink运行时的功能
     option.add_experimental_option('excludeSwitches', ['enable-automation'])  # 防止被网站识别
     option.add_experimental_option('useAutomationExtension', False)
@@ -332,7 +472,7 @@ def read_excel():
 def delete_cookie(browser):
     print("进入delete_cookie()，清理缓存、cookie")
     # 清除缓存提示框
-    clean_url = "https://www.google.com"
+    clean_url = "https://www.baidu.com"
     new_tab(browser, clean_url)
     # 2S 等待时间
     time_sleep(2)
@@ -340,11 +480,11 @@ def delete_cookie(browser):
 
     clean_url = "chrome://settings/clearBrowserData"
     browser.get(clean_url)
-    time_sleep(2,"准备清缓存")
+    time_sleep(2,"准备清缓存, 记得谷歌清缓存选择'all time'")
     clearButton = browser.execute_script(
         "return document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm')")
     clearButton.click()
-    time_sleep(5, "清理完毕")
+    time_sleep(2, "清理完毕")
     # browser.close()
 
 ##↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ 通用函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
@@ -5557,8 +5697,8 @@ def OP_uniswap(browser, wait, from_source, to_source):
     except:
         return "失败"
     
-  
-def OP_sushiswap(browser, wait, from_source, to_source):
+#mode. 1-->最大化ETH模式    0-->比例化USDC等代币
+def OP_sushiswap(browser, wait, from_source, to_source, mode):
 
     print("开始 OP_sushiswap 任务")
     new_tab(browser, op_sushiswap_url)
@@ -5592,16 +5732,50 @@ def OP_sushiswap(browser, wait, from_source, to_source):
     to_button.send_keys(Keys.ENTER)
     time_sleep(5,"等待响应")
     
-    # 输入金额.随机选用一种方法
-    # random_way = random.randint(1,2)
-    #法一: 选择最大金额. 但用ETH作为from时有bug:点击max, 但实际没有max
+    # 输入金额.
+    if mode == "max_all":
+        #法一: 选择最大金额. 但用ETH作为from时有bug:点击max, 但实际没有max
+        print("本次采用最大化金额法")
+        max_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/div[1]//div[text()[contains(.,'Balance')]]")))
+        time_sleep(3, "max_button button found")
+        browser.execute_script("arguments[0].click();", max_button)
+        time_sleep(8, "已经点击max,等待响应")
     
-    print("本次采用最大化金额法")
-    max_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/div[1]//div[text()[contains(.,'Balance')]]")))
-    time_sleep(3, "max_button button found")
-    browser.execute_script("arguments[0].click();", max_button)
-    time_sleep(8, "已经点击max,等待响应")
-    
+    elif mode == "save_some_token":
+        #法二: 部分金额法.比如源是OP, 保留3~5个OP代币
+        print("本次采用比例化金额法")
+        time_sleep(3, "提取金额....")
+        balance_box_path = "//div[@class='relative filter z-10']/div[1]/div[@class='flex flex-col gap-3']/div[1]//div[@class='text-sm leading-5 font-medium cursor-pointer select-none flex text-secondary whitespace-nowrap']"
+        balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, balance_box_path)))
+        balance_string = balance_button.text #类似 Balance:13.3942
+        balance_a = balance_string.split()[-1]
+        L2_max_value = float(balance_a)
+        print("恭喜提取到的金额是:", L2_max_value)
+
+        # =======找输入金额框
+        time_sleep(3,"准备找输入金额框")
+        input_amount_box = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='relative filter z-10']/div[1]/div[@class='flex flex-col gap-3']/div[1]//input")))
+        time_sleep(2,"已经找到了输入框")
+
+        # 随机金额. 留取3~5个OP币
+        point = random.randint(1, 2)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+        input_value = round(random.uniform(L2_max_value - 5, L2_max_value -3), point)
+        print(f"本次从 {from_source} 转到 {to_source} 的随机金额是{input_value}，将来预估余额是：{float(L2_max_value) - input_value}")
+        input_amount_box.send_keys(str(input_value))
+        time_sleep(10,"已经输入金额")
+
+    elif mode == "buy_some_token":#只买指定数量的目标币,如5个OP, 则输入0.001 ETH
+        # =======找输入金额框
+        time_sleep(3,"准备找输入金额框")
+        input_amount_box = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='relative filter z-10']/div[1]/div[@class='flex flex-col gap-3']/div[1]//input")))
+        time_sleep(2,"已经找到了输入框")
+
+        # 随机金额. 
+        point = random.randint(3, 5)  # 最起码保留2位小数，因为L1的ETH范围是0.05~0.08
+        input_value = round(random.uniform(0.001, 0.003), point)
+        print(f"本次从 {from_source} 转到 {to_source} 的随机金额是{input_value}，将来预估余额是：{float(L2_max_value) - input_value}")
+        input_amount_box.send_keys(str(input_value))
+        time_sleep(10,"已经输入金额")
 
     #准备确认交易. from 不是ETH时可能会出现 Approve BentoBox , Approve USDC
     if from_source != "ETH":
@@ -5611,12 +5785,18 @@ def OP_sushiswap(browser, wait, from_source, to_source):
             if "BentoBox" in allow_button.text:
                 sushiswap_allow_Bentobox(browser, wait)
 
-            elif "Approve" in allow_button.text:
+        except:
+            print("可能是之前allow 过了,不需要重新授权")
+    if from_source != "ETH":
+        try:
+            #查看是哪一种allow
+            allow_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='flex flex-col gap-3']/button[1]")))
+
+            if "Approve" in allow_button.text:
                 #无论如何都要试一试使用USDC
                 sushiswap_allow_token(browser, wait)
         except:
             print("可能是之前allow 过了,不需要重新授权")
- 
             
     else: #如果是用ETH转出去,可能会有一个 Bentobox
         try:
@@ -5783,12 +5963,495 @@ def get_balance_from_debank(browser, wait, network_name):
     switch_tab_by_handle(browser, 1, 0)  # 一定要切换回去,给selenium一个指针,否则无法新建标签页.
     time_sleep(3,"准备打开新网页")
 
-    return max_token
+    return max_token, balance_dict
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  debank的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
-## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  ZK 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓  Alchemy 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+#Alchemy填写项目描述
+def fill_in_alchemy_project_des(browser, wait):
+    print("开始填写alchemy项目描述, 刚开始注册帐号的时候需要")
+    des1_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='My Team']")))
+    time_sleep(2,"准备输入描述1")
+    des1_button.send_keys(fake.sentence())
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    des2_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='...']")))
+    time_sleep(2,"准备输入描述2")
+    des2_button.send_keys("NFT")
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    Ethereum_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Ethereum']")))
+    time_sleep(2,"准备选择Ethereum")
+    browser.execute_script("arguments[0].click();", Ethereum_button)
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    free_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()='Free']")))
+    time_sleep(2,"准备选择Free")
+    browser.execute_script("arguments[0].click();", free_button)
+
+    next_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Next']")))
+    time_sleep(2,"准备点击Next")
+    browser.execute_script("arguments[0].click();", next_button)
+
+    #跳过信用卡
+    skip_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Skip for now']")))
+    time_sleep(2,"准备选择Free")
+    browser.execute_script("arguments[0].click();", skip_button)
+
+    build_button = wait.until(EC.element_to_be_clickable((By.XPATH,'''//button[text()="Let's Build!"]''')))
+    time_sleep(2,"准备选择 build ")
+    browser.execute_script("arguments[0].click();", build_button)
+    time_sleep(20,"已经点击 build ")
+
+#Alchemy创建rinkeby项目
+def alchemy_create_rinkeby_app(browser, wait):
+    print("开始创建rinkeby项目")
+    create_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Create')]]")))
+    time_sleep(2,"准备创建")
+    browser.execute_script("arguments[0].click();", create_button)
+
+    name_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='name']")))
+    time_sleep(2,"准备输入name")
+    app_name = fake.last_name()
+    name_button.send_keys(app_name)
+
+    desc_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='description']")))
+    time_sleep(2,"准备输入desc")
+    desc_button.send_keys(fake.first_name())
+
+    #下拉列表
+    try:
+        down_list_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='select-input-container css-1tyu61v']//div[@class='css-1hkumgc']/span")))
+        time_sleep(2,"准备点击下拉")
+        # browser.execute_script("arguments[0].click();", down_list_button)
+        ActionChains(browser).click(down_list_button).perform()  # 必须用模拟鼠标点
+    except:
+        print("下拉没找到哦啊")
+
+    # #选择rinkeby
+    rinkeby_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='css-1hkumgc']/span[text()[contains(.,'Rinkeby')]]")))
+    time_sleep(2,"准备选择 rinkeby")
+    browser.execute_script("arguments[0].click();", rinkeby_button)
+    # ActionChains(browser).click(rinkeby_button).perform()  # 模拟鼠标点
+
+    #确定创建
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='submit']")))
+    time_sleep(2,"准备点击创建")
+    browser.execute_script("arguments[0].click();", confirm_login)
+    time_sleep(20,"已经点击创建")
+    return app_name
+
+#注册Alchemy时,填写随机信息
+def signup_alchemy_random_info(browser, wait, email_account, email_pw):
+    first_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Gavin']")))
+    time_sleep(2,"准备输入姓")
+    first_name.send_keys(fake.last_name())
+    time.sleep(2)
+
+    second_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Belson']")))
+    time_sleep(2,"准备输入名")
+    second_name.send_keys(fake.first_name())
+
+    email_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='gavin@hooli.com']")))
+    time_sleep(2,"准备输入邮箱")
+    email_button.send_keys(email_account)
+
+    pw_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='••••••••']")))
+    time_sleep(2,"准备输入密码")
+    pw_button.send_keys(email_pw)
+
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//form/button[text()='Sign up']")))
+    time_sleep(2,"准备点击登录")
+    browser.execute_script("arguments[0].click();", confirm_login)
+    time_sleep(10,"纯倒计时,等待查看resent按钮")
+
+# 登录alchemy时,填写帐号密码
+def alchemy_login(browser, wait, email_to_login, email_pw):
+    email_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='gavin@hooli.com']")))
+    time_sleep(2,"准备输入邮箱")
+    email_button.send_keys(email_to_login)
+
+    pw_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='••••••••']")))
+    time_sleep(2,"准备输入密码")
+    pw_button.send_keys(email_pw)
+
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='submit']")))
+    time_sleep(2,"准备点击登录")
+    # browser.execute_script("arguments[0].click();", confirm_login)
+    ActionChains(browser).click(confirm_login).perform()  # 用模拟鼠标点
+    # time_sleep(2,"再点一次")
+    # ActionChains(browser).click(confirm_login).perform()  # 用模拟鼠标点
+
+#官方限制最多5个app, 删除一些不必要的app
+def alchemy_delete_app(browser, wait, keyword):
+    #查看第一个app的名字
+    try:
+        first_app_name = wait.until(EC.element_to_be_clickable((By.XPATH,"//tbody[@class='table-body']/tr[1]/td[1]/div/a")))
+        if first_app_name.text == "Demo App":
+            time_sleep(2,"是官方app, 需要进去删除")
+            browser.execute_script("arguments[0].click();", first_app_name)
+
+            Delete_App = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Delete App')]]")))
+            time_sleep(2,"准备点击删除")
+            browser.execute_script("arguments[0].click();", Delete_App)
+            #
+            Delete_App_input = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='Demo App']")))
+            time_sleep(2,"找到输入框")
+            Delete_App_input.send_keys("Demo App")
+
+            Confirm_Delete_App = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Delete Forever')]]")))
+            time_sleep(2,"准备确认删除")
+            browser.execute_script("arguments[0].click();", Confirm_Delete_App)
+            time_sleep(30,"已经确认")
+    except:
+        print("第一个app不是管方app")
+    try:
+        # 删除其他不必要的app, 先查看有多少个app
+        app_nums = wait.until(EC.presence_of_all_elements_located((By.XPATH,"//tbody[@class='table-body']/tr")))
+        num_result = len(list(app_nums))
+        print("App个数：", num_result)
+    except:
+        print("没有找到app列表, 可能是没有app")
+        num_result = 1
+    #循环删除不要的app, 比如非 Rinkeby
+    for i in range(1,num_result+1):
+        try:
+            network_xpath = f"//tbody[@class='table-body']/tr[{i}]/td[3]//span"
+            App_network = wait.until(EC.element_to_be_clickable((By.XPATH, network_xpath)))
+            
+            view_detail_xpath = f"//tbody[@class='table-body']/tr[{i}]//span[text()='View Details']"
+            view_detail_button = wait.until(EC.element_to_be_clickable((By.XPATH, view_detail_xpath)))
+
+            app_net_name = App_network.text #查看App是在那个网络
+            if keyword not in app_net_name:
+                print(f"第{i}个 app 需要删除")
+                time_sleep(2,"需要删除非 Rinkeby 的网络. ")
+                browser.execute_script("arguments[0].click();", view_detail_button)
+                
+                security_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='button']/span")))
+                time_sleep(2,"准备点击删除1")
+                browser.execute_script("arguments[0].click();", security_button)
+
+                Delete_App = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Delete App')]]")))
+                time_sleep(2,"准备点击删除2")
+                browser.execute_script("arguments[0].click();", Delete_App)
+
+                Delete_App_input = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='input-container']//input[@type='text']")))
+                input_text = Delete_App_input.get_attribute("placeholder")
+                time_sleep(2,f"找到输入框,输入: {input_text}")
+                Delete_App_input.send_keys(input_text)
+
+                Confirm_Delete_App = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Delete Forever')]]")))
+                time_sleep(2,"准备确认删除")
+                browser.execute_script("arguments[0].click();", Confirm_Delete_App)
+                time_sleep(30,"已经确认删除")
+        except:
+            time_sleep(1, "删除app出错了")
+            Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'Dashboard')]]")))
+            time_sleep(2,"准备点击dashboard")
+            browser.execute_script("arguments[0].click();", Dashboard_button)
+
+#获取app的https 和 api等信息
+def get_alchemy_app_info(browser, wait, app_name):
+    print("开始去获取 app 的 https 和 api等信息")
+    app_name_xpath = f"//tbody//a[text()[contains(.,'{app_name}')]]"
+    App_name_button = wait.until(EC.element_to_be_clickable((By.XPATH, app_name_xpath)))    
+    time_sleep(2, "找到了新建的app")
+    browser.execute_script("arguments[0].click();", App_name_button)
+
+    viw_key_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'View Key')]]")))
+    time_sleep(2,"准备点击view key")
+    browser.execute_script("arguments[0].click();", viw_key_button)
+
+    api_info_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='app-url-widget m-3']/div[1]//input")))
+    https_info_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='app-url-widget m-3']/div[2]//input")))
+    api_info = api_info_button.get_attribute("value")
+    https_info = https_info_button.get_attribute("value")
+    print("api获取到的数据是", api_info)
+    print("https_info获取到的数据是", https_info)
+
+    return https_info, api_info
+
+#从alchemy出领取测试币
+def get_alchemy_faucet(browser, wait):
+    #=================================== 领水
+    app_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//tbody[@class='table-body']/tr[3]/td[1]/a")))
+    time_sleep(2,"准备点击进入app, 打算去领水")
+    browser.execute_script("arguments[0].click();", app_button)
+
+
+    get_test_ETH = wait.until(EC.element_to_be_clickable((By.XPATH,"//a[text()[contains(.,'Get Test ETH')]]")))
+    time_sleep(2,"准备点击进入水龙头")
+    browser.execute_script("arguments[0].click();", get_test_ETH)
+
+    switch_tab_by_handle(browser, 2, 0)  # 切换到
+
+    #============查看是不是要登录
+    login_flag = True
+    try_times = 0
+    while login_flag:
+        #去检查需不需要登录
+        browser.refresh()
+        time_sleep(10, "领水网页刷新")
+        try:
+            login_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[text()[contains(.,'Please signup or login')]]")))
+            print("需要登录login")
+            login_flag = True
+        except:
+            print("可能是已经登录了")
+            login_flag = False
+        #需要的话去登录
+        if login_flag:
+            try:
+                try_times +=1
+                login_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Alchemy Login')]]")))
+                time_sleep(2,"准备登录")
+                browser.execute_script("arguments[0].click();", login_button)
+                time_sleep(20,"已经点击登录alchemy")
+
+            except:
+                browser.refresh()
+                time_sleep(15, "登录失败, 重新登录")
+        print(f"第{try_times}次领水尝试登录")        
+        if try_times == 5:
+            browser.quit()
+
+
+    #=========循环领取
+    faucet_flag = True
+    try_times = 0
+    while faucet_flag:
+        browser.refresh()
+        time_sleep(10, "进入领水, 等待刷新")
+        #去检查需不需要领. 如果是空,说明需要领取
+        try:
+            blank_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='alchemy-faucet-table-data col']")))
+            print("领取列表是空的,需要领水")
+        except:
+            print("可能是已经领到了")
+            faucet_flag = False
+        #需要的话去领
+        if faucet_flag:
+            try:
+                try_times +=1
+                address_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@type='address']")))
+                time_sleep(2,"准备输入小狐狸帐号")
+                address_button.send_keys(fox_address)
+
+                confirm_send = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='button']//span")))
+                time_sleep(2,"准备点击send")
+                # browser.execute_script("arguments[0].click();", confirm_login)
+                ActionChains(browser).click(confirm_send).perform()  # 用模拟鼠标点
+
+                time_sleep(30,"已经点击send")
+            except:
+                browser.refresh()
+                time_sleep(15, "领取失败, 重新领")
+        print(f"第{try_times}次领水~~~")   
+        if try_times == 5:
+            browser.quit()
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  Alchemy 的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   filebase的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+#=============== 修改json文件
+def edit_json_file(json_path, pic_CID):
+    whole_pic_CID = f'https://ipfs.filebase.io/ipfs/{pic_CID}'
+    with open(json_path, 'r+') as f:
+        # 读取demp.json文件内容
+        data = json.load(f)
+        # print(data)
+        # print('================')
+        # print(data["image"])
+
+        # 修改CID的值
+        data["image"] = whole_pic_CID
+        data["name"] = RandomWords().get_random_word()  # 随机一个名字
+        print("====修改 image 的链接为:", whole_pic_CID)
+        # print('================')
+        # print(data)
+        with open(json_path, 'w') as f2:
+            json.dump(data, f2)  # 写入f2文件到本地
+            f2.close() #打开后需要关闭，否则文件无变化，导致CID一直一样
+        time.sleep(2)
+        f.close()
+        time.sleep(2)
+
+def login_filebase(browser, wait, filebase_email, filebase_pw):
+    print("尝试登录")
+    send_password = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='user_email']")))
+    time_sleep(2,"准备输入用户名")
+    send_password.send_keys(filebase_email)
+    time.sleep(2)
+
+    send_password = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='user_password']")))
+    time_sleep(2,"准备输入密码")
+    send_password.send_keys(filebase_pw)
+
+    remember_me = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='user_remember_me']")))
+    time_sleep(2,"准备点击记住我")
+    browser.execute_script("arguments[0].click();", remember_me)
+
+
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='submit']")))
+    time_sleep(2,"准备点击登录")
+    browser.execute_script("arguments[0].click();", confirm_login)  
+
+
+#=========在进入bucket后,上传图片文件,并获得图片CID
+def filebase_upload_pic_file_in_bucket(browser, wait, pic_path):
+    print("===上传图片")
+    upload_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@id='menu-button']")))
+    time_sleep(2,"准备点击upload")
+    browser.execute_script("arguments[0].click();", upload_button)
+
+    #==========选择file按钮
+    file_button  = browser.find_element(By.XPATH, "//label[text()[contains(.,'File')]]//span/input")
+    time_sleep(2,"准备选择file上传")
+    file_button.send_keys(pic_path)
+
+    time_sleep(20,"等待上传图片......")
+
+    #获取图片的CID
+    pic_CID = wait.until(EC.element_to_be_clickable((By.XPATH, "//tbody/tr[1]//span[@id='ipfs_cid']")))
+    pic_CID_text = pic_CID.text 
+    print("========获取到的图片CID是:", pic_CID_text)
+    return pic_CID_text
+
+#=======================上传json文件,并获得CID
+def filebase_upload_json_file_in_bucket(browser, wait, json_path):
+    print("===上传json")
+    upload_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@id='menu-button']")))
+    time_sleep(2,"准备点击upload")
+    browser.execute_script("arguments[0].click();", upload_button)
+
+    file_button  = browser.find_element(By.XPATH, "//label[text()[contains(.,'File')]]//span/input")
+    time_sleep(2,"准备选择file上传")
+    file_button.send_keys(json_path)
+    time_sleep(20,"等待上传json文件......")
+
+    # 获取json 的CID
+    json_CID = wait.until(EC.element_to_be_clickable((By.XPATH, "//tbody/tr[2]//span[@id='ipfs_cid']")))
+    json_CID_text = json_CID.text 
+    print("============获取到json的CID是:", json_CID_text)
+    return json_CID_text
+
+def filebase_random_create_bucket_and_enter(browser, wait):
+    print("===随机创建bucket并进入")
+    create_bucket = wait.until(EC.element_to_be_clickable((By.XPATH,"//span//button[text()[contains(.,'Create Bucket')]]")))
+    time_sleep(2,"准备创建bucket")
+    browser.execute_script("arguments[0].click();", create_bucket)
+
+    c = fake.md5()
+    print("bucket 名字是:",c)
+
+    send_bucket_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='bucket_name']")))
+    time_sleep(2,"准备输入bucket name")
+    send_bucket_name.send_keys(c)
+    time.sleep(2)
+
+    #创建bucket
+    confirm_bucket_name = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@id='save_bucket']")))
+    time_sleep(2,"准备创建bucket")
+    browser.execute_script("arguments[0].click();", confirm_bucket_name)
+    time_sleep(10, "已经点击创建bucket")
+
+    #======================进入bucket
+    # c = 'cd1183'
+    login_bucket = wait.until(EC.element_to_be_clickable((By.XPATH,f"//p[text()[contains(.,'{c}')]]")))
+    time_sleep(2,"准备进入bucket")
+    browser.execute_script("arguments[0].click();", login_bucket)
+    time_sleep(10, "已经点进进入bucket")
+
+def filebase_return_to_bucket(browser, wait):
+    #=============回到bucket首页
+    try:
+        back_to_bucket = wait.until(EC.element_to_be_clickable((By.XPATH,"//nav/a[text()[contains(.,' Buckets')]]")))
+        time_sleep(2,"准备回到bucket")
+        browser.execute_script("arguments[0].click();", back_to_bucket)
+        print("已经点击回到bucket")
+    except:
+        print("程序一开始, 点击返回bucket失败")
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
 
 
-## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #

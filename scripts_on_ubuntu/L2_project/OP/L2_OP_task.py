@@ -7,7 +7,7 @@ excel_path = '/home/parallels/ubuntu_op/Block_chain/scripts_on_ubuntu/L2_project
 
 write_success_to_excel_column = "H"  #把成功或失败记录到excel的列
 read_from_excel_column = "H" #从excel中的哪一列读取状态? 判断是不是要做任务?
-excel_start_row = 2
+excel_start_row = 3
 browser_wait_times = 20
 
 while 1:
@@ -18,6 +18,7 @@ while 1:
                 print(f"第 {i} 个号需要做 op")
                 ##============= 一, 准备浏览器、切换IP、清理缓存
                 wait, browser = my_linux_chrome(time_out=browser_wait_times)
+                browser.set_page_load_timeout(121)
                 open_clash_dashboard(browser, wait, url_dashboard)
                 random_select_clash_ip(browser, wait)
                 delete_cookie(browser)
@@ -31,8 +32,10 @@ while 1:
                 fox_change_account(browser, wait, i)  #换号，选列表里的
 
 
-                # ============= 四, 从 Debank 上获取某个网络余额
-                from_source = get_balance_from_debank(browser, wait, "Optimism")
+                # ============= 四, 从 Debank 上获取某个网络余额. 返回最大金额和代币列表.
+                from_source, balance_dict = get_balance_from_debank(browser, wait, "Optimism")
+                
+
                 if from_source == "ETH":                  
                     stable_coin_list = ["USDC", "DAI"]
                     # stable_coin_list = ["USDT", "USDT"]
@@ -41,8 +44,9 @@ while 1:
                 else: #说明稳定币的余额更多
                     to_source = "ETH"
 
-                # ============= 五, 开始做任务
-                print(f"本次要从 {from_source} 转到 {to_source}")                
+                # ============= 五, 开始做任务(随机法)
+                print(f"本次要从 {from_source} 转到 {to_source}")    
+            
                 if i in range(2,40):
                     a = random.randint(1,2)
                     if a == 1:
@@ -82,13 +86,13 @@ while 1:
                 else:
                     Do_Excel(excel_path, sheetname='SheetJS').plain_write(i, write_success_to_excel_column, "×")
 
-                a = random.randint(10, 15)
-                time_sleep(a, f"++++++++++随机等待时间{a}")
+                a = random.randint(15, 19)
+                time_sleep(a, f"++++++++++随机等待时间{a}, 之后关闭浏览器")
                 browser.quit()
                 a = random.randint(10, 15)
                 time_sleep(a, f"++++++++++随机等待时间{a}")
             except:
-                print("出错了,将会记录到excel中")
+                print("啊啊啊!出错了,将会记录到excel中")
                 Do_Excel(excel_path, sheetname='SheetJS').plain_write(i, write_success_to_excel_column, "×")
                 a = random.randint(10, 15)
                 time_sleep(a, f"++++++++++随机等待时间{a}")
