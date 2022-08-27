@@ -6054,6 +6054,44 @@ def alchemy_create_rinkeby_app(browser, wait):
     time_sleep(20,"已经点击创建")
     return app_name
 
+#Alchemy创建goerli项目
+def alchemy_create_goerli_app(browser, wait):
+    print("开始创建goerli项目")
+    create_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Create')]]")))
+    time_sleep(2,"准备创建")
+    browser.execute_script("arguments[0].click();", create_button)
+
+    name_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='name']")))
+    time_sleep(2,"准备输入name")
+    app_name = fake.last_name()
+    name_button.send_keys(app_name)
+
+    desc_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='description']")))
+    time_sleep(2,"准备输入desc")
+    desc_button.send_keys(fake.first_name())
+
+    #下拉列表
+    try:
+        down_list_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='select-input-container css-1tyu61v']//div[@class='css-1hkumgc']/span")))
+        time_sleep(2,"准备点击下拉")
+        # browser.execute_script("arguments[0].click();", down_list_button)
+        ActionChains(browser).click(down_list_button).perform()  # 必须用模拟鼠标点
+    except:
+        print("下拉没找到哦啊")
+
+    # #选择rinkeby
+    rinkeby_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='css-1hkumgc']/span[text()[contains(.,'Goerli')]]")))
+    time_sleep(2,"准备选择 rinkeby")
+    browser.execute_script("arguments[0].click();", rinkeby_button)
+    # ActionChains(browser).click(rinkeby_button).perform()  # 模拟鼠标点
+
+    #确定创建
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='submit']")))
+    time_sleep(2,"准备点击创建")
+    browser.execute_script("arguments[0].click();", confirm_login)
+    time_sleep(20,"已经点击创建")
+    return app_name
+
 #注册Alchemy时,填写随机信息
 def signup_alchemy_random_info(browser, wait, email_account, email_pw):
     first_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Gavin']")))

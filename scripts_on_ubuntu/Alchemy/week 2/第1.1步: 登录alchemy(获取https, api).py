@@ -83,12 +83,12 @@ while 1:
                     #     print("====可能是不需要填写alchemy项目描述")
 
                     
-                    #======删除demo app, Rinkeby是要保留的
-                    alchemy_delete_app(browser, wait, "Rinkeby")
+                    #======删除demo app, Rinkeby, Goerli是要保留的
+                    alchemy_delete_app(browser, wait, "RinkebyGoerli")
 
                     # ===================创建app
                     if create_app == 1:
-                        app_name = alchemy_create_rinkeby_app(browser, wait)
+                        app_name = alchemy_create_goerli_app(browser, wait)
                     else:
                         print("不要再创建app了")
 
