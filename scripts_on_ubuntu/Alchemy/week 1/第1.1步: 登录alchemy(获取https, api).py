@@ -6,7 +6,7 @@ from functions import *
 from faker import Faker
 fake = Faker()
 
-excel_row = 24
+excel_row = 41
 browser_wait_times = 15
 read_active_excel_column = "E" #帐号是否激活了
 https_link_excel_column = "F" # https 放在这一列
