@@ -22,8 +22,8 @@ excel_path = '/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/L2_p
 # C列 = ETH转USDC, D列 = USDC转ETH
 # E列 = 提供流动性, F列 = 解除流动性
 
-write_to_excel_column = "F"  #把成功或失败记录到excel的列
-read_from_excel_column = "F" #从excel中的哪一列读取状态? 判断是不是要做任务?
+write_to_excel_column = "C"  #把成功或失败记录到excel的列
+read_from_excel_column = "C" #从excel中的哪一列读取状态? 判断是不是要做任务?
 excel_start_row = 2
 browser_wait_times = 15
 
@@ -37,6 +37,8 @@ while True:
                 #===========做一些准备工作
                 #打開clash 切換ip
                 open_clash_dashboard(browser, wait, url_dashboard)
+                time_sleep(3600, "等嗲")
+                time_sleep(3600, "等嗲")
                 random_select_clash_ip(browser, wait)
                 # ip_switcher(browser, wait, url_google)
                 
@@ -47,7 +49,7 @@ while True:
 
                 #=============开始任务, i 用于记录第几个号, excel_which_column用于记录成功或失败
                 #任务1:ETH转USDC. 任务成功会记录到excel中
-                # ETH_swap_USDC(browser, wait,excel_path, i, write_to_excel_column)
+                ETH_swap_USDC(browser, wait,excel_path, i, write_to_excel_column)
                 
                 # #任务2:USDC转ETH.模式0:随机转金额;模式1:全部转
                 # USDC_swap_ETH(browser, wait,excel_path, i, write_to_excel_column, 0)
@@ -57,7 +59,7 @@ while True:
                 # syncswap_provide_LP(browser, wait,excel_path, i, write_to_excel_column)
 
                 # #任务4:解除流动性.模式0:移除随机比例的流动性;模式1:移除所有流动性
-                syncswap_remove_LP(browser, wait,excel_path, i, write_to_excel_column, 0)
+                # syncswap_remove_LP(browser, wait,excel_path, i, write_to_excel_column, 0)
 
                 ##=========== 这里要设置随机等待时间
                 aa = random.randint(45, 80)
