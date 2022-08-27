@@ -9,15 +9,16 @@ from faker import Faker
 fake = Faker()
 
 
-excel_row = 22   #待注册的邮箱. 新的一批号,从第20往后开始
-write_resent_to_excel_column = "E" #通过查看resent, 来判断是否发送激活链接
-write_active_excel_column = "F" #激活信息
+excel_row = 61   #待注册的邮箱. 新的一批号,从第20往后开始
+
 email_excel_column = "C" #邮箱
 pw_excel_column = "D"  #密码
+write_resent_to_excel_column = "E" #通过查看resent, 来判断是否发送激活链接
+write_active_excel_column = "F" #激活信息
 
-excel_path = '/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/Alchemy/week 1/week 1.xlsx'
 
-browser_wait_times = 10
+excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/week 1.xlsx'
+browser_wait_times = 15
 alchemyURL = f"https://auth.alchemyapi.io/signup?redirectUrl=https%3A%2F%2Fdashboard.alchemy.com%2Fsignup%2F%3Freferrer_origin%3DDIRECT"
 alchemy_official_URL = f"https://www.alchemy.com"
 #从脆球官网获取
@@ -112,7 +113,7 @@ while 1:
                                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "Y")
                                     a = random.randint(2, 10)
                                     time_sleep(a, f"-------------注册成功!!==随机等待时间{a}")
-                                    browser.quit()
+                                    # browser.quit()
                                     a = random.randint(1, 10)
                                     time_sleep(a, f"+++++++注册成功, 已经推出了浏览器,机等待时间{a}")
 
@@ -132,7 +133,8 @@ while 1:
                         except:
                             print("可能已经推出浏览器了")
                         a = random.randint(10, 15)
-                        time_sleep(a, f"####随机等待时间 {a} ####")   
+                        time_sleep(a, f"####随机等待时间 {a} ####")
+
             except:
                 print("=======注册alchemy失败")
                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_resent_to_excel_column, "×")
