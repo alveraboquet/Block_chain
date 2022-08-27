@@ -1,12 +1,12 @@
 from faker import Faker
 from random_word import RandomWords
 import sys
-sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
+sys.path.append('/home/parallels/ubuntu_syncswap/Block_chain')
 from functions import *
 from faker import Faker
 fake = Faker()
 
-excel_row = 41
+excel_row = 25
 browser_wait_times = 15
 
 email_account_excel_column = "C" #帐号
@@ -76,11 +76,11 @@ while 1:
                         if try_times == 5:
                             browser.quit()
 
-                    # #==================填写描述
-                    try:
-                        fill_in_alchemy_project_des(browser, wait)
-                    except:
-                        print("====可能是不需要填写alchemy项目描述")
+                    # # #==================填写描述
+                    # try:
+                    #     fill_in_alchemy_project_des(browser, wait)
+                    # except:
+                    #     print("====可能是不需要填写alchemy项目描述")
 
                     
                     #======删除demo app, Rinkeby是要保留的
