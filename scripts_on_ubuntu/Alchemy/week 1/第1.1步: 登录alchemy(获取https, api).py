@@ -84,7 +84,7 @@ while 1:
 
                     
                     #======删除demo app, Rinkeby是要保留的
-                    alchemy_delete_app(browser, wait, "Rinkeby")
+                    alchemy_delete_app(browser, wait, "RinkebyGoerli")
 
                     # ===================创建app
                     if create_app == 1:
