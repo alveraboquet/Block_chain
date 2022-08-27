@@ -1,23 +1,25 @@
-#把ETH上的goerli转到zk上
+#把ETH上的goerli转到zk上。小狐狸切换到goerli
 
 
 #为了跨文件夹导入包
-import os,inspect
-current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-os.chdir(current_dir)
+# import os,inspect
+# current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+# os.chdir(current_dir)
+# import sys
+# sys.path.append('../../../')
 import sys
-sys.path.append('../../../')
-
-
+sys.path.append('/home/parallels/ubuntu_op/Block_chain')
+sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
 from functions import *
 
+
 #准备工作：登陆小狐狸，获取小狐狸账户个数。这是第0个标签
-url_dashboard = 'http://clash.razord.top/#/proxies'
+url_dashboard = 'https://clash.razord.top/#/proxies'
 zksync_goerli_bridge = 'https://portal.zksync.io/bridge'
 zhsync_home = "https://wallet.zksync.io/"
-excel_path = "/home/parallels/Documents/block_chain/sync_swap_50.xlsx"
+excel_path = "/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/L2_project/ZK/sync_swap/sync_swap_50-之后变为200号.xlsx"
 
-excel_start = 17
+excel_start = 180
 browser_wait_times = 30
 wait, browser = my_linux_chrome(time_out=browser_wait_times)
 
@@ -29,7 +31,6 @@ ip_switcher(browser, wait, url_google)
 
 #登錄小狐狸
 login_metamask(browser, wait, metamask_pw, metamask_home)
-
 
 #切換到i小狐狸,準備換號
 switch_tab_by_handle(browser, 1, 0)
@@ -57,10 +58,11 @@ elif "成功" in fox_statue:
 aa = random.randint(20, 50)
 time_sleep(aa, f"++++++++++随机等待时间{aa}")
 
-for i in range(excel_start+1,52):
+for i in range(excel_start+1,201):
     print(f"准备换号:{i}")
-    success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, "B")
-    if success_or_fail != '成功':
+    # success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, "B")
+    # if success_or_fail != '成功':
+    try:
         #第一步: 切换到ip页面,换ip
         switch_tab_by_handle(browser, 0, 0)
         random_select_clash_ip(browser, wait)
@@ -89,5 +91,7 @@ for i in range(excel_start+1,52):
 
         #随机休息
         aa = random.randint(30, 60)
-        time_sleep(aa, f"++++++++++随机等待时间{aa}")
+        time_sleep(aa, f"++++++++++==随机等待时间{aa}")
+    except:
+        continue
 
