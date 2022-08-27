@@ -10,12 +10,12 @@ fake = Faker()
 
 
 excel_row = 22   #待注册的邮箱. 新的一批号,从第20往后开始
-write_resent_to_excel_column = "D" #通过查看resent, 来判断是否发送激活链接
-write_active_excel_column = "E" #激活信息
-email_excel_column = "B" #邮箱
-pw_excel_column = "C"  #密码
+write_resent_to_excel_column = "E" #通过查看resent, 来判断是否发送激活链接
+write_active_excel_column = "F" #激活信息
+email_excel_column = "C" #邮箱
+pw_excel_column = "D"  #密码
 
-excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/alchemy可用邮箱手动整理版.xlsx'
+excel_path = '/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/Alchemy/week 1/week 1.xlsx'
 
 browser_wait_times = 10
 alchemyURL = f"https://auth.alchemyapi.io/signup?redirectUrl=https%3A%2F%2Fdashboard.alchemy.com%2Fsignup%2F%3Freferrer_origin%3DDIRECT"

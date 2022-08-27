@@ -10,7 +10,7 @@ fake = Faker()
 
 excel_start_row = 30 #从excel第几行开始
 browser_wait_times = 15
-write_jsonCID_to_excel_column = 'H' # json CID 结果记录到哪一列
+write_jsonCID_to_excel_column = 'I' # json CID 结果记录到哪一列
 
 json_path = "/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/metadata.json"
 excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/alchemy可用邮箱手动整理版.xlsx'

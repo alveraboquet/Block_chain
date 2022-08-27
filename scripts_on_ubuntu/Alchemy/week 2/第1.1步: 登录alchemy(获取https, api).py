@@ -15,7 +15,7 @@ read_active_excel_column = "F" #帐号是否激活了
 https_link_excel_column = "G" # https 放在这一列
 api_info_excel_column = "H" #api 放在这里
 
-excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/alchemy可用邮箱手动整理版.xlsx'
+excel_path = '/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/Alchemy/week 2/week 2.xlsx'
 alchemy_login_url = f"https://auth.alchemyapi.io/?redirectUrl=https%3A%2F%2Fdashboard.alchemyapi.io%2Fsignup%2F"
 create_app = 1 #是否要创建app
 
