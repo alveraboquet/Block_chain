@@ -39,7 +39,7 @@ def cuiqiu_find_alchemy_activate_email(email_to_be_activate):
     not_find_yet = True
     try_times = 0
     while not_find_yet:
-        activate_link = '' #空链接
+        activate_link = 'not receive active email' #空链接
         #获取邮件列表
         url = "https://domain-open-api.cuiqiu.com/v1/box/list"
         payload={'mail_id': cuiqiu_mail_id,
@@ -109,6 +109,8 @@ def cuiqiu_find_alchemy_activate_email(email_to_be_activate):
             not_find_yet = False
             activate_link = url[:-2] #找到了激活链接
             time_sleep(1, "提取到了激活链接")
+            return activate_link
+        else:
             return activate_link
 
 
@@ -6081,7 +6083,7 @@ def alchemy_create_goerli_app(browser, wait):
 
     # #选择rinkeby
     rinkeby_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='css-1hkumgc']/span[text()[contains(.,'Goerli')]]")))
-    time_sleep(2,"准备选择 rinkeby")
+    time_sleep(2,"准备选择 goerli ")
     browser.execute_script("arguments[0].click();", rinkeby_button)
     # ActionChains(browser).click(rinkeby_button).perform()  # 模拟鼠标点
 
@@ -6174,9 +6176,10 @@ def alchemy_delete_app(browser, wait, keyword):
             view_detail_button = wait.until(EC.element_to_be_clickable((By.XPATH, view_detail_xpath)))
 
             app_net_name = App_network.text #查看App是在那个网络
-            if keyword not in app_net_name:
+            print("===找到的app网络是:", app_net_name)
+            if app_net_name not in keyword:
                 print(f"第{i}个 app 需要删除")
-                time_sleep(2,"需要删除非 Rinkeby 的网络. ")
+                time_sleep(2,f"需要删除非 {keyword} 的网络. ")
                 browser.execute_script("arguments[0].click();", view_detail_button)
                 
                 security_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='button']/span")))
@@ -6425,7 +6428,431 @@ def filebase_return_to_bucket(browser, wait):
     except:
         print("程序一开始, 点击返回bucket失败")
 
-## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  Replit 的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   Replit项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+#找 Replit 的注册激活链接
+def cuiqiu_find_replit_activate_email(email_to_be_activate, from_email):
+    #从脆球官网获取
+    cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
+    cuiqiu_mail_id = '608142'
+    #循环检索邮箱. email_to_be_activate 表示待激活的邮箱
+    not_find_yet = True
+    try_times = 0
+    while not_find_yet:
+        activate_link = 'not receive active email' #空链接
+        #获取邮件列表
+        url = "https://domain-open-api.cuiqiu.com/v1/box/list"
+        payload={'mail_id': cuiqiu_mail_id,
+        'token': cuiqiu_token,
+        'start_time': '2022-08-24',
+        'end_time': '2023-08-25',
+        'page': '1',
+        'limit': '10'}
+        files=[
+
+        ]
+        headers = {}
+        response = requests.request("POST", url, headers=headers, data=payload, files=files)
+        result = response.text 
+
+        #==================================获取邮件id
+        #字符串转json
+        json1 = json.loads(result)
+        # print(json1)
+        # print(type(json1))
+        #转为列表
+        email_list = json1['data']['list']
+        # print("==========邮件列表是: ", email_list)
+
+        result_box_id = 'kong'
+        for i in email_list:
+            # print(i, type(i))
+            if email_to_be_activate in str(i):
+                if from_email in str(i):
+                    # print(i)
+                    print("待激活的邮件id是:", i['id'])
+                    result_box_id = i['id']
+                    time_sleep(2, "已经找到了激活邮件, 需要提取下链接")
+                    not_find_yet = False #防止死循环
+                else:
+                    time_sleep(60, f"没有找到激活邮件, 重试{try_times}次")
+        try_times +=1
+        if try_times == 10:
+            print("重试了10分钟,还是失败")
+            return "not receive active email" 
+    # time_sleep(3600, "测试用")
+    #===================== 获取邮件详情. 提取激活链接
+    # # box_id 通过 v1/box/list 获取邮箱列表接口获取
+    url = "https://domain-open-api.cuiqiu.com/v1/box/detail"
+
+    payload={'mail_id': cuiqiu_mail_id,
+    'token': cuiqiu_token,
+    'box_id': result_box_id}
+    files=[
+
+    ]
+    headers = {}
+
+    response = requests.request("POST", url, headers=headers, data=payload, files=files)
+
+    result = response.text
+    # print("==========邮件详情是: ",result)
+
+    urls = re.findall('[a-zA-z]+://[^\s]*', result)
+    # print("==========正则提取到的链接是:",urls)
+   
+
+    for url in urls:
+        if url.startswith("https://replit.com/data/user/verify"):
+            # https://replit.com/data/user/verify/3f02b3eb653780d237746e34db82f194\\"\\u003eVerify
+            print("==========激活链接是:", url[:-14])
+            not_find_yet = False
+            activate_link = url[:-14] #找到了激活链接
+            return activate_link
+        else:
+            return activate_link
+
+#注册 Replit 时,填写随机信息
+def signup_replit_random_info(browser, wait, email_account, email_pw):
+    first_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Username']")))
+    time_sleep(2,"准备输入姓名")
+    #fake.first_name()+fake.last_name()
+    name = email_account.split("@")[0]
+    while len(name) > 15: #网站限制不能超过15个字符
+        name = name[:15]
+    first_name.send_keys(name)
+    time.sleep(2)
+
+    email_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='Email']")))
+    time_sleep(2,"准备输入邮箱")
+    email_button.send_keys(email_account)
+
+    pw_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@placeholder='Password']")))
+    time_sleep(2,"准备输入密码")
+    pw_button.send_keys(email_pw)
+
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[text()='Create account']")))
+    time_sleep(2,"准备点击登录")
+    browser.execute_script("arguments[0].click();", confirm_login)
+    time_sleep(2,"已经点击登录")
+
+#开始打开浏览器激活
+def cuiqiu_browser_active_replit_link(wait, browser, activate_link, email_account, email_pw):
+    print("开始激活 replit 发来的邮件")
+
+    dashboard_flag = False
+    ##============ 准备浏览器, 激活帐号
+    print("登录 Replit")
+ 
+    #=======清理下缓存
+    # delete_cookie(browser)
+
+    #=============正式开始
+    browser.get(activate_link)
+    time_sleep(5, "等待  加载")
+    switch_tab_by_handle(browser, 1, 0)  # 切换到
+    #尝试输入帐号密码登录
+    # try:
+    #     email_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='1val-input']")))
+    #     time_sleep(2,"准备输入邮箱")
+    #     email_button.send_keys(email_account)
+
+    #     pw_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='2val-input']")))
+    #     time_sleep(2,"准备输入密码")
+    #     pw_button.send_keys(email_pw)
+
+    #     confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[text()='Log in']")))
+    #     time_sleep(2,"准备点击登录")
+    #     browser.execute_script("arguments[0].click();", confirm_login)
+    #     time_sleep(10,"cuiqiu_browser_active_replit_link 纯倒计时,等待网页加载, 查看 on boarding 按钮")
+    # except:
+    #     print("可能不要登录")
+
+    try:
+        #如果能找到首页,说明已经进入了
+        time_sleep(15, "尝试查看是不是已经进入首页")
+        Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//h2[text()='Get started with Replit!']")))
+        dashboard_flag = True
+        print("=======已经登录了首页")
+    except:
+        print("======再试试能不能找到 @ ====")
+        try:
+            #如果能找到@,说明已经进入
+            Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'@')]]")))
+            dashboard_flag = True
+            print("=======已经找到了@")
+        except:
+            print("======没有进入首页====")
+
+    return dashboard_flag
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   Replit项目的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   polygonscan项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+#找 Replit 的注册激活链接
+def cuiqiu_find_polygonscan_activate_email(email_to_be_activate, from_email, email_subject, active_email_start_with):
+    #从脆球官网获取
+    cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
+    cuiqiu_mail_id = '608142'
+    #循环检索邮箱. email_to_be_activate 表示待激活的邮箱
+    not_find_yet = True
+    try_times = 0  #尝试找邮件的次数
+    while not_find_yet:
+        activate_link = 'not receive active email' #空链接
+        #获取邮件列表
+        url = "https://domain-open-api.cuiqiu.com/v1/box/list"
+        payload={'mail_id': cuiqiu_mail_id,
+        'token': cuiqiu_token,
+        'start_time': '2022-08-24',
+        'end_time': '2023-08-25',
+        'page': '1',
+        'limit': '10'}
+        files=[
+
+        ]
+        headers = {}
+        response = requests.request("POST", url, headers=headers, data=payload, files=files)
+        result = response.text 
+
+        #==================================获取邮件id
+        #字符串转json
+        json1 = json.loads(result)
+        # print(json1)
+        # print(type(json1))
+        #转为列表
+        email_list = json1['data']['list']
+        # print("==========邮件列表是: ", email_list)
+
+        result_box_id = 'kong'
+        for i in email_list:
+            # print(i, type(i))
+            if email_to_be_activate in str(i):
+                if from_email in str(i):
+                    if email_subject in str(i):
+                        # print(i)
+                        print("待激活的邮件id是:", i['id'])
+                        result_box_id = i['id']
+                        time_sleep(2, "已经找到了激活邮件, 需要提取下链接")
+                        not_find_yet = False #防止死循环
+                else:
+                    time_sleep(60, f"=====没有找到激活邮件, 重试{try_times}次")
+        try_times +=1
+        if try_times == 10:
+            print("重试了10分钟,还是失败")
+            return "not receive active email" 
+
+    # time_sleep(3600, "测试用")
+    #===============获取邮件详情. 提取激活链接
+    # # box_id 通过 v1/box/list 获取邮箱列表接口获取
+    url = "https://domain-open-api.cuiqiu.com/v1/box/detail"
+
+    payload={'mail_id': cuiqiu_mail_id,
+    'token': cuiqiu_token,
+    'box_id': result_box_id}
+    files=[
+
+    ]
+    headers = {}
+
+    response = requests.request("POST", url, headers=headers, data=payload, files=files)
+
+    result = response.text
+    print("==========邮件详情是: ",result)
+
+    urls = re.findall('[a-zA-z]+://[^\s]*', result)
+    print("==========正则提取到的链接是:",urls)
+   
+
+    for url in urls:
+        if url.startswith(active_email_start_with):
+            # https://polygonscan.com/confirmemail?email=mpass7289%40gmail.com&code=DYGBCJQHJI7DKHA6JVBG
+            print("==========激活链接是:", url[:-11])
+            not_find_yet = False
+            activate_link = url[:-11] #找到了激活链接
+            if f"\\u0026" in activate_link:
+                print("\u0026确实在")
+                activate_link = activate_link.replace('\\u0026' , '&')
+                print("=========替换后的链接是", activate_link)
+            return activate_link
+        else:
+            return activate_link
+
+#注册 Replit 时,填写随机信息
+def signup_polygonscan_random_info(browser, wait, email_account, email_pw, signup_name):
+    user_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='ContentPlaceHolder1_txtUserName']")))
+    time_sleep(2,"准备输入姓名")
+    # name = fake.first_name()+fake.last_name()
+    # # name = email_account.split("@")[0]
+    # while len(name) > 29: #网站限制不能超过15个字符
+    #     name = name[:28]
+    user_name.send_keys(signup_name)
+    time.sleep(2)
+
+    email_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='ContentPlaceHolder1_txtEmail']")))
+    time_sleep(2,"准备输入邮箱")
+    email_button.send_keys(email_account)
+
+    pw_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='ContentPlaceHolder1_txtPassword']")))
+    time_sleep(2,"准备输入密码")
+    pw_button.send_keys(email_pw)
+
+    pw_button_2 = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='ContentPlaceHolder1_txtPassword2']")))
+    time_sleep(2,"准备输入密码")
+    pw_button_2.send_keys(email_pw)
+
+    check_box_1 = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[text()='I agree to the ']")))
+    time_sleep(2,"准备打勾1")
+    browser.execute_script("arguments[0].click();", check_box_1)
+    # ActionChains(browser).click(check_box_1).perform()  # 模拟鼠标点
+
+    check_box_2 = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[text()='I agree to receive the PolygonScan newsletter and understand that I can unsubscribe at any time.']")))
+    time_sleep(2,"准备打勾2")
+    # ActionChains(browser).click(check_box_2).perform()  # 模拟鼠标点
+    browser.execute_script("arguments[0].click();", check_box_2)
+    
+    captcha_info = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='captcha-solver-info']")))
+    captcha_info_now = captcha_info.text
+    
+    try_times = 0
+    while captcha_info_now == "Solving...":
+        captcha_info = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='captcha-solver-info']")))
+        captcha_info_now = captcha_info.text
+        time_sleep(5, "**********暂时还没有解决验证码, 等等")
+        try_times += 1
+        if try_times == 120: #最多等待10分钟
+            print("=======还是没有通过验证码,失败!!")
+            browser.quit()
+    
+    #如果解决了验证码, 则点击注册
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='ContentPlaceHolder1_btnRegister']")))
+    time_sleep(2,"准备点击登录")
+    browser.execute_script("arguments[0].click();", confirm_login)
+    # ActionChains(browser).click(confirm_login).perform()  # 模拟鼠标点
+    time_sleep(2,"已经点击登录")
+
+
+    #点击login后, 查看是否进入主页
+    #=========循环查看是不是有resent按钮
+    check_resent_flag = True
+    already_in_flag = False #初始定义不要flase
+    try_times = 0
+    while check_resent_flag:
+        try:
+            try_times +=1  
+            print("=========准备不断去查找标志!!")
+            onboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'We have sent')]]")))
+            check_resent_flag = False #不用再检查resent了
+            already_in_flag = True #需要去激活邮件
+            # browser.quit()#不要关闭浏览器, 直接打开激活链接, 防止有验证码
+            time_sleep(3, f"++++++++++已经找到了sent 标志, 等待时间")
+            return already_in_flag #需要记录用户名
+        except:
+            time_sleep(5, "**********暂时还没有找到主页, 等等")
+            
+        if try_times == 60: #最多等待5分钟
+            print("没有找到首页按钮,可能是有验证, 记录到excel")
+            check_resent_flag = False #不要再检查resent了
+            browser.quit()
+            return already_in_flag
+
+#开始打开浏览器激活
+def cuiqiu_browser_active_polygonscan_link(wait, browser, activate_link):
+    dashboard_flag = False
+    ##============ 准备浏览器, 激活帐号
+    print("登录 polygonscan")
+
+    #=============正式开始
+    browser.get(activate_link)
+    time_sleep(5, "等待  加载")
+    switch_tab_by_handle(browser, 1, 0)  # 切换到
+    try:
+        #如果能找到首页,说明已经进入了
+        time_sleep(15, "尝试查看是不是已经进入首页")
+        Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//h1[text()[contains(.,'Confirm')]]")))
+        dashboard_flag = True
+        print("=======已经登录了首页")
+    except:
+        print("======没有进入首页====")
+        
+    return dashboard_flag
+
+# polyscan登录
+def login_polygonscan(wait, browser, email_pw, user_name):
+    click_login_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@value='Click to Login']")))
+    time_sleep(2,"准备点击click to login")
+    browser.execute_script("arguments[0].click();", click_login_button)
+
+    user_name_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='ContentPlaceHolder1_txtUserName']")))
+    time_sleep(2,"准备输入邮箱")
+    user_name_button.send_keys(user_name)
+
+    pw_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='ContentPlaceHolder1_txtPassword']")))
+    time_sleep(2,"准备输入密码")
+    pw_button.send_keys(email_pw)
+
+    # check_box_1 = wait.until(EC.element_to_be_clickable((By.XPATH,"//label[@class='custom-control-label']")))
+    # time_sleep(2,"准备打勾1")
+    # browser.execute_script("arguments[0].click();", check_box_1)
+    # ActionChains(browser).click(check_box_1).perform()  # 模拟鼠标点
+
+    try_times = 0
+    captcha_info_now = "Solving..."#设置初始值为Solving...
+    print("======开始等待验证码")
+    while captcha_info_now == "Solving...":
+        captcha_info = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='captcha-solver-info']")))
+        captcha_info_now = captcha_info.text
+        time_sleep(5, "**********暂时还没有解决验证码, 等等")
+        try_times += 1
+        if try_times == 120: #最多等待10分钟
+            print("=======还是没有通过验证码,失败!!")
+            browser.quit()
+    print("======验证码通过!!")
+    #如果解决了验证码, 则点击注册
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='ContentPlaceHolder1_btnLogin']")))
+    time_sleep(2,"准备点击登录")
+    browser.execute_script("arguments[0].click();", confirm_login)
+
+    #=========循环查看是不是有sent按钮
+    check_home_flag = True
+    already_home_flag = False #初始定义不要去邮箱检查激活链接
+    try_times = 0
+    while check_home_flag:
+        try:
+            try_times +=1  
+            print("=========准备不断去查找on board")
+            onboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//a[text()[contains(.,'API-KEYs')]]")))
+            check_home_flag = False #不用再检查resent了
+            already_home_flag = True #
+            # browser.quit()#不要关闭浏览器, 直接打开激活链接, 防止有验证码
+            return already_home_flag
+        except:
+            time_sleep(5, "**********暂时还没有找到主页, 等等")
+        if try_times == 50:
+            print("========登录失败!!")
+            browser.quit()
+            
+#polyscan获取API
+def pologanscan_get_API(wait, browser):
+    api_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//a[text()[contains(.,'API-KEYs')]]")))
+    time_sleep(2,"准备点击 api_button ")
+    browser.execute_script("arguments[0].click();", api_button)
+
+    add_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//a[@id='ContentPlaceHolder1_addnew']")))
+    time_sleep(2,"准备点击 Add")
+    browser.execute_script("arguments[0].click();", add_button)
+
+    continue_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='ContentPlaceHolder1_btnSubmit']")))
+    time_sleep(2,"准备点击continue")
+    browser.execute_script("arguments[0].click();", continue_button)
+    
+    api_box = wait.until(EC.element_to_be_clickable((By.XPATH,"//table/tbody[1]//td[2]")))
+    api_result = api_box.text
+    print("提取到的API信息是", api_result)
+
+    return api_result
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   polygonscan项目的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
 
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #

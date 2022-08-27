@@ -84,7 +84,7 @@ while 1:
 
                     
                     #======删除demo app, Rinkeby, Goerli是要保留的
-                    alchemy_delete_app(browser, wait, "RinkebyGoerli")
+                    alchemy_delete_app(browser, wait, "Rinkeby Goerli")
 
                     # ===================创建app
                     if create_app == 1:
@@ -97,7 +97,7 @@ while 1:
                     https_info, api_info = get_alchemy_app_info(browser, wait, app_name)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, https_link_excel_column, https_info)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, api_info_excel_column, api_info)
-                    a = random.randint(15, 19)
+                    a = random.randint(15, 29)
                     time_sleep(a, f"++++++++++随机等待时间{a}, 之后关闭浏览器")
                     browser.quit()
                     a = random.randint(10, 15)
