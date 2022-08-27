@@ -111,10 +111,10 @@ while 1:
                                 #如果已经点击了 dashboard_flag 为真, 记录Y
                                 if dashboard_flag: 
                                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "Y")
-                                    a = random.randint(2, 10)
+                                    a = random.randint(200, 1000)
                                     time_sleep(a, f"-------------注册成功!!==随机等待时间{a}")
                                     # browser.quit()
-                                    a = random.randint(1, 10)
+                                    a = random.randint(100, 1000)
                                     time_sleep(a, f"+++++++注册成功, 已经推出了浏览器,机等待时间{a}")
 
                             #读取标识位, 防止死循环
