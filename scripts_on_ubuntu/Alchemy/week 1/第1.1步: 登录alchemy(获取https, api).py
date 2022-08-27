@@ -40,7 +40,7 @@ while 1:
 
                     ##=========== 准备浏览器, 清理下缓存
                     wait, browser = my_linux_chrome(time_out=browser_wait_times)
-                    browser.set_page_load_timeout(121) #设置网页加载最多1分钟
+                    browser.set_page_load_timeout(221) #设置网页加载最多1分钟
                     open_clash_dashboard(browser, wait, url_dashboard)
                     random_select_clash_ip(browser, wait)
                     delete_cookie(browser)
@@ -93,8 +93,8 @@ while 1:
                     #==========================   获取https
                     
                     https_info, api_info = get_alchemy_app_info(browser, wait, app_name)
-                    Do_Excel(excel_path, sheetname='Sheet1').plain_write(excel_row, https_link_excel_column, https_info)
-                    Do_Excel(excel_path, sheetname='Sheet1').plain_write(excel_row, api_info_excel_column, api_info)
+                    Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, https_link_excel_column, https_info)
+                    Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, api_info_excel_column, api_info)
                     a = random.randint(15, 19)
                     time_sleep(a, f"++++++++++随机等待时间{a}, 之后关闭浏览器")
                     browser.quit()
