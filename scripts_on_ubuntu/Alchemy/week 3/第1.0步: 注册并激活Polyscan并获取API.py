@@ -95,7 +95,7 @@ while 1:
                     time_sleep(a, f"+++++++注册成功, 等待时间{a}")
                                 
             except:
-                print("=======注册失败")
+                print("=======注册失败了")
                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "×")
                 try:
                     browser.quit()
