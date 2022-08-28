@@ -48,7 +48,7 @@ while 1:
                 random_select_clash_ip(browser, wait)
                 delete_cookie(browser)
 
-                #==========正式开始注册
+                #==========正式开始注册al
                 browser.get(alchemyURL)
                 switch_tab_by_handle(browser, 1, 0)  # 切换到
 
@@ -58,7 +58,7 @@ while 1:
                 #================判断需要去邮箱提取链接
                 if active_email_flag:
                     email_id = cuiqiu_find_alchemy_activate_email_id(email_account, email_from, email_subject)
-                    activate_link = cuiqiu_extract_link_from_email_id(email_id)
+                    activate_link = cuiqiu_extract_alchemy_link_from_email_id(email_id)
                 
                 #===========需要去浏览器激活链接
                 if activate_link:
