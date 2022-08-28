@@ -81,7 +81,7 @@ def cuiqiu_find_alchemy_activate_email_id(email_to_be_activate, email_from, emai
 
 
 #找到邮件 id 后, 开始提取链接
-def cuiqiu_extract_link_from_email_id(email_id):
+def cuiqiu_extract_alchemy_link_from_email_id(email_id):
     # # box_id 通过 v1/box/list 获取邮箱列表接口获取
     url = "https://domain-open-api.cuiqiu.com/v1/box/detail"
     payload={'mail_id': cuiqiu_mail_id,
