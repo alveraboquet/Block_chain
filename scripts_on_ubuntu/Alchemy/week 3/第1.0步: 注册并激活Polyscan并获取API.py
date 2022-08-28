@@ -35,7 +35,7 @@ email_subject = "Please confirm your email [polygonscan.com]"
 # activate_link = cuiqiu_extract_polyscan_link_from_email_id(email_id)
 # time_sleep(3600, "测试邮件")
 
-excel_row = 27   
+excel_row = 30   
 while 1:
     for i in range(excel_row, 120):
         #=======================如果没有resent, 说明没有发送激活链接,
