@@ -6834,6 +6834,7 @@ def login_polygonscan(wait, browser, email_pw, user_name):
             time_sleep(5, "**********暂时还没有找到主页, 等等")
         if try_times == 50:
             print("========登录失败!!")
+            check_home_flag = False
             browser.quit()
             
 #polyscan获取API

@@ -34,7 +34,7 @@ cuiqiu_mail_id = '608142'
 email_to_be_activate = "angelfreeman495@gmail.com"
 # cuiqiu_find_polygonscan_activate_email(email_to_be_activate, from_email, email_subject, active_email_start_with)
 
-excel_row = 15   #待注册的邮箱  StevenPatrick
+excel_row = 12   #待注册的邮箱  StevenPatrick
 while 1:
     for i in range(excel_row, 120):
         #=======================如果没有resent, 说明没有发送激活链接,
@@ -88,14 +88,14 @@ while 1:
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_api_excel_column, API_info)
 
                     #=========终于结束任务, 可以关闭浏览器了
-                    a = random.randint(2, 10)
+                    a = random.randint(50, 100)
                     time_sleep(a, f"-------------终于结束任务, 可以关闭浏览器了!!==随机等待时间{a}")
                     browser.quit()
-                    a = random.randint(1, 10)
+                    a = random.randint(50, 100)
                     time_sleep(a, f"+++++++注册成功, 等待时间{a}")
                                 
             except:
-                print("=======注册失败")
+                print("=======注册失败了")
                 Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "×")
                 try:
                     browser.quit()
@@ -103,9 +103,3 @@ while 1:
                     print("可能已经推出浏览器了")
                 a = random.randint(10, 15)
                 time_sleep(a, f"@ @ @ @ @ 随机等待时间 {a} @ @ @ @")    
-
-           
-                
-
-                
-
