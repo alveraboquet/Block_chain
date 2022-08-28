@@ -6,7 +6,7 @@ from functions import *
 from faker import Faker
 fake = Faker()
 
-excel_row = 41
+
 browser_wait_times = 15
 
 email_account_excel_column = "C" #帐号
@@ -15,7 +15,7 @@ read_active_excel_column = "F" #帐号是否激活了
 https_link_excel_column = "G" # https 放在这一列
 api_info_excel_column = "H" #api 放在这里
 
-excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/alchemy可用邮箱手动整理版.xlsx'
+excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/week 1.xlsx'
 alchemy_login_url = f"https://auth.alchemyapi.io/?redirectUrl=https%3A%2F%2Fdashboard.alchemyapi.io%2Fsignup%2F"
 create_app = 1 #是否要创建app
 
@@ -23,8 +23,9 @@ create_app = 1 #是否要创建app
 # fox_address = Do_Excel(excel_path,sheetname='Sheet1').read(excel_row, "A")
 
 #如果已经激活,则开始创建项目
+excel_row = 61
 while 1:
-    for i in range(excel_row, 120):
+    for i in range(excel_row, 97):
         #=======================先查看这个号有没有激活过
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, read_active_excel_column)
         print(f"excel中, {i} 号是否已激活帐号的数据是:", str(success_or_fail))

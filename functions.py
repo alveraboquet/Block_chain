@@ -28,18 +28,20 @@ import linecache #用于读取txt文档
 from faker import Faker
 from random_word import RandomWords
 fake = Faker()
+from bs4 import BeautifulSoup
+from lxml import etree
 
 ##===========================脆球邮箱相关
-#找alchemy的注册激活链接
-def cuiqiu_find_alchemy_activate_email(email_to_be_activate):
-    #从脆球官网获取
-    cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
-    cuiqiu_mail_id = '608142'
+#从脆球官网获取
+cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
+cuiqiu_mail_id = '608142'
+
+#找alchemy的注册激活的邮件 id
+def cuiqiu_find_alchemy_activate_email_id(email_to_be_activate, email_from, email_subject):
     #循环检索邮箱. email_to_be_activate 表示待激活的邮箱
     not_find_yet = True
     try_times = 0
     while not_find_yet:
-        activate_link = '' #空链接
         #获取邮件列表
         url = "https://domain-open-api.cuiqiu.com/v1/box/list"
         payload={'mail_id': cuiqiu_mail_id,
@@ -47,119 +49,96 @@ def cuiqiu_find_alchemy_activate_email(email_to_be_activate):
         'start_time': '2022-08-24',
         'end_time': '2023-08-25',
         'page': '1',
-        'limit': '10'}
+        'limit': '100'}
         files=[
 
         ]
         headers = {}
         response = requests.request("POST", url, headers=headers, data=payload, files=files)
-        result = response.text 
+        result = response.text #原始字符串格式
+        result_to_json = json.loads(result) #字符串转json
+        
+        #========这是一个列表集合, 先把列表轮寻一遍, 提取邮件id
+        #如果失败, 则再请求下一个列表
+        email_list = result_to_json['data']['list'] #取值
+        # print("=========所有的邮件在这里: ", email_list)
+        for email in email_list:
+            if email["to"] == email_to_be_activate:
+                if email["from"] == email_from:
+                    if email["subject"]== email_subject:
+                        result_email_id = email["id"]
+                        print("===========待激活的邮件id是:", result_email_id)
+                        not_find_yet = False #防止死循环
+                        return result_email_id
 
-        #==================================获取邮件id
-        #字符串转json
-        json1 = json.loads(result)
-        # print(json1)
-        # print(type(json1))
-        print("===================")
-        #转为列表
-        email_list = json1['data']['list']
-        # print(email_list)
+        try_times += 1
+        time_sleep(5,f"尝试{try_times}次, 最多100次. 是不是参数 limit 太少了? ")
+        if try_times == 100:
+            print("找邮件重试了10分钟,还是失败")
+            not_find_yet = False #防止死循环
+            result_email_id = False
+            return result_email_id
 
-        result_box_id = 'kong'
-        for i in email_list:
-            # print(i, type(i))
-            if email_to_be_activate in str(i):
-                if 'Verify your email' in str(i):
-                    # print(i)
-                    print("待激活的邮件id是:", i['id'])
-                    result_box_id = i['id']
-                    time_sleep(8, "已经找到了激活邮件, 需要提取下链接")
-                    not_find_yet = False #防止死循环
-                else:
-                    time_sleep(60, f"没有找到激活邮件, 重试{try_times}次")
-        try_times +=1
-        if try_times == 10:
-            print("重试了10分钟,还是失败")
-            return "not receive active email" 
 
-    #===================== 获取邮件详情. 提取激活链接
+#找到邮件 id 后, 开始提取链接
+def cuiqiu_extract_link_from_email_id(email_id):
     # # box_id 通过 v1/box/list 获取邮箱列表接口获取
     url = "https://domain-open-api.cuiqiu.com/v1/box/detail"
-
     payload={'mail_id': cuiqiu_mail_id,
     'token': cuiqiu_token,
-    'box_id': result_box_id}
+    'box_id': email_id}
     files=[
 
     ]
     headers = {}
 
     response = requests.request("POST", url, headers=headers, data=payload, files=files)
-
     result = response.text
-    # print("邮件详情是: ",result)
+    to_json = json.loads(result)
+    html_body = to_json['data']['content']['body']
+    # print("===提取html_body, 输入到etree", html_body)
 
-    urls = re.findall('[a-zA-z]+://[^\s]*', result)
-    print(urls)
-    print("===================")
-
-    for url in urls:
-        if url.startswith("http://url6420.alchemy.com/ls/click?"):
-            print("激活链接是:", url[:-2])
-            not_find_yet = False
-            activate_link = url[:-2] #找到了激活链接
-            time_sleep(1, "提取到了激活链接")
-            return activate_link
-
+    html = etree.HTML(html_body)
+    # print("=====解析到的网页是:", type(html), html)
+    
+    activate_link = html.xpath("//a[text()='VERIFY EMAIL']/@href")
+    print("=====提取到的链接是, 这是一个列表, 需要转为字符串", activate_link, type(activate_link))
+    return str(activate_link[0])
 
 #开始打开浏览器激活
-def cuiqiu_browser_active_alchemy_link(activate_link):
+def cuiqiu_browser_active_alchemy_link(browser, wait, activate_link):
     print("开始激活alchemy发来的邮件")
-    alread_click_verify = False
-    alread_build = False
     dashboard_flag = False
-    ##============ 准备浏览器, 激活帐号
-    browser_wait_times = 10
-    print("登录alchemy")
-    wait, browser = my_linux_chrome(time_out=browser_wait_times)
-    alchemy_login_url = activate_link
-
-    #=======清理下缓存
-    delete_cookie(browser)
-
-    #=============正式开始
-    browser.get(alchemy_login_url)
+    
+    browser.get(activate_link)
     time_sleep(5, "等待 alchemy 加载")
     switch_tab_by_handle(browser, 1, 0)  # 切换到
 
-    #===========================================激活帐号
+    #=================激活帐号
     try:
         Verify_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Verify']")))
         time_sleep(2,"准备点击 Verify")
         browser.execute_script("arguments[0].click();", Verify_button)
-        time_sleep(30,"=====已经点击 Verify, 请考虑写入excel")
-        alread_click_verify = True
+        time_sleep(30,"=====已经点击 Verify")
     except:
-        print("点击verify失败")
-        alread_click_verify = False
-
+        print("点击verify失败, 会不会有影响?")
+ 
     # ==================填写描述
     try:
         fill_in_alchemy_project_des(browser, wait)
-        alread_build = True
     except:
         print("可能是不需要填写alchemy项目描述, 或哪里出错了")
-        alread_build = False
-    
+
     try:
         #如果能找到Alchemy的首页,说明已经进入了
         time_sleep(20, "尝试查看是不是已经进入 Alchemy 了")
         Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'Dashboard')]]")))
         dashboard_flag = True
         print("=======已经登录了 Alchemy")
+        return dashboard_flag
     except:
         print("======没有找到dashboard=====")
-    return dashboard_flag, alread_click_verify, alread_build
+    
 
 
 ##===========切换IP相关
@@ -6076,7 +6055,35 @@ def signup_alchemy_random_info(browser, wait, email_account, email_pw):
     confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//form/button[text()='Sign up']")))
     time_sleep(2,"准备点击登录")
     browser.execute_script("arguments[0].click();", confirm_login)
-    time_sleep(10,"纯倒计时,等待查看resent按钮")
+    time_sleep(15,"等待查看resent按钮")
+
+    #=========循环查看是不是有resent按钮
+    check_resent_flag = True
+    active_email_flag = False #初始定义不要去邮箱检查激活链接
+    try_times = 0
+    while check_resent_flag:
+        try:
+            try_times +=1  
+            resent_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Resend email']")))
+            print("找到了resent按钮, 待激活")
+            check_resent_flag = False #不用再检查resent了
+            active_email_flag = True #需要去激活邮件
+            return active_email_flag
+            
+        except:
+            time_sleep(6, "**********暂时还没有找到resent链接, 尝试再次点击sign up")
+            try:#尝试再次点击login
+                confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//form/button[text()='Sign up']")))
+                time_sleep(2,"======准备再次点击登录")
+                browser.execute_script("arguments[0].click();", confirm_login)
+                print("===========已经再次点击sign up")
+            except:
+                print("===尝试再次点击sign up,失败!!!")
+
+        if try_times == 50:
+            check_resent_flag = False #不要再检查resent了
+            browser.quit()
+            time_sleep(5, "等待了5分钟, 没有找到resent按钮,可能是有验证, 记录到excel")
 
 # 登录alchemy时,填写帐号密码
 def alchemy_login(browser, wait, email_to_login, email_pw):
