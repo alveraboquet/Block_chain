@@ -1,12 +1,12 @@
 from faker import Faker
 from random_word import RandomWords
 import sys
-sys.path.append('/home/parallels/ubuntu_zk/Block_chain')
+sys.path.append('/home/parallels/ubuntu_syncswap/Block_chain')
 from functions import *
 from faker import Faker
 fake = Faker()
 
-excel_row = 41
+excel_row = 25
 browser_wait_times = 15
 
 email_account_excel_column = "C" #帐号
@@ -76,19 +76,19 @@ while 1:
                         if try_times == 5:
                             browser.quit()
 
-                    # #==================填写描述
-                    try:
-                        fill_in_alchemy_project_des(browser, wait)
-                    except:
-                        print("====可能是不需要填写alchemy项目描述")
+                    # # #==================填写描述
+                    # try:
+                    #     fill_in_alchemy_project_des(browser, wait)
+                    # except:
+                    #     print("====可能是不需要填写alchemy项目描述")
 
                     
-                    #======删除demo app, Rinkeby是要保留的
-                    alchemy_delete_app(browser, wait, "Rinkeby")
+                    #======删除demo app, Rinkeby, Goerli是要保留的
+                    alchemy_delete_app(browser, wait, "Rinkeby Goerli")
 
                     # ===================创建app
                     if create_app == 1:
-                        app_name = alchemy_create_rinkeby_app(browser, wait)
+                        app_name = alchemy_create_goerli_app(browser, wait)
                     else:
                         print("不要再创建app了")
 
@@ -97,7 +97,7 @@ while 1:
                     https_info, api_info = get_alchemy_app_info(browser, wait, app_name)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, https_link_excel_column, https_info)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, api_info_excel_column, api_info)
-                    a = random.randint(15, 19)
+                    a = random.randint(15, 29)
                     time_sleep(a, f"++++++++++随机等待时间{a}, 之后关闭浏览器")
                     browser.quit()
                     a = random.randint(10, 15)
