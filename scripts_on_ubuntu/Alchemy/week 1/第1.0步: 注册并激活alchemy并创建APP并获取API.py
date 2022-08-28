@@ -48,7 +48,7 @@ while 1:
                 random_select_clash_ip(browser, wait)
                 delete_cookie(browser)
 
-                #==========正式开始注册al
+                #==========正式开始注册alchemy
                 browser.get(alchemyURL)
                 switch_tab_by_handle(browser, 1, 0)  # 切换到
 
