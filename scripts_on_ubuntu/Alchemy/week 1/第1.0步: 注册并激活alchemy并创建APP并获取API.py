@@ -79,10 +79,10 @@ while 1:
                     https_info, api_info = get_alchemy_app_info(browser, wait, app_name)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, https_link_excel_column, https_info)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, api_info_excel_column, api_info)
-                    a = random.randint(5, 9)
+                    a = random.randint(50, 100)
                     time_sleep(a, f"++++++++++随机等待时间{a}, 之后关闭浏览器")
                     browser.quit()
-                    a = random.randint(2, 5)
+                    a = random.randint(50, 200)
                     time_sleep(a, f"++++++++++随机等待时间{a}")
                 
             except:
