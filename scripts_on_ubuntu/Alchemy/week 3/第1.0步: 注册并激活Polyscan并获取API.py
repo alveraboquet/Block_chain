@@ -88,10 +88,10 @@ while 1:
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_api_excel_column, API_info)
 
                     #=========终于结束任务, 可以关闭浏览器了
-                    a = random.randint(50, 500)
+                    a = random.randint(50, 100)
                     time_sleep(a, f"-------------终于结束任务, 可以关闭浏览器了!!==随机等待时间{a}")
                     browser.quit()
-                    a = random.randint(50, 500)
+                    a = random.randint(50, 100)
                     time_sleep(a, f"+++++++注册成功, 等待时间{a}")
                                 
             except:
