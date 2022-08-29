@@ -12,8 +12,8 @@ fake = Faker()
 email_excel_column = "C" #邮箱
 pw_excel_column = "D"  #密码
 write_active_excel_column = "E" #帐号激活成功信息
-https_link_excel_column = "G" # https 放在这一列
-api_info_excel_column = "H" #api 放在这里
+https_link_excel_column = "F" # https 放在这一列
+api_info_excel_column = "G" #api 放在这里
 
 excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/week 1.xlsx'
 browser_wait_times = 15
@@ -24,11 +24,14 @@ alchemy_official_URL = f"https://www.alchemy.com"
 email_from = "hello@alchemy.com"
 email_subject = "Verify your email"
 
+#测试邮件接受
+# email_id = cuiqiu_find_alchemy_activate_email_id("curtissaunder@gmail.com", email_from, email_subject)
+# activate_link = cuiqiu_extract_alchemy_link_from_email_id(email_id)
+# time_sleep(3600, "测试邮寄那")
 
-
-excel_row = 101   #待注册的邮箱. 新的一批号,从第20往后开始
+excel_row = 222   #待注册的邮箱. 新的一批号,从第20往后开始
 while 1:
-    for i in range(excel_row, 120):
+    for i in range(excel_row, 308):
         #=======================如果没有resent, 说明没有发送激活链接,
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, write_active_excel_column)
         print("excel中, 是否激活的信息是:", str(success_or_fail))
@@ -36,7 +39,7 @@ while 1:
         if "Y" not in str(success_or_fail):
             #注册alchemy
             try:
-                print(f" ========== {i} 号需要注册 alchemy ")
+                print(f" ============================= {i} 号需要注册 alchemy ==========================")
                 email_account =  Do_Excel(excel_path,sheetname='Sheet1').read(i, email_excel_column)
                 email_pw = Do_Excel(excel_path,sheetname='Sheet1').read(i, pw_excel_column)
                 print("开始注册, 待注册邮箱, 密码是:", email_account, email_pw)
@@ -48,7 +51,7 @@ while 1:
                 random_select_clash_ip(browser, wait)
                 delete_cookie(browser)
 
-                #==========正式开始注册al
+                #==========正式开始注册alchemy
                 browser.get(alchemyURL)
                 switch_tab_by_handle(browser, 1, 0)  # 切换到
 
@@ -68,8 +71,8 @@ while 1:
                 if dashboard_flag: 
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "Y")
     
-                    # 1)删除demo app, Rinkeby是要保留的
-                    alchemy_delete_app(browser, wait, "RinkebyGoerli")
+                    # 1)删除demo app, 把官方案例删除. 之后再把 Mainnet 加上
+                    alchemy_delete_app(browser, wait, "Rinkeby Goerli Polygon Mumbai")
 
                     # 2)创建app
                     app_name = alchemy_create_rinkeby_app(browser, wait)
@@ -79,10 +82,10 @@ while 1:
                     https_info, api_info = get_alchemy_app_info(browser, wait, app_name)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, https_link_excel_column, https_info)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, api_info_excel_column, api_info)
-                    a = random.randint(50, 100)
+                    # a = random.randint(500, 1000)
                     time_sleep(a, f"++++++++++随机等待时间{a}, 之后关闭浏览器")
                     browser.quit()
-                    a = random.randint(50, 200)
+                    a = random.randint(500, 1000)
                     time_sleep(a, f"++++++++++随机等待时间{a}")
                 
             except:
@@ -92,7 +95,7 @@ while 1:
                     browser.quit()
                 except:
                     print("可能已经推出浏览器了")
-                a = random.randint(10, 15)
+                a = random.randint(800, 1000)
                 time_sleep(a, f"============ 随机等待时间 {a} ==========")    
 
            
