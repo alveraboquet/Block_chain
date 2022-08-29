@@ -41,7 +41,7 @@ while 1:
                     email_pw = Do_Excel(excel_path,sheetname='Sheet1').read(i, email_pw_excel_column)
                     print("待登录邮箱, 密码是:", email_to_login, email_pw)
 
-                    ##=========== 准备浏览器, 清理下缓存
+                    ##================= 准备浏览器, 清理下缓存
                     wait, browser = my_linux_chrome(time_out=browser_wait_times)
                     browser.set_page_load_timeout(221) #设置网页加载最多1分钟
                     open_clash_dashboard(browser, wait, url_dashboard)
@@ -50,7 +50,7 @@ while 1:
                     random_select_clash_ip(browser, wait)
                     delete_cookie(browser)
 
-                    #==================正式开始
+                    #================== 正式开始
                     browser.get(alchemy_login_url)
                     time_sleep(5, "等待 alchemy 加载,可能会卡在这里")
                     switch_tab_by_handle(browser, 1, 0)  # 切换到
