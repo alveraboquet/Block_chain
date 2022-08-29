@@ -6,7 +6,6 @@ from functions import *
 from faker import Faker
 fake = Faker()
 
-excel_row = 25
 browser_wait_times = 15
 
 email_account_excel_column = "C" #帐号
@@ -22,7 +21,7 @@ create_app = 1 #是否要创建app
 # 小狐狸地址
 # fox_address = Do_Excel(excel_path,sheetname='Sheet1').read(excel_row, "A")
 
-#如果已经激活,则开始创建项目
+excel_row = 25
 while 1:
     for i in range(excel_row, 120):
         #=======================先查看这个号有没有激活过

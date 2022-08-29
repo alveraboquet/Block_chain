@@ -28,7 +28,7 @@ import linecache #用于读取txt文档
 from faker import Faker
 from random_word import RandomWords
 fake = Faker()
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from lxml import etree
 
 ##===========================脆球邮箱相关
@@ -6442,16 +6442,13 @@ def filebase_return_to_bucket(browser, wait):
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑  Replit 的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   Replit项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
-#找 Replit 的注册激活链接
-def cuiqiu_find_replit_activate_email(email_to_be_activate, from_email):
-    #从脆球官网获取
-    cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
-    cuiqiu_mail_id = '608142'
+
+#找 Replit 的注册激活的邮件 id
+def cuiqiu_find_replit_activate_email_id(email_to_be_activate, email_from, email_subject):
     #循环检索邮箱. email_to_be_activate 表示待激活的邮箱
     not_find_yet = True
     try_times = 0
     while not_find_yet:
-        activate_link = 'not receive active email' #空链接
         #获取邮件列表
         url = "https://domain-open-api.cuiqiu.com/v1/box/list"
         payload={'mail_id': cuiqiu_mail_id,
@@ -6459,70 +6456,67 @@ def cuiqiu_find_replit_activate_email(email_to_be_activate, from_email):
         'start_time': '2022-08-24',
         'end_time': '2023-08-25',
         'page': '1',
-        'limit': '10'}
+        'limit': '100'}
         files=[
 
         ]
         headers = {}
         response = requests.request("POST", url, headers=headers, data=payload, files=files)
-        result = response.text 
+        result = response.text #原始字符串格式
+        result_to_json = json.loads(result) #字符串转json
+        
+        #========这是一个列表集合, 先把列表轮寻一遍, 提取邮件id
+        #如果失败, 则再请求下一个列表
+        email_list = result_to_json['data']['list'] #取值
+        # print("=========所有的邮件在这里: ", email_list)
+        for email in email_list:
+            if email["to"] == email_to_be_activate:
+                if email["from"] == email_from:
+                    if email["subject"]== email_subject:
+                        print("====找到了这封邮件:", email)
+                        result_email_id = email["id"]
+                        print("===========待激活的邮件id是:", result_email_id)
+                        not_find_yet = False #防止死循环
+                        return result_email_id
 
-        #==================================获取邮件id
-        #字符串转json
-        json1 = json.loads(result)
-        # print(json1)
-        # print(type(json1))
-        #转为列表
-        email_list = json1['data']['list']
-        # print("==========邮件列表是: ", email_list)
+        try_times += 1
+        time_sleep(5,f"尝试{try_times}次, 最多100次. 是不是参数 limit 太少了? ")
+        if try_times == 100:
+            print("找邮件重试了10分钟,还是失败")
+            not_find_yet = False #防止死循环
+            result_email_id = False
+            return result_email_id
 
-        result_box_id = 'kong'
-        for i in email_list:
-            # print(i, type(i))
-            if email_to_be_activate in str(i):
-                if from_email in str(i):
-                    # print(i)
-                    print("待激活的邮件id是:", i['id'])
-                    result_box_id = i['id']
-                    time_sleep(2, "已经找到了激活邮件, 需要提取下链接")
-                    not_find_yet = False #防止死循环
-                else:
-                    time_sleep(60, f"没有找到激活邮件, 重试{try_times}次")
-        try_times +=1
-        if try_times == 10:
-            print("重试了10分钟,还是失败")
-            return "not receive active email" 
-    # time_sleep(3600, "测试用")
-    #===================== 获取邮件详情. 提取激活链接
+#找到邮件 id 后, 开始提取链接
+def cuiqiu_extract_replit_link_from_email_id(email_id):
     # # box_id 通过 v1/box/list 获取邮箱列表接口获取
     url = "https://domain-open-api.cuiqiu.com/v1/box/detail"
-
     payload={'mail_id': cuiqiu_mail_id,
     'token': cuiqiu_token,
-    'box_id': result_box_id}
+    'box_id': email_id}
     files=[
 
     ]
     headers = {}
 
     response = requests.request("POST", url, headers=headers, data=payload, files=files)
-
     result = response.text
-    # print("==========邮件详情是: ",result)
+    # print("======request邮件内容初始格式", result)
 
-    urls = re.findall('[a-zA-z]+://[^\s]*', result)
-    # print("==========正则提取到的链接是:",urls)
-   
+    to_json = json.loads(result)
+    print("转化为json后, 如果有html 则可以xml解析, 很关键!!")
 
-    for url in urls:
-        if url.startswith("https://replit.com/data/user/verify"):
-            # https://replit.com/data/user/verify/3f02b3eb653780d237746e34db82f194\\"\\u003eVerify
-            print("==========激活链接是:", url[:-14])
-            not_find_yet = False
-            activate_link = url[:-14] #找到了激活链接
-            return activate_link
-        else:
-            return activate_link
+    html_body = to_json['data']['content']['body']
+    # print("===提取html_body, 输入到etree", html_body)
+
+    html = etree.HTML(html_body)
+    # print("=====解析到的网页是:", type(html), html)
+    
+    activate_link = html.xpath("//a[text()='Verify Now']/@href")
+    print("=====提取到的链接是, 这是一个列表, 需要转为字符串", activate_link, type(activate_link))
+    return str(activate_link[0])
+
+
 
 #注册 Replit 时,填写随机信息
 def signup_replit_random_info(browser, wait, email_account, email_pw):
@@ -6547,6 +6541,27 @@ def signup_replit_random_info(browser, wait, email_account, email_pw):
     time_sleep(2,"准备点击登录")
     browser.execute_script("arguments[0].click();", confirm_login)
     time_sleep(2,"已经点击登录")
+
+    #=========循环查看是不是有resent按钮
+    check_resent_flag = True
+    active_email_flag = False #初始定义不要去邮箱检查激活链接
+    try_times = 0
+    while check_resent_flag:
+        try:
+            try_times +=1  
+            print("=========准备不断去查找on board")
+            onboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//span[text()='Skip']")))
+            check_resent_flag = False #不用再检查resent了
+            active_email_flag = True #需要去激活邮件
+            # browser.quit()#不要关闭浏览器, 直接打开激活链接, 防止有验证码
+            return active_email_flag
+        except:
+            time_sleep(15, "**********暂时还没有找到resent链接, 等等")
+            
+        if try_times == 32: #最多等待8分钟
+            print("没有找到首页按钮,可能是有验证, 记录到excel")
+            check_resent_flag = False #不要再检查resent了
+            browser.quit()
 
 #开始打开浏览器激活
 def cuiqiu_browser_active_replit_link(wait, browser, activate_link, email_account, email_pw):
@@ -6582,7 +6597,7 @@ def cuiqiu_browser_active_replit_link(wait, browser, activate_link, email_accoun
 
     try:
         #如果能找到首页,说明已经进入了
-        time_sleep(15, "尝试查看是不是已经进入首页")
+        time_sleep(15, "===尝试查看能不能找到哦啊首页")
         Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//h2[text()='Get started with Replit!']")))
         dashboard_flag = True
         print("=======已经登录了首页")
@@ -6600,16 +6615,12 @@ def cuiqiu_browser_active_replit_link(wait, browser, activate_link, email_accoun
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   Replit项目的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   polygonscan项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
-#找 Replit 的注册激活链接
-def cuiqiu_find_polygonscan_activate_email(email_to_be_activate, from_email, email_subject, active_email_start_with):
-    #从脆球官网获取
-    cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
-    cuiqiu_mail_id = '608142'
+#找 polysacn 的注册激活的邮件 id
+def cuiqiu_find_polyscan_activate_email_id(email_to_be_activate, email_from, email_subject):
     #循环检索邮箱. email_to_be_activate 表示待激活的邮箱
     not_find_yet = True
-    try_times = 0  #尝试找邮件的次数
+    try_times = 0
     while not_find_yet:
-        activate_link = 'not receive active email' #空链接
         #获取邮件列表
         url = "https://domain-open-api.cuiqiu.com/v1/box/list"
         payload={'mail_id': cuiqiu_mail_id,
@@ -6617,78 +6628,67 @@ def cuiqiu_find_polygonscan_activate_email(email_to_be_activate, from_email, ema
         'start_time': '2022-08-24',
         'end_time': '2023-08-25',
         'page': '1',
-        'limit': '10'}
+        'limit': '100'}
         files=[
 
         ]
         headers = {}
         response = requests.request("POST", url, headers=headers, data=payload, files=files)
-        result = response.text 
-
-        #==================================获取邮件id
-        #字符串转json
-        json1 = json.loads(result)
-        # print(json1)
-        # print(type(json1))
-        #转为列表
-        email_list = json1['data']['list']
-        # print("==========邮件列表是: ", email_list)
-
-        result_box_id = 'kong'
-        for i in email_list:
-            # print(i, type(i))
-            if email_to_be_activate in str(i):
-                if from_email in str(i):
-                    if email_subject in str(i):
-                        # print(i)
-                        print("待激活的邮件id是:", i['id'])
-                        result_box_id = i['id']
-                        time_sleep(2, "已经找到了激活邮件, 需要提取下链接")
+        result = response.text #原始字符串格式
+        result_to_json = json.loads(result) #字符串转json
+        
+        #========这是一个列表集合, 先把列表轮寻一遍, 提取邮件id
+        #如果失败, 则再请求下一个列表
+        email_list = result_to_json['data']['list'] #取值
+        # print("=========所有的邮件在这里: ", email_list)
+        for email in email_list:
+            if email["to"] == email_to_be_activate:
+                if email["from"] == email_from:
+                    if email["subject"]== email_subject:
+                        print("====找到了这封邮件:", email)
+                        result_email_id = email["id"]
+                        print("===========待激活的邮件id是:", result_email_id)
                         not_find_yet = False #防止死循环
-                else:
-                    time_sleep(60, f"=====没有找到激活邮件, 重试{try_times}次")
-        try_times +=1
-        if try_times == 10:
-            print("重试了10分钟,还是失败")
-            return "not receive active email" 
+                        return result_email_id
 
-    # time_sleep(3600, "测试用")
-    #===============获取邮件详情. 提取激活链接
+        try_times += 1
+        time_sleep(5,f"尝试{try_times}次, 最多100次. 是不是参数 limit 太少了? ")
+        if try_times == 100:
+            print("找邮件重试了10分钟,还是失败")
+            not_find_yet = False #防止死循环
+            result_email_id = False
+            return result_email_id
+
+#找到邮件 id 后, 开始提取链接
+def cuiqiu_extract_polyscan_link_from_email_id(email_id):
     # # box_id 通过 v1/box/list 获取邮箱列表接口获取
     url = "https://domain-open-api.cuiqiu.com/v1/box/detail"
-
     payload={'mail_id': cuiqiu_mail_id,
     'token': cuiqiu_token,
-    'box_id': result_box_id}
+    'box_id': email_id}
     files=[
 
     ]
     headers = {}
 
     response = requests.request("POST", url, headers=headers, data=payload, files=files)
-
     result = response.text
-    print("==========邮件详情是: ",result)
+    # print("======request邮件内容初始格式", result)
 
-    urls = re.findall('[a-zA-z]+://[^\s]*', result)
-    print("==========正则提取到的链接是:",urls)
-   
+    to_json = json.loads(result)
+    print("转化为json后, 如果有html 则可以xml解析, 很关键!!")
+    # print("======转为json后", to_json)  #这个决定了能不能用xml解析, 如果有html 则可以解析
 
-    for url in urls:
-        if url.startswith(active_email_start_with):
-            # https://polygonscan.com/confirmemail?email=mpass7289%40gmail.com&code=DYGBCJQHJI7DKHA6JVBG
-            print("==========激活链接是:", url[:-11])
-            not_find_yet = False
-            activate_link = url[:-11] #找到了激活链接
-            if f"\\u0026" in activate_link:
-                print("\u0026确实在")
-                activate_link = activate_link.replace('\\u0026' , '&')
-                print("=========替换后的链接是", activate_link)
-            return activate_link
-        else:
-            return activate_link
+    text_info = to_json['data']['content']['body']  #这是字符串
+    print("===========格式为",type(text_info), text_info)
 
-#注册 Replit 时,填写随机信息
+    #由于返回值没有html, 只能字符串提取
+    activate_link = text_info.split("Link : ")[1].split("***")[0]
+    print("=======切割后的链接是:", activate_link)
+    return activate_link
+
+
+#注册 polysacn 时,填写随机信息
 def signup_polygonscan_random_info(browser, wait, email_account, email_pw, signup_name):
     user_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@id='ContentPlaceHolder1_txtUserName']")))
     time_sleep(2,"准备输入姓名")
@@ -6867,7 +6867,44 @@ def pologanscan_get_API(wait, browser):
 
 
 
-## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   polygonscan项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+
+
+
+#开始打开浏览器激活
+def cuiqiu_browser_active_polyscan_link(browser, wait, activate_link):
+    print("开始激活alchemy发来的邮件")
+    dashboard_flag = False
+    
+    browser.get(activate_link)
+    time_sleep(5, "等待 alchemy 加载")
+    switch_tab_by_handle(browser, 1, 0)  # 切换到
+
+    #=================激活帐号
+    try:
+        Verify_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='Verify']")))
+        time_sleep(2,"准备点击 Verify")
+        browser.execute_script("arguments[0].click();", Verify_button)
+        time_sleep(30,"=====已经点击 Verify")
+    except:
+        print("点击verify失败, 会不会有影响?")
+ 
+    # ==================填写描述
+    try:
+        fill_in_alchemy_project_des(browser, wait)
+    except:
+        print("可能是不需要填写alchemy项目描述, 或哪里出错了")
+
+    try:
+        #如果能找到Alchemy的首页,说明已经进入了
+        time_sleep(20, "尝试查看是不是已经进入 Alchemy 了")
+        Dashboard_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[text()[contains(.,'Dashboard')]]")))
+        dashboard_flag = True
+        print("=======已经登录了 Alchemy")
+        return dashboard_flag
+    except:
+        print("======没有找到dashboard=====")
+    
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 

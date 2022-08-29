@@ -26,15 +26,16 @@ active_email_start_with = "https://polygonscan.com/confirmemail"
 
 #注册url
 polygonscan_signup_URL = "https://polygonscan.com/register"
+#从提取邮件用
+email_from = "noreply@polygonscan.com"
+email_subject = "Please confirm your email [polygonscan.com]"
 
-#从脆球官网获取
-cuiqiu_token = '88434c9de6ef45b0b8f360a190f60abd'
-cuiqiu_mail_id = '608142'
+# #测试邮件接收
+# email_id = cuiqiu_find_polyscan_activate_email_id("lambertslandon40@gmail.com", email_from, email_subject)
+# activate_link = cuiqiu_extract_polyscan_link_from_email_id(email_id)
+# time_sleep(3600, "测试邮件")
 
-email_to_be_activate = "angelfreeman495@gmail.com"
-# cuiqiu_find_polygonscan_activate_email(email_to_be_activate, from_email, email_subject, active_email_start_with)
-
-excel_row = 12   #待注册的邮箱  StevenPatrick
+excel_row = 30   
 while 1:
     for i in range(excel_row, 120):
         #=======================如果没有resent, 说明没有发送激活链接,
@@ -67,8 +68,9 @@ while 1:
                 #================注册成功, 则去提取邮箱
                 if already_in_flag:
                     print("======准备提取激活链接")
-                    activate_link = cuiqiu_find_polygonscan_activate_email(email_account, from_email, email_subject, active_email_start_with)
-                
+                    email_id = cuiqiu_find_polyscan_activate_email_id(email_account, email_from, email_subject)
+                    activate_link = cuiqiu_extract_polyscan_link_from_email_id(email_id)
+                    
                 #================邮件提取成功, 则去激活邮箱
                 if activate_link != "not receive active email":
                     print("===开始激活邮件")
