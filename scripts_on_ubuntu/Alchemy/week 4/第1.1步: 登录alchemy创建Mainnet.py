@@ -32,7 +32,7 @@ while 1:
             success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, https_link_excel_column)
             print(f"excel中, {i} 号 https 数据是:", str(success_or_fail))
             # if True: #测试用
-            # https://eth-goerli.g.alchemy.com/v2/r1nIPHamIGYPFbV41VNm6121dH5XpqDN
+            # https://eth-goerli.g.alchemy.com/v2/r1nIPHamIGYPFbV41VNm6121dH5Xp
             # https://eth-mainnet.g.alchemy.com/v2/cAX5BFcwgjqjuffV31wsIDvzbuaptbEy
             if "https://eth-mainnet.g.alchemy.com/v2" not in str(success_or_fail):
                 try:
