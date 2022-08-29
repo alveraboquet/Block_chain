@@ -14,16 +14,16 @@ read_active_excel_column = "E" #帐号是否激活了
 https_link_excel_column = "F" # https 放在这一列
 api_info_excel_column = "G" #api 放在这里
 
-excel_path = '/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/Alchemy/week 2/week 2.xlsx'
+excel_path = '/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/Alchemy/week 4/week 4.xlsx'
 alchemy_login_url = f"https://auth.alchemyapi.io/?redirectUrl=https%3A%2F%2Fdashboard.alchemyapi.io%2Fsignup%2F"
 create_app = 1 #是否要创建app
 get_https = 1
 # 小狐狸地址
 # fox_address = Do_Excel(excel_path,sheetname='Sheet1').read(excel_row, "A")
 
-excel_row = 10
+excel_row = 3
 while 1:
-    for i in range(excel_row, 120):
+    for i in range(excel_row, 308):
         #=======================先查看这个号有没有激活过
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, read_active_excel_column)
         print(f"excel中, {i} 号是否已激活帐号的数据是:", str(success_or_fail))
@@ -33,7 +33,8 @@ while 1:
             print(f"excel中, {i} 号 https 数据是:", str(success_or_fail))
             # if True: #测试用
             # https://eth-goerli.g.alchemy.com/v2/r1nIPHamIGYPFbV41VNm6121dH5XpqDN
-            if "https://eth-goerli.g.alchemy.com/v2" not in str(success_or_fail):
+            # https://eth-mainnet.g.alchemy.com/v2/cAX5BFcwgjqjuffV31wsIDvzbuaptbEy
+            if "https://eth-mainnet.g.alchemy.com/v2" not in str(success_or_fail):
                 try:
                     print(f"============================ {i} 号需要登录 alchemy 获取 Goerli https =========================")
                     email_to_login =  Do_Excel(excel_path,sheetname='Sheet1').read(i, email_account_excel_column)
@@ -44,6 +45,8 @@ while 1:
                     wait, browser = my_linux_chrome(time_out=browser_wait_times)
                     browser.set_page_load_timeout(221) #设置网页加载最多1分钟
                     open_clash_dashboard(browser, wait, url_dashboard)
+                    # time_sleep(3600,'waiting...')
+
                     random_select_clash_ip(browser, wait)
                     delete_cookie(browser)
 
@@ -83,8 +86,9 @@ while 1:
 
                     # ===================删除demo app, Rinkeby, Goerli是要保留的, 创建app
                     if create_app == 1:
-                        alchemy_delete_app(browser, wait, "Rinkeby Goerli")
-                        app_name = alchemy_create_goerli_app(browser, wait)
+                        alchemy_delete_app(browser, wait, "Rinkeby Goerli Polygon Mumbai Mainnet")
+                        #app name 不能去掉, 因为要点击进入
+                        app_name = alchemy_create_Mainnet_app(browser, wait)
                     
                     if get_https == 1:
                         #==========================   获取https
