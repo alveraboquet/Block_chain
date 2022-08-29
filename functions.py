@@ -94,12 +94,17 @@ def cuiqiu_extract_alchemy_link_from_email_id(email_id):
 
     response = requests.request("POST", url, headers=headers, data=payload, files=files)
     result = response.text
+    # print("====request邮件内容初始格式", result)
+
     to_json = json.loads(result)
+    print("转化为json后, 如果有html 则可以xml解析, 很关键!!")
+    # print("======转为json后", to_json) #这个决定了能不能用xml解析, 如果有html 则可以解析
+
     html_body = to_json['data']['content']['body']
     # print("===提取html_body, 输入到etree", html_body)
 
     html = etree.HTML(html_body)
-    # print("=====解析到的网页是:", type(html), html)
+    # print("=====输入到etree, 解析到的邮件html详情是:", type(html), html)
     
     activate_link = html.xpath("//a[text()='VERIFY EMAIL']/@href")
     print("=====提取到的链接是, 这是一个列表, 需要转为字符串", activate_link, type(activate_link))
@@ -137,6 +142,7 @@ def cuiqiu_browser_active_alchemy_link(browser, wait, activate_link):
         print("=======已经登录了 Alchemy")
         return dashboard_flag
     except:
+        browser.quit()
         print("======没有找到dashboard=====")
     
 
