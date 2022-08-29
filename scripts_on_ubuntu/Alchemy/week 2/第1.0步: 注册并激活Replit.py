@@ -26,9 +26,9 @@ email_subject = "Replit: Verify Your Email"
 # activate_link = cuiqiu_extract_replit_link_from_email_id(email_id)
 # time_sleep(3600, "邮件测试")
 
-excel_row = 33   #待注册的邮箱
+excel_row = 109   #待注册的邮箱
 while 1:
-    for i in range(excel_row, 120):
+    for i in range(excel_row, 308):
         #=======================如果没有resent, 说明没有发送激活链接,
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, write_active_excel_column)
         print("excel中, 是否激活的信息是:", str(success_or_fail))

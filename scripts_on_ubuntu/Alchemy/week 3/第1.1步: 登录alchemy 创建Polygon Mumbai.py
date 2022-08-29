@@ -85,7 +85,7 @@ while 1:
                     
                     #======删除demo app, Rinkeby, Goerli是要保留的
                     #  Polygon Mumbai
-                    alchemy_delete_app(browser, wait, "Rinkeby Goerli Polygon Mumbai")
+                    alchemy_delete_app(browser, wait, "Rinkeby Goerli Polygon Mumbai Mainnet")
 
                     # ===================创建app
                     if create_app == 1:

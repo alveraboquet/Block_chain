@@ -10,9 +10,9 @@ browser_wait_times = 15
 
 email_account_excel_column = "C" #帐号
 email_pw_excel_column = "D"  #密码
-read_active_excel_column = "F" #帐号是否激活了
-https_link_excel_column = "G" # https 放在这一列
-api_info_excel_column = "H" #api 放在这里
+read_active_excel_column = "E" #帐号是否激活了
+https_link_excel_column = "F" # https 放在这一列
+api_info_excel_column = "G" #api 放在这里
 
 excel_path = '/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/Alchemy/week 2/week 2.xlsx'
 alchemy_login_url = f"https://auth.alchemyapi.io/?redirectUrl=https%3A%2F%2Fdashboard.alchemyapi.io%2Fsignup%2F"
@@ -21,7 +21,7 @@ create_app = 1 #是否要创建app
 # 小狐狸地址
 # fox_address = Do_Excel(excel_path,sheetname='Sheet1').read(excel_row, "A")
 
-excel_row = 25
+excel_row = 61
 while 1:
     for i in range(excel_row, 120):
         #=======================先查看这个号有没有激活过

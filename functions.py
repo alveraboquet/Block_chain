@@ -1250,6 +1250,30 @@ def fox_import_private_key(browser, wait, private_key):
     except:
         print("可能导入失败")
 
+#获取小狐狸上的帐号. 因为有时只有密钥, 没有帐号
+def fox_get_account(browser, wait):
+    print("开始获取小狐狸帐号, 因为有时只有密钥")
+    ##=========== 点击账户详情
+    icon_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@title='账户选项']")))
+    time_sleep(1, "先点击三个点")
+    browser.execute_script("arguments[0].click();", icon_button)
+
+    account_detail_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='账户详情']")))
+    time_sleep(1, "再点击账户详情")
+    browser.execute_script("arguments[0].click();", account_detail_button)
+
+    ##=========== 点击提取account
+    account_text_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='qr-code__address-container']/div[1]")))
+    account_text = account_text_button.text
+    print("======找到的账户是:",account_text)
+
+    ##=========== 点击完成
+    close_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='account-modal__close']")))
+    time_sleep(1, "点击关闭")
+    browser.execute_script("arguments[0].click();", close_button)
+    
+    return account_text
+
 #小狐狸本地添加代币
 def fox_add_token(browser, wait, keywords):
     print("进入fox_add_token()，小狐狸添加代币")
@@ -6831,7 +6855,7 @@ def login_polygonscan(wait, browser, email_pw, user_name):
             # browser.quit()#不要关闭浏览器, 直接打开激活链接, 防止有验证码
             return already_home_flag
         except:
-            time_sleep(5, "**********暂时还没有找到主页, 等等")
+            time_sleep(5, f"**********暂时还没有找到主页, 等等{try_times}/50")
         if try_times == 50:
             print("========登录失败!!")
             check_home_flag = False
