@@ -30,7 +30,7 @@ for i in range(215, 249):
     #获取余额
     browser.refresh()
     time_sleep(60)
-    
+
     token_1_balance, token_2_balance = fox_get_rinkeby_balance(browser, wait)
     time_sleep(10)
 
@@ -48,4 +48,4 @@ for i in range(215, 249):
 # get_fox_network_token_balance(browser, wait)
 # def fox_get_token_balance(browser, wait)
 # //div[@class='tabs__content']/div[2]//div[@class='list-item__heading']
-time_sleep(3600, "waiting...")
+# time_sleep(3600, "waiting...")
