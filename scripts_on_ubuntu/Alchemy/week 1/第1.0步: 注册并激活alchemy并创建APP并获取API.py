@@ -29,9 +29,9 @@ email_subject = "Verify your email"
 # activate_link = cuiqiu_extract_alchemy_link_from_email_id(email_id)
 # time_sleep(3600, "测试邮寄那")
 
-excel_row = 222   #待注册的邮箱. 新的一批号,从第20往后开始
+excel_row = 114   #待注册的邮箱. 新的一批号,从第20往后开始
 while 1:
-    for i in range(excel_row, 308):
+    for i in range(excel_row, 309):
         #=======================如果没有resent, 说明没有发送激活链接,
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, write_active_excel_column)
         print("excel中, 是否激活的信息是:", str(success_or_fail))
@@ -82,10 +82,10 @@ while 1:
                     https_info, api_info = get_alchemy_app_info(browser, wait, app_name)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, https_link_excel_column, https_info)
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, api_info_excel_column, api_info)
-                    # a = random.randint(500, 1000)
+                    a = random.randint(100, 200)
                     time_sleep(a, f"++++++++++随机等待时间{a}, 之后关闭浏览器")
                     browser.quit()
-                    a = random.randint(500, 1000)
+                    a = random.randint(100, 200)
                     time_sleep(a, f"++++++++++随机等待时间{a}")
                 
             except:
@@ -95,7 +95,7 @@ while 1:
                     browser.quit()
                 except:
                     print("可能已经推出浏览器了")
-                a = random.randint(800, 1000)
+                a = random.randint(100, 200)
                 time_sleep(a, f"============ 随机等待时间 {a} ==========")    
 
            
