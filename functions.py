@@ -1256,6 +1256,30 @@ def fox_import_private_key(browser, wait, private_key):
     except:
         print("可能导入失败")
 
+#获取小狐狸上的帐号. 因为有时只有密钥, 没有帐号
+def fox_get_account(browser, wait):
+    print("开始获取小狐狸帐号, 因为有时只有密钥")
+    ##=========== 点击账户详情
+    icon_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@title='账户选项']")))
+    time_sleep(1, "先点击三个点")
+    browser.execute_script("arguments[0].click();", icon_button)
+
+    account_detail_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='账户详情']")))
+    time_sleep(1, "再点击账户详情")
+    browser.execute_script("arguments[0].click();", account_detail_button)
+
+    ##=========== 点击提取account
+    account_text_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='qr-code__address-container']/div[1]")))
+    account_text = account_text_button.text
+    print("======找到的账户是:",account_text)
+
+    ##=========== 点击完成
+    close_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='account-modal__close']")))
+    time_sleep(1, "点击关闭")
+    browser.execute_script("arguments[0].click();", close_button)
+    
+    return account_text
+
 #小狐狸本地添加代币
 def fox_add_token(browser, wait, keywords):
     print("进入fox_add_token()，小狐狸添加代币")
@@ -6077,6 +6101,45 @@ def alchemy_create_goerli_app(browser, wait):
     time_sleep(20,"已经点击创建")
     return app_name
 
+#Alchemy创建goerli项目
+def alchemy_create_Mainnet_app(browser, wait):
+    print("开始创建 Mainnet 项目")
+    create_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()[contains(.,'Create')]]")))
+    time_sleep(2,"准备创建")
+    browser.execute_script("arguments[0].click();", create_button)
+
+    name_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='name']")))
+    time_sleep(2,"准备输入name")
+    app_name = fake.last_name()
+    name_button.send_keys(app_name)
+
+    desc_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='description']")))
+    time_sleep(2,"准备输入desc")
+    desc_button.send_keys(fake.first_name())
+
+    # #下拉列表
+    # try:
+    #     down_list_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='select-input-container css-1tyu61v']//div[@class='css-1hkumgc']/span")))
+    #     time_sleep(2,"准备点击下拉")
+    #     # browser.execute_script("arguments[0].click();", down_list_button)
+    #     ActionChains(browser).click(down_list_button).perform()  # 必须用模拟鼠标点
+    # except:
+    #     print("下拉没找到哦啊")
+
+    # # #选择rinkeby
+    # rinkeby_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='css-1hkumgc']/span[text()[contains(.,'Goerli')]]")))
+    # time_sleep(2,"准备选择 goerli ")
+    # browser.execute_script("arguments[0].click();", rinkeby_button)
+    # # ActionChains(browser).click(rinkeby_button).perform()  # 模拟鼠标点
+
+    #确定创建
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@type='submit']")))
+    time_sleep(2,"准备点击创建")
+    browser.execute_script("arguments[0].click();", confirm_login)
+    time_sleep(20,"已经点击创建")
+    return app_name
+
+
 #注册Alchemy时,填写随机信息
 def signup_alchemy_random_info(browser, wait, email_account, email_pw):
     first_name = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Gavin']")))
@@ -6837,7 +6900,7 @@ def login_polygonscan(wait, browser, email_pw, user_name):
             # browser.quit()#不要关闭浏览器, 直接打开激活链接, 防止有验证码
             return already_home_flag
         except:
-            time_sleep(5, "**********暂时还没有找到主页, 等等")
+            time_sleep(5, f"**********暂时还没有找到主页, 等等{try_times}/50")
         if try_times == 50:
             print("========登录失败!!")
             check_home_flag = False
