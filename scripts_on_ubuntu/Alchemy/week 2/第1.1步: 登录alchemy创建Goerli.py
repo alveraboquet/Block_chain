@@ -21,7 +21,15 @@ get_https = 1
 # 小狐狸地址
 # fox_address = Do_Excel(excel_path,sheetname='Sheet1').read(excel_row, "A")
 
+<<<<<<< HEAD
 excel_row = 10
+=======
+<<<<<<< HEAD
+excel_row = 61
+=======
+excel_row = 10
+>>>>>>> 9aefd239b07b029a301c4cd6c28e98732a8daf31
+>>>>>>> 9d66b6175a8b5e43eda2c504f9dd4133fa231c94
 while 1:
     for i in range(excel_row, 120):
         #=======================先查看这个号有没有激活过
@@ -73,7 +81,11 @@ while 1:
                         except:
                             print("========登录失败, 重新登录")                        
                             browser.refresh()
+<<<<<<< HEAD
+                            time_sleep(30, "已经网页刷新, 检查下是否已经登录进去了")
+=======
                             time_sleep(30, "已经网页刷新, 再次尝试登录")
+>>>>>>> 9d66b6175a8b5e43eda2c504f9dd4133fa231c94
                             print(f"第{try_times}次登录alchemy")   
                         if try_times == 3:
                             browser.quit()
@@ -83,7 +95,11 @@ while 1:
 
                     # ===================删除demo app, Rinkeby, Goerli是要保留的, 创建app
                     if create_app == 1:
+<<<<<<< HEAD
+                        alchemy_delete_app(browser, wait, "Rinkeby Goerli")
+=======
                         alchemy_delete_app(browser, wait, "Rinkeby Goerli Polygon Mumbai Mainnet")
+>>>>>>> 9d66b6175a8b5e43eda2c504f9dd4133fa231c94
                         app_name = alchemy_create_goerli_app(browser, wait)
                     
                     if get_https == 1:

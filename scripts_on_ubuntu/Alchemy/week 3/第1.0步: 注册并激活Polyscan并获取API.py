@@ -16,6 +16,7 @@ pw_excel_column = "D"  #密码
 username_to_excel_column = "E" #用户名
 write_active_excel_column = "F" #激活信息
 write_api_excel_column = "G" #激活信息
+polygon_api_excel_column = "H" #激活信息
 excel_path = '/home/parallels/ubuntu_syncswap/Block_chain/scripts_on_ubuntu/Alchemy/week 3/week 3.xlsx'
 
 
@@ -35,14 +36,13 @@ email_subject = "Please confirm your email [polygonscan.com]"
 # activate_link = cuiqiu_extract_polyscan_link_from_email_id(email_id)
 # time_sleep(3600, "测试邮件")
 
-excel_row = 30   
+excel_row = 32
 while 1:
-    for i in range(excel_row, 120):
+    for i in range(excel_row, 295):
         #=======================如果没有resent, 说明没有发送激活链接,
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, write_active_excel_column)
         print("excel中, 是否激活的信息是:", str(success_or_fail))
-
-        if "Y" not in str(success_or_fail):
+        if "Y" not in str(success_or_fail): #只有已经注册且激活的帐号才去做
             #注册alchemy
             try:
                 print(f" ================================ {i} 号需要注册 =================================")
@@ -65,7 +65,7 @@ while 1:
                 #================开始注册, 
                 already_in_flag = signup_polygonscan_random_info(browser, wait, email_account, email_pw, signup_name)
                 
-                #================注册成功, 则去提取邮箱
+                #================若注册成功, 则去提取邮箱
                 if already_in_flag:
                     print("======准备提取激活链接")
                     email_id = cuiqiu_find_polyscan_activate_email_id(email_account, email_from, email_subject)
@@ -81,7 +81,7 @@ while 1:
                 if dashboard_flag: 
                     print("====开始正式登录")
                     already_home_flag = login_polygonscan(wait, browser, email_pw, signup_name)
-                    #记录用户名, Y
+                    #记录, Y
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "Y")
                 
                 if already_home_flag:
@@ -90,10 +90,10 @@ while 1:
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_api_excel_column, API_info)
 
                     #=========终于结束任务, 可以关闭浏览器了
-                    a = random.randint(50, 100)
+                    a = random.randint(5, 10)
                     time_sleep(a, f"-------------终于结束任务, 可以关闭浏览器了!!==随机等待时间{a}")
                     browser.quit()
-                    a = random.randint(50, 100)
+                    a = random.randint(5, 10)
                     time_sleep(a, f"+++++++注册成功, 等待时间{a}")
                                 
             except:
