@@ -6187,7 +6187,7 @@ def signup_alchemy_random_info(browser, wait, email_account, email_pw):
             except:
                 print("===尝试再次点击sign up,失败!!!")
 
-        if try_times == 50:
+        if try_times == 5:
             check_resent_flag = False #不要再检查resent了
             browser.quit()
             time_sleep(5, "等待了5分钟, 没有找到resent按钮,可能是有验证, 记录到excel")
@@ -6508,6 +6508,7 @@ def filebase_return_to_bucket(browser, wait):
 
 #找 Replit 的注册激活的邮件 id
 def cuiqiu_find_replit_activate_email_id(email_to_be_activate, email_from, email_subject):
+    print("开始循环检索邮件..........")
     #循环检索邮箱. email_to_be_activate 表示待激活的邮箱
     not_find_yet = True
     try_times = 0
@@ -6516,7 +6517,7 @@ def cuiqiu_find_replit_activate_email_id(email_to_be_activate, email_from, email
         url = "https://domain-open-api.cuiqiu.com/v1/box/list"
         payload={'mail_id': cuiqiu_mail_id,
         'token': cuiqiu_token,
-        'start_time': '2022-08-24',
+        'start_time': '2022-08-29',
         'end_time': '2023-08-25',
         'page': '1',
         'limit': '100'}
@@ -6524,6 +6525,7 @@ def cuiqiu_find_replit_activate_email_id(email_to_be_activate, email_from, email
 
         ]
         headers = {}
+        time_sleep(5)
         response = requests.request("POST", url, headers=headers, data=payload, files=files)
         result = response.text #原始字符串格式
         result_to_json = json.loads(result) #字符串转json
@@ -6531,21 +6533,22 @@ def cuiqiu_find_replit_activate_email_id(email_to_be_activate, email_from, email
         #========这是一个列表集合, 先把列表轮寻一遍, 提取邮件id
         #如果失败, 则再请求下一个列表
         email_list = result_to_json['data']['list'] #取值
-        # print("=========所有的邮件在这里: ", email_list)
+        print("=========所有的邮件在这里: ", email_list)
         for email in email_list:
             if email["to"] == email_to_be_activate:
+                print("找到了待激活邮件, 但还需要确定发件人")
                 if email["from"] == email_from:
+                    print("====确定了发件人, 但还需要确定主题")
                     if email["subject"]== email_subject:
-                        print("====找到了这封邮件:", email)
+                        print("====确定了主题, 就是这封邮件了, 找到了这封邮件:", email)
                         result_email_id = email["id"]
                         print("===========待激活的邮件id是:", result_email_id)
                         not_find_yet = False #防止死循环
                         return result_email_id
-
         try_times += 1
-        time_sleep(5,f"尝试{try_times}次, 最多100次. 是不是参数 limit 太少了? ")
-        if try_times == 100:
-            print("找邮件重试了10分钟,还是失败")
+        time_sleep(8, f"尝试第 {try_times} 次, 最多60次. 是不是参数 limit 太少了? ")
+        if try_times == 60:
+            print("找邮件重试了8分钟,还是失败")
             not_find_yet = False #防止死循环
             result_email_id = False
             return result_email_id
@@ -6619,9 +6622,9 @@ def signup_replit_random_info(browser, wait, email_account, email_pw):
             # browser.quit()#不要关闭浏览器, 直接打开激活链接, 防止有验证码
             return active_email_flag
         except:
-            time_sleep(15, "**********暂时还没有找到resent链接, 等等")
+            time_sleep(5, f"***尝试第{try_times}次, 暂时还没有找到resent链接, 再次查找, 最多30次")
             
-        if try_times == 32: #最多等待8分钟
+        if try_times == 20: #最多等待8分钟
             print("没有找到首页按钮,可能是有验证, 记录到excel")
             check_resent_flag = False #不要再检查resent了
             browser.quit()
