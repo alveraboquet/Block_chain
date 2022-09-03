@@ -8,21 +8,20 @@ from functions import *
 from faker import Faker
 fake = Faker()
 
-excel_start_row = 30 #从excel第几行开始
+
 browser_wait_times = 15
-write_jsonCID_to_excel_column = 'I' # json CID 结果记录到哪一列
+write_jsonCID_to_excel_column = 'A' # json CID 结果记录到哪一列
 
 json_path = "/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/metadata.json"
-excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/alchemy可用邮箱手动整理版.xlsx'
-
+excel_path = '/home/parallels/ubuntu_zk/Block_chain/scripts_on_ubuntu/Alchemy/week 1/备用json CID.xlsx'
 
 filebaseURL = 'https://console.filebase.com/buckets'
 filebase_email = '1570561804@qq.com'
 filebase_pw = '6PaozA!zJj^v'
 
-
+excel_start_row = 8 #从excel第几行开始
 while 1:
-    for i in range(excel_start_row,201):
+    for i in range(excel_start_row, 72):
         #=======================如果没有ipfs_json 的话, 开始任务吧
         success_or_fail = Do_Excel(excel_path,sheetname='Sheet1').read(i, write_jsonCID_to_excel_column)
         print("====json CID 数据是:", str(success_or_fail))
@@ -32,7 +31,8 @@ while 1:
                 print(f" {i} 号没有ipfs, 需要做创建ipfs")
                 ##=========== 准备浏览器
                 wait, browser = my_linux_chrome(time_out=browser_wait_times)
-                browser.set_page_load_timeout(121) #设置网页加载最多1分钟
+                browser.refresh()  #不然显示不出网页
+                # browser.set_page_load_timeout(121) #设置网页加载最多1分钟
                 browser.get(filebaseURL)
                 switch_tab_by_handle(browser, 0, 0)  # 切换到filebase
 
