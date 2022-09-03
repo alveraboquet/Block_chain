@@ -29,51 +29,9 @@ login_metamask(browser, wait, metamask_pw, metamask_home)
 while True:
     for i in range(excel_start_row, 52):
         print(f"第{i}个号需要做任务")
-
+        
         fox_change_account(browser, wait, i)
-
-        ##=========== 点击账户详情
-        icon_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@title='账户选项']")))
-        time_sleep(1, "先点击三个点")
-        browser.execute_script("arguments[0].click();", icon_button)
-
-        account_detail_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='账户详情']")))
-        time_sleep(1, "再点击账户详情")
-        browser.execute_script("arguments[0].click();", account_detail_button)
-
-        ##=========== 点击提取account
-        account_text_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='qr-code__address-container']/div[1]")))
-        account_text = account_text_button.text
-        print(account_text)
-        Do_Excel(excel_path, sheetname='Sheet1').plain_write(i+22, write_account_to_excel_column, account_text)
-        ##=========== 点击导出私钥匙
-        key_detail_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()='导出私钥']")))
-        time_sleep(1, "点击导出私钥匙")
-        browser.execute_script("arguments[0].click();", key_detail_button)
-        
-
-        #输入密码
-        send_detail_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@type='password']")))
-        time_sleep(1, "输入密码")
-        send_detail_button.send_keys("12345678")
-
-        confirm_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()='确认']")))
-        time_sleep(1, "点击导出私钥匙")
-        browser.execute_script("arguments[0].click();", confirm_button)
-        try:
-            #获取text
-            key_text_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='export-private-key-modal__private-key-display']")))
-            key_text = key_text_button.text
-            print(key_text)
-        except:
-            time_sleep(36, "出错")
-        Do_Excel(excel_path, sheetname='Sheet1').plain_write(i+22, write_key_to_excel_column, key_text)
-
-        ##=========== 点击完成
-        key_detail_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()='完成']")))
-        time_sleep(1, "点击完成")
-        browser.execute_script("arguments[0].click();", key_detail_button)
-        
+        fox_account_key_detail(browser, wait)
 
         aa = random.randint(2, 3)
         time_sleep(aa, f"++++++++++随机等待时间{aa}")
