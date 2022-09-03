@@ -36,7 +36,7 @@ email_subject = "Please confirm your email [polygonscan.com]"
 # activate_link = cuiqiu_extract_polyscan_link_from_email_id(email_id)
 # time_sleep(3600, "测试邮件")
 
-excel_row = 32
+excel_row = 267
 while 1:
     for i in range(excel_row, 295):
         #=======================如果没有resent, 说明没有发送激活链接,
@@ -90,10 +90,10 @@ while 1:
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_api_excel_column, API_info)
 
                     #=========终于结束任务, 可以关闭浏览器了
-                    a = random.randint(5, 10)
+                    a = random.randint(200, 400)
                     time_sleep(a, f"-------------终于结束任务, 可以关闭浏览器了!!==随机等待时间{a}")
                     browser.quit()
-                    a = random.randint(5, 10)
+                    a = random.randint(200, 400)
                     time_sleep(a, f"+++++++注册成功, 等待时间{a}")
                                 
             except:
@@ -103,5 +103,5 @@ while 1:
                     browser.quit()
                 except:
                     print("可能已经推出浏览器了")
-                a = random.randint(10, 15)
+                a = random.randint(100, 150)
                 time_sleep(a, f"@ @ @ @ @ 随机等待时间 {a} @ @ @ @")    
