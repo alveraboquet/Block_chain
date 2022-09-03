@@ -6124,7 +6124,7 @@ def signup_alchemy_random_info(browser, wait, email_account, email_pw):
             except:
                 print("===尝试再次点击sign up,失败!!!")
 
-        if try_times == 50:
+        if try_times == 5:
             check_resent_flag = False #不要再检查resent了
             browser.quit()
             time_sleep(5, "等待了5分钟, 没有找到resent按钮,可能是有验证, 记录到excel")
