@@ -26,7 +26,7 @@ email_subject = "Replit: Verify Your Email"
 # activate_link = cuiqiu_extract_replit_link_from_email_id(email_id)
 # time_sleep(3600, "邮件测试")
 
-excel_row = 109   #待注册的邮箱
+excel_row = 181   #待注册的邮箱
 while 1:
     for i in range(excel_row, 308):
         #=======================如果没有resent, 说明没有发送激活链接,
@@ -43,7 +43,7 @@ while 1:
 
                 ##=========== 准备浏览器
                 wait, browser = my_linux_chrome(time_out=browser_wait_times)
-                browser.set_page_load_timeout(221) #设置网页加载最多1分钟
+                browser.set_page_load_timeout(121) #设置网页加载最多1分钟
                 open_clash_dashboard(browser, wait, url_dashboard)
                 random_select_clash_ip(browser, wait)
                 delete_cookie(browser)
@@ -68,9 +68,9 @@ while 1:
                 #============如果已经点击了 dashboard_flag 为真, 记录Y
                 if dashboard_flag: 
                     Do_Excel(excel_path, sheetname='Sheet1').plain_write(i, write_active_excel_column, "Y")
-                    a = random.randint(100, 300)
+                    a = random.randint(600, 1000)
                     time_sleep(a, f"-------------注册成功!!==随机等待时间{a}")
-                    a = random.randint(100, 300)
+                    a = random.randint(300, 600)
                     time_sleep(a, f"+++++++注册成功, 等待时间{a}")
                     browser.quit()
 
@@ -82,10 +82,4 @@ while 1:
                 except:
                     print("可能已经推出浏览器了")
                 a = random.randint(10, 15)
-                time_sleep(a, f"@ @ @ @ @ 随机等待时间 {a} @ @ @ @")    
-
-           
-                
-
-                
-
+                time_sleep(a, f"@ @ @ @ @ 随机等待时间 {a} @ @ @ @")
