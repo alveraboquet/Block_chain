@@ -26,7 +26,7 @@ email_subject = "Replit: Verify Your Email"
 # activate_link = cuiqiu_extract_replit_link_from_email_id(email_id)
 # time_sleep(3600, "邮件测试")
 
-excel_row = 181   #待注册的邮箱
+excel_row = 191   #待注册的邮箱
 while 1:
     for i in range(excel_row, 308):
         #=======================如果没有resent, 说明没有发送激活链接,
