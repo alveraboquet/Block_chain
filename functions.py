@@ -6973,7 +6973,96 @@ def cuiqiu_browser_active_polyscan_link(browser, wait, activate_link):
 
 
 
-## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   consensys 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+# 找 consensys 的注册激活的邮件 id
+def cuiqiu_find_consensys_activate_email_id(email_to_be_activate, email_from, email_subject):
+    print("===================进入脆球循环检索邮箱")
+    #循环检索邮箱. email_to_be_activate 表示待激活的邮箱
+    not_find_yet = True
+    try_times = 0
+    while not_find_yet:
+        #获取邮件列表
+        url = "https://domain-open-api.cuiqiu.com/v1/box/list"
+        payload={'mail_id': cuiqiu_mail_id,
+        'token': cuiqiu_token,
+        'start_time': '2022-08-24',
+        'end_time': '2023-08-25',
+        'page': '1',
+        'limit': '100'}
+        files=[
+
+        ]
+        headers = {}
+        response = requests.request("POST", url, headers=headers, data=payload, files=files)
+        result = response.text #原始字符串格式
+        result_to_json = json.loads(result) #字符串转json
+        
+        #========这是一个列表集合, 先把列表轮寻一遍, 提取邮件id
+        #如果失败, 则再请求下一个列表
+        email_list = result_to_json['data']['list'] #取值
+        # print("=========所有的邮件在这里: ", email_list)
+        for email in email_list:
+            if email_to_be_activate[2:] in email["to"] :  #因为会出现收件邮件箱是小写的情况
+                if email["from"] == email_from:
+                    if email_subject in email["subject"]:
+                        result_email_id = email["id"]
+                        print("===========待激活的邮件id是:", result_email_id)
+                        not_find_yet = False #防止死循环
+                        return result_email_id
+
+        try_times += 1
+        time_sleep(5,f"尝试{try_times}次, 最多100次. 是不是参数 limit 太少了? ")
+        if try_times == 100:
+            print("找邮件重试了10分钟,还是失败")
+            not_find_yet = False #防止死循环
+            result_email_id = False
+            return result_email_id
+
+
+# 注册 consensys 时,填写随机信息
+def signup_consensys_random_info(browser, wait, email_account):
+    Be_the_first_one_to_know = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-w-id='8627caad-7642-f48f-59af-a7ecafbd5e46']/div")))
+    time_sleep(2,"点击注册")
+    browser.execute_script("arguments[0].click();", Be_the_first_one_to_know)
+    time.sleep(2)
+
+    email_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@id='email-507a628b-f7db-4631-add1-4f947492eb2d']")))
+    time_sleep(2,"准备输入邮箱")
+    email_button.send_keys(email_account)
+
+    confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@type='submit']")))
+    time_sleep(2,"准备点击登录")
+    browser.execute_script("arguments[0].click();", confirm_login)
+    time_sleep(15,"等待查看邮件是否发出成功按钮")
+
+    #=========循环查看注册邮件是否发送成功
+    check_resent_flag = True
+    active_email_flag = False #初始定义不要去邮箱检查激活链接
+    try_times = 0
+    while check_resent_flag:
+        try:
+            try_times +=1  
+            email_sent_successful_button = wait.until(EC.element_to_be_clickable((By.XPATH,"//p[text()[contains(., 'Thank You')]]")))
+            print("注册邮件发送成功, 待激活")
+            check_resent_flag = False #不用再检查resent了
+            active_email_flag = True #需要去激活邮件
+            return active_email_flag
+            
+        except:
+            time_sleep(6, "**********暂时还没有找到resent链接, 尝试再次点击sign up")
+            try:#尝试再次点击login
+                confirm_login = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@type='submit']")))
+                time_sleep(2,"准备点击登录")
+                browser.execute_script("arguments[0].click();", confirm_login)
+                print("===========已经再次点击sign up")
+            except:
+                print("===尝试再次点击sign up,失败!!!")
+
+        if try_times == 5:
+            check_resent_flag = False #不要再检查resent了
+            browser.quit()
+            time_sleep(5, "等待了5分钟, 没有找到resent按钮,可能是有验证, 记录到excel")
+
 
 ## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
