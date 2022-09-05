@@ -7226,9 +7226,146 @@ def signup_consensys_random_info(browser, wait, email_account):
 
 
 
-## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   Zeta 项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
+#是否链接钱包
+def zeta_connect_wallet(browser, wait):
+    #先等全部元素加载出来，
+    print("我已进入zeta_connect_wallet，clipper准备连接小狐狸钱包")
+    connect_fox = False
+    try:
+        zeta_connect_wallet = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__next']/div[1]/div/header/div[2]/div/button[1]/span[1]")))
+        connect_fox = True
+    except:
+        print("不需要链接钱包, 直接做任务")
+    
+    if connect_fox:
+        connect_wallet = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='inner-content']//button[text()='Connect Wallet']")))
+        time_sleep(2, "准备点击链接钱包")
+        browser.execute_script("arguments[0].click();", connect_wallet)
+        
+        fox_wallet = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[text()='MetaMask']")))
+        time_sleep(2, "准备点击小狐狸")
+        browser.execute_script("arguments[0].click();", fox_wallet)
 
-## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
+
+        
+        time_sleep(5)
+        
+
+    try:#选择 OP 网络
+        time_sleep(2, "准备找 OP 网络")
+        OP_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[@class='MuiTypography-root MuiFormControlLabel-label MuiTypography-body1' and text() = 'Optimism Mainnet']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", OP_button)
+    except:
+        print("clipper_connect_wallet()中，选择 OP 网络失败了，是否影响？")
+
+    try:#选择小狐狸
+        time_sleep(2, "准备找小狐狸")
+        metamask_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='connect-METAMASK']/span[2]")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", metamask_button)
+    except:
+        print("clipper_connect_wallet()中，点击connect wallet后，再选择小狐狸失败了，是否影响？")
+
+
+def zeta_get_test_coin(browser, wait):
+    #先等全部元素加载出来，
+    print("我已进入 zeta_get_test_coin ，准备领取测试币")
+    faucet_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[text()='Get ZETA']")))
+    time_sleep(2, "准备点击水龙头")
+    browser.execute_script("arguments[0].click();", faucet_button)
+    
+    fox_wallet = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[text()='MetaMask']")))
+    time_sleep(2, "准备点击小狐狸")
+    browser.execute_script("arguments[0].click();", fox_wallet)
+
+
+def zeta_do_swap(browser, wait, from_network):
+    #先等全部元素加载出来，
+    print("我已进入 zeta_do_swap ，准备swap")
+    swap_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[text()='Swap']")))
+    time_sleep(2, "准备点击swap按钮")
+    browser.execute_script("arguments[0].click();", swap_button)
+    
+    #选择from, to
+    # ============= 一、先选择 from，链和token
+    # 点击源下拉框
+    choose_net = wait.until(EC.element_to_be_clickable((By.XPATH, "//p[text()='Goerli']")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", choose_net)
+    time_sleep(2, " 我已经点击 net 下拉框")
+
+    try:
+        # 选择何种源网络, 记得把网络先添加上
+        choose_from_token = wait.until(EC.element_to_be_clickable((By.XPATH,
+                                                                   f"//div[@class='ChangeTokenActionSheet__TokenSymbolLabel-sc-1pl3sgj-12 kiChfM' and text()='{from_token}']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", choose_from_token)
+        time_sleep(2, f"我已经选择from {from_token}")
+    except:
+        print(f"可能是之前选择了{from_token}")
+
+
+    # 点击 token 下拉框
+    choose_token = wait.until(EC.element_to_be_clickable((By.XPATH, "//p[text()='Select Token']")))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", choose_token)
+    time_sleep(2, " 我已经点击 token 下拉框")
+
+    try:
+        # 选择何种币
+        choose_from_token = wait.until(EC.element_to_be_clickable((By.XPATH,
+                                                                   f"//div[@class='ChangeTokenActionSheet__TokenSymbolLabel-sc-1pl3sgj-12 kiChfM' and text()='{from_token}']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", choose_from_token)
+        time_sleep(2, f"我已经选择from {from_token}")
+    except:
+        print(f"可能是之前选择了{from_token}")
+    #=============== 有可能出现 I understand
+    try:
+        I_understand_button = wait.until(EC.element_to_be_clickable(
+            (By.XPATH,
+             "//button[text()='I understand']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", I_understand_button)
+        print("get_OP_ETH_by_matcha_and_prepare_from_to_token, 已经点击 I understand")
+    except:
+        print("I understand 点击失败，可能没出现")
+
+    # ================= 二、再选择 to，兑换成什么货币
+    # 点击下拉框
+    receive_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="trading-page-container"]/div[2]/div/div/aside/div[1]/div/div/div[6]/div[3]/div[1]/button')))
+    time_sleep(2)
+    browser.execute_script("arguments[0].click();", receive_button)
+    time_sleep(2, " 我已经点击You receive下拉框")
+
+    # 选择何种币
+    try:
+        choose_to_token = wait.until(EC.element_to_be_clickable((By.XPATH, f"//div[@class='ChangeTokenActionSheet__TokenSymbolLabel-sc-1pl3sgj-12 kiChfM' and text()='{to_token}']")))
+        time_sleep(2)
+        browser.execute_script("arguments[0].click();", choose_to_token)
+        time_sleep(2, f"我已经选择to {to_token}")
+    except:
+        print(f"可能是之前选择了{to_token}")
+
+    #==============获取余额
+    try:
+        balance_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="trading-page-container"]/div[2]/div/div/aside/div[1]/div/div/div[3]/button')))
+        print("matcha找到的按钮是", balance_button.text) #返回的是 " MAX 0.0332 ETH"
+        a = balance_button.text
+        b = a.split()
+        c = b[1]
+        print("分割后，最终找到的ETH金额是:", c)
+        return float(c)
+    except:
+        print("get_OP_ETH_by_matcha_and_prepare_from_to_token，没有找到 OP 上ETH 的金额")
+    
+        
+
+
+
+## ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑   Zeta 的一些函数 ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ #
 
 
 ## ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   项目的一些函数 ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ #
